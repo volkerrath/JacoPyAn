@@ -41,7 +41,7 @@ import pyvista as pv
 import PVGeo as pvg
 
 
-mypath = ["/home/vrath/Py4MT/py4mt/modules/", "/home/vrath/Py4MT/py4mt/scripts/"]
+mypath = ["/home/vrath/Py4MT/JacoPyAn/modules/", "/home/vrath/Py4MT/JacoPyAn/scripts/"]
 for pth in mypath:
     if pth not in sys.path:
         sys.path.append(pth)

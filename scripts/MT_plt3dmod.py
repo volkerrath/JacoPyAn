@@ -31,8 +31,8 @@ import pylab as pl
 from time import sleep
 
 
-PY4MT_ROOT = os.environ["PY4MT_ROOT"]
-mypath = [PY4MT_ROOT+"/py4mt/modules/", PY4MT_ROOT+"/py4mt/scripts/"]
+JACOPYAN_ROOT = os.environ["JACOPYAN_ROOT"]
+mypath = [JACOPYAN_ROOT+"/JacoPyAn/modules/", JACOPYAN_ROOT+"/JacoPyAn/scripts/"]
 for pth in mypath:
     if pth not in sys.path:
         sys.path.insert(0,pth)
@@ -56,10 +56,10 @@ rhoair = 1.e17
 
 total = 0
 
-PFile = r"/home/vrath/Py4MT/py4mt/data/ANN21_Jacobian/Ann21_T"
-DFile = r"/home/vrath/Py4MT/py4mt/data/ANN21_Jacobian/Ann21_T3.dat"
-MFile = r"/home/vrath/Py4MT/py4mt/data/ANN21_Jacobian/Ann21_Prior100_T_NLCG_033.rho"
-SFile = r"/home/vrath/Py4MT/py4mt/data/ANN21_Jacobian/Ann21_Prior100_T-Z3.sns"
+PFile = r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/Ann21_T"
+DFile = r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/Ann21_T3.dat"
+MFile = r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/Ann21_Prior100_T_NLCG_033.rho"
+SFile = r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/Ann21_Prior100_T-Z3.sns"
 
 
 start = time.time()

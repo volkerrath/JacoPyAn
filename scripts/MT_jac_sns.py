@@ -38,7 +38,7 @@ import scipy.sparse as scs
 import netCDF4 as nc
 
 
-mypath = ["/home/vrath/Py4MT/py4mt/modules/", "/home/vrath/Py4MT/py4mt/scripts/"]
+mypath = ["/home/vrath/Py4MT/JacoPyAn/modules/", "/home/vrath/Py4MT/JacoPyAn/scripts/"]
 for pth in mypath:
     if pth not in sys.path:
         sys.path.insert(0,pth)
@@ -54,7 +54,7 @@ titstrng = utl.print_title(version=version, fname=__file__, out=False)
 print(titstrng+"\n\n")
 
 
-PY4MT_DATA = os.environ["PY4MT_DATA"]
+JACOPYAN_DATA = os.environ["JACOPYAN_DATA"]
 
 
 gc.enable()
@@ -84,26 +84,26 @@ outform = outform.upper()
 
 
 # # Ubaye case
-# WorkDir = PY4MT_DATA+"/NewJacobians/Ubaye/work/"
+# WorkDir = JACOPYAN_DATA+"/NewJacobians/Ubaye/work/"
 # WorkName = "Ub22Jac"
 # MFile   = WorkDir +"Ub22.rho"
 # MPad=[13, 13 , 13, 13, 0, 36]
 
 # # Annecy case
-# WorkDir = PY4MT_DATA+"/NewJacobians/Annecy/work/"
+# WorkDir = JACOPYAN_DATA+"/NewJacobians/Annecy/work/"
 # WorkName = "Ann25Jac"
 # MFile   = WorkDir +"Ann25.rho"
 # MPad=[22, 22 , 22, 22, 0, 15]
 
 # # Maurienne case
-# WorkDir = PY4MT_DATA+"/NewJacobians/Maurienne/E10/"
+# WorkDir = JACOPYAN_DATA+"/NewJacobians/Maurienne/E10/"
 # WorkName = "MauJac"
 # MFile   = WorkDir +"Maur15_500_PTZ_E10_NLCG_016.rho"
 # # MFile   = WorkDir +"Maur15_500_PTZ_E03_NLCG_026.rho"
 # MPad=[14, 14 , 14, 14, 0, 15]
 
 # UBINAS
-WorkDir = PY4MT_DATA+"/Peru/Ubinas/UbiJac/"
+WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/"
 WorkName = "UBI_best"
 MFile   = WorkDir + "UBI_best.rho"
 MPad=[14, 14 , 14, 14, 0, 71]

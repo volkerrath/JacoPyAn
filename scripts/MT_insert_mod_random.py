@@ -34,8 +34,8 @@ from datetime import datetime
 import numpy as np
 import netCDF4 as nc
 
-PY4MT_ROOT = os.environ["PY4MT_ROOT"]
-mypath = [PY4MT_ROOT+"/py4mt/modules/", PY4MT_ROOT+"/py4mt/scripts/"]
+JACOPYAN_ROOT = os.environ["JACOPYAN_ROOT"]
+mypath = [JACOPYAN_ROOT+"/JacoPyAn/modules/", JACOPYAN_ROOT+"/JacoPyAn/scripts/"]
 for pth in mypath:
     if pth not in sys.path:
         sys.path.insert(0,pth)
@@ -61,13 +61,13 @@ version, _ = versionstrg()
 titstrng = utl.print_title(version=version, fname=__file__, out=False)
 print(titstrng+"\n\n")
 
-PY4MT_DATA = os.environ["PY4MT_DATA"]
+JACOPYAN_DATA = os.environ["JACOPYAN_DATA"]
 
 
 rhoair = 1.e+17
 
 total = 0
-InModDir = r"/home/vrath/Py4MT/py4mt/data/ANN21_Jacobian/"
+InModDir = r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/"
 OutModDir = InModDir
 ModFil = r"Ann21_Prior100_T_NLCG_033"
 ModFile_out = r"/home/vrath/work/MT/Annecy/ImageProc/Out/ANN20_02_PT_NLCG_016_nse"

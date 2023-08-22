@@ -44,8 +44,8 @@ import pyvista as pv
 import PVGeo as pvg
 
 
-PY4MT_ROOT = os.environ["PY4MT_ROOT"]
-mypath = [PY4MT_ROOT+"/py4mt/modules/", PY4MT_ROOT+"/py4mt/scripts/"]
+JACOPYAN_ROOT = os.environ["JACOPYAN_ROOT"]
+mypath = [JACOPYAN_ROOT+"/JacoPyAn/modules/", JACOPYAN_ROOT+"/JacoPyAn/scripts/"]
 for pth in mypath:
     if pth not in sys.path:
         sys.path.insert(0,pth)
@@ -85,9 +85,9 @@ WorkDir = r"/media/vrath/BlackOne/MT_Data/Krafla/Krafla1/"
 MFile   = WorkDir +r"Krafla.rho"
 MPad=[15, 15 , 15, 15, 0, 36]
 
-JFile = WorkDir +r"/home/vrath/Py4MT/py4mt/data/ANN21_Jacobian/Ann21_Prior100_T-T3.jac"
-MFile = r"/home/vrath/Py4MT/py4mt/data/ANN21_Jacobian/Ann21_Prior100_T_NLCG_033.rho"
-SFile = r"/home/vrath/Py4MT/py4mt/data/ANN21_Jacobian/Ann21_Prior100_T-Z3.sns"
+JFile = WorkDir +r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/Ann21_Prior100_T-T3.jac"
+MFile = r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/Ann21_Prior100_T_NLCG_033.rho"
+SFile = r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/Ann21_Prior100_T-Z3.sns"
 
 JThresh  = 1.e-4
 NSingulr = 300

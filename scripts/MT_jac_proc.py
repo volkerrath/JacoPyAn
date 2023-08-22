@@ -39,7 +39,7 @@ import scipy.sparse as scp
 import netCDF4 as nc
 
 
-mypath = ["/home/vrath/Py4MT/py4mt/modules/", "/home/vrath/Py4MT/py4mt/scripts/"]
+mypath = ["/home/vrath/Py4MT/JacoPyAn/modules/", "/home/vrath/Py4MT/JacoPyAn/scripts/"]
 for pth in mypath:
     if pth not in sys.path:
         sys.path.insert(0,pth)
@@ -68,7 +68,7 @@ sparse_thresh = 1.e-8
 outform = "LINEAR"
 outform = outform.upper()
 
-WorkDir = PY4MT_DATA+"/Peru/Ubinas/UbiJac/"
+WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/"
 WorkName = "UBI_best"
 MFile   = WorkDir + "UBI_best.rho"
 MPad=[14, 14 , 14, 14, 0, 71]
