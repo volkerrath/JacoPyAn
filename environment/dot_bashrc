@@ -108,20 +108,8 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
-
-alias zipl='zip --symlinks'
-alias tifon='ssh -X volker@tifon.fis.ucm.es'
-alias aria='ssh -X vrath@ariadne.dias.ie'
-alias dahu='ssh -Y dahu.ciment'
-
-alias scan_it='sudo ufw disable; scangearmp2; sudo ufw enable'
-
 alias conda_init='. /home/vrath/bin/conda_init'
 alias condi='. /home/vrath/bin/conda_init'
-# alias MT='. /home/vrath/bin/conda_init; /home/vrath/bin/conda_update; conda activate Py4MT; cd Py4MT;  spyder --new-instance &'
-# alias AEM='. /home/vrath/bin/conda_init; /home/vrath/bin/conda_update; conda activate AEMpyX; cd AEMpyX; spyder --new-instance &'
-alias MT='. /home/vrath/bin/conda_init; mamba update --all; conda activate Py4MT; mamba update --all --yes; cd ~/Py4MT;  spyder --new-instance &'
-alias AEM='. /home/vrath/bin/conda_init; mamba update --all; conda activate AEMpyX; cd ~/AEMpyX; mamba update --all --yes; spyder --new-instance &'
 alias JAC='. /home/vrath/bin/conda_init; mamba update --all; conda activate JacoPyAn; mamba update --all --yes; cd ~/JacoPyAn;  spyder --new-instance &'
 
 
@@ -129,9 +117,6 @@ alias la='ls -lah'
 alias md='mkdir'
 alias gnome-control-center='env XDG_CURRENT_DESKTOP=GNOME gnome-control-center'
 
-alias modclean='rm OAR*; rm Nod*'
-alias tor='/usr/local/tor-browser/Browser/start-tor-browser'
-alias jabref='/opt/jabref/bin/JabRef'
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
