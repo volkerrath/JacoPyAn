@@ -43,6 +43,40 @@ def idctn(x, norm="ortho"):
     return x
 
 
+def wait1d(periods=np.array([]),
+           thick=np.array([]), cond=np.array([]), out=False)
+
+    """
+    Calculate magnetotelluric impedance Z , apparent resitivity rhoa, and phase phi for a given layer model.
+    
+    """
+
+    scale = 1 / (4 * np.pi / 10000000)
+    mu = 4 * np.pi * 1e-7 * scale
+    omega = 2 * np.pi / periods
+
+    Z = np.zeros(len(periods), dtype=complex)
+    rhoa = np.zeros(len(periods))
+    phi = np.zeros(len(periods))
+    
+    for nfreq, w in enumerate(omega):
+        prop_const = np.sqrt(1j*mu*cond[-1] * w)
+        C = np.zeros(len(r), dtype=complex)
+        C[-1] = 1./prop_const
+        if len(thick) > 1:
+            for k in reversed(range(len(r) - 1)):
+                prop_layer = np.sqrt(1j*w*mu*cond[k])
+                k1 = (C[k+1] * prop_layer + np.tanh(prop_layer * thick[k]))
+                k2 = ((C[k+1] * prop_layer * np.tanh(prop_layer * thick[k])) + 1)
+                C[k] = (1./ prop_layer) * (k1 / k2)
+
+        Z[nfreq] = 1j * w * mu * C[0]
+    
+    rhoa = 1./omega*np.abs(Z)**2;
+    phi = np.angle(Z, deg=True)
+
+    return Z, rhoa, phi
+
 def parse_ast(filename):
     with open(filename, "rt") as file:
 
@@ -714,4 +748,3 @@ def print_title(version="", fname="", form="%m/%d/%Y, %H:%M:%S", out=True):
         print(title)
 
     return title
-

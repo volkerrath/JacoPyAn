@@ -114,7 +114,8 @@ def calc_sensitivity(Jac=np.array([]),
 
 
 def transform_sensitivity(S=np.array([]), V=np.array([]),
-                          Transform=["size","max", "sqrt"], OutInfo=False):
+                          Transform=["size","max", "sqrt"],
+                          asinhpar=[0.], OutInfo=False):
     """
     Transform sensitivities.
 
@@ -130,6 +131,8 @@ def transform_sensitivity(S=np.array([]), V=np.array([]),
         "sqr"       Take the square root. Only usefull for euc sensitivities. 
         "log"       Take the logaritm. This should always be the 
                     last value in Transform list
+        "asinh"     asinh transform. WARNING: excludes all other options, and should be used
+                    only for raw sensitivities
         
 
     author:VR 4/23
@@ -137,14 +140,9 @@ def transform_sensitivity(S=np.array([]), V=np.array([]),
     """
 
     if np.size(S)==0:
-        error("Transform_sensitivity: Sensitivity size is 0! Exit.")
+        error("transform_sensitivity: Sensitivity size is 0! Exit.")
     
     ns = np.shape(S)
-    # print("S", np.shape(S))    
-    # print("V", np.shape(V))
-    # S = S.ravel()
-    # print("S0", np.shape(S))
-    # reshape((ns,1))
 
     for item in Transform:       
         
@@ -165,18 +163,69 @@ def transform_sensitivity(S=np.array([]), V=np.array([]),
              S = S/maxval
              # print("S0m", np.shape(S))
             
-        elif "sur" in item.lower():
-            S = S/S[0]
-            
-
         if "sqr" in item.lower():
             S = np.sqrt(S)
             # print("S0s", np.shape(S))
             
         if "log" in item.lower():    
             S = np.log10(S)
-            
+
+        if "asinh" in item.lower():
+            maxval = np.amax(S)
+            minval = np.amin(S)
+            if maxval>0 and minval>0:
+                print("transform_sensitivity: No negatives, switched to log transform!")
+                S = np.log10(S)
+            else:
+                if len(asinhpar)==1:
+                    scale = asinhpar[0]
+                else:
+                    scale = get_scale(S, method=asinhpar[0])
+
+                    S = numpy.arcsinh(S/scale)
+
+
     return S
+
+def get_scale(d=numpy.array([]), F=0.1, method = "other", OutInfo = False):
+    """
+    Get optimal Scale for arcsin transformation.
+
+    Parameters
+    ----------
+    d : float, required.
+        Data vector.
+    F : float, optional
+        Weight for arcsinh transformation, default from Scholl & Edwards (2007)
+
+    Returns
+    -------
+    S : float
+        Scale value for arcsinh
+
+    C. Scholl
+    Die Periodizitaet von Sendesignalen bei Long-Offset Transient Electromagnetics
+    Diploma Thesis, Institut für Geophysik und Meteorologie der Universität zu Koeln, 2001.
+
+
+    """
+
+    if numpy.size(d)==0:
+        error("get_S: No data given! Exit.")
+
+    if "s2007" in method.lower():
+        S = F * numpy.nanmax(numpy.abs(d))
+
+    else:
+        dmax = numpy.nanmax(numpy.abs(d))
+        dmin = numpy.nanmin(numpy.abs(d))
+        denom =F *(numpy.log(dmax)-numpy.log(dmin))
+        scale = numpy.abs(dmax/denom)
+
+    if OutInfo:
+        print("Scale value S is "+str(scale)+", method "+method)
+
+    return scale
 
 
 def update_avg(k = None, m_k=None, m_a=None, m_v=None):
