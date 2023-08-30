@@ -595,7 +595,7 @@ def write_model_ncd(
 #         f.write("%10.2f  \n" % (0.0))
 
 
-def write_model(ModFile=None, dx=None, dy=None, dz=None, mval=None, reference=None,
+def write_model_mod(ModFile=None, dx=None, dy=None, dz=None, mval=None, reference=None,
                 trans=None, aircells = None, mvalair = 1.e17, blank = 1.e17, header="", out=True):
     """
     Write ModEM model input.
@@ -603,10 +603,10 @@ def write_model(ModFile=None, dx=None, dy=None, dz=None, mval=None, reference=No
     Expects mval in physical units (linear).
 
     author: vrath
-    last changed: Aug 18, 2020
+    last changed: Aug 28, 2023
 
 
-    In Fortran:
+    Modem model format in Fortran:
 
     DO iz = 1,Nz
         DO iy = 1,Ny
@@ -617,9 +617,9 @@ def write_model(ModFile=None, dx=None, dy=None, dz=None, mval=None, reference=No
     ENDDO
 
     """
-    if len(header)==0:
-        header ="# 3D MT model written by ModEM in WS format"
-     
+
+
+
     dims = np.shape(mval)
 
     nx = dims[0]
@@ -627,8 +627,18 @@ def write_model(ModFile=None, dx=None, dy=None, dz=None, mval=None, reference=No
     nz = dims[2]
     dummy = 0
 
-    if trans is not None:
 
+    if not aircells == None:
+        mval.reshape(dims)[aircells] = mvalair
+
+    if not blank == None:
+        blanks = np.where(~np.isfinite(mval))
+        mval.reshape(dims)[blanks] = mvalair
+
+    if len(header)==0:
+        header ="# 3D MT model written by ModEM in WS format"
+
+    if trans is not None:
         trans = trans.upper()
 
         if trans == "LOGE":
@@ -643,27 +653,25 @@ def write_model(ModFile=None, dx=None, dy=None, dz=None, mval=None, reference=No
                 print("values to " + ModFile + " transformed to: " + trans)
         elif trans == "LINEAR":
             pass
-
+    
         else:
             print("Transformation: " + trans + " not defined!")
             sys.exit(1)
-
-
+            
     else:
-        trans = "LINEAR"
+        trans == "LINEAR"
 
-    if not aircells == None:
-        mval.reshape(dims)[aircells] = mvalair
 
-    if not blank == None:
-        blanks = np.where(~np.isfinite(mval))
-        mval.reshape(dims)[blanks] = mvalair
+    trns = np.array(trans)
 
-    trans = np.array(trans)
+
+    M = os.path.splitext(ModFile)[0]
+    ModFile = M+".rho"
+
     with open(ModFile, "w") as f:
         np.savetxt(
             f, [header], fmt="%s")
-        line = np.array([nx, ny,nz, dummy, trans],dtype="object")
+        line = np.array([nx, ny,nz, dummy, trns],dtype="object")
         # line = np.array([nx, ny, nz, dummy, trans])
         # np.savetxt(f, line.reshape(1, 5), fmt="   %s"*5)
         np.savetxt(f, line.reshape(1, 5), fmt =["  %i","  %i","  %i","  %i", "  %s"])
@@ -687,14 +695,150 @@ def write_model(ModFile=None, dx=None, dy=None, dz=None, mval=None, reference=No
         f.write("%10.2f  \n" % (0.0))
 
 
-def read_model(ModFile=None, trans="LINEAR", volumes=False, out=True):
+
+def write_model_ubc(ModFile=None, dx=None, dy=None, dz=None, mval=None, reference=None,
+                aircells = None, mvalair = 1.e17, blank = 1.e17, header="", out=True):
+    """
+    Write UBC model input.
+
+    Expects mval in physical units (linear).
+
+    author: vrath
+    last changed: Aug 28, 2023
+
+
+    Modem model format in Fortran:
+
+    DO iz = 1,Nz
+        DO iy = 1,Ny
+            DO ix = Nx,1,-1
+                READ(10,*) mval(ix,iy,iz)
+            ENDDO
+        ENDDO
+    ENDDO
+
+    """
+
+
+
+    dims = np.shape(mval)
+
+    nx = dims[0]
+    ny = dims[1]
+    nz = dims[2]
+ 
+
+
+    if not aircells == None:
+        mval.reshape(dims)[aircells] = mvalair
+
+    if not blank == None:
+        blanks = np.where(~np.isfinite(mval))
+        mval.reshape(dims)[blanks] = mvalair
+
+
+    # if "mod" in mformat.lower():
+    #     if len(header)==0:
+    #         header ="# 3D MT model written by ModEM in WS format"
+
+    #     trans = trans.upper()
+
+    #     if trans == "LOGE":
+    #         mval = np.log(mval)
+    #         mvalair = np.log(mvalair)
+    #         if out:
+    #             print("values to " + ModFile + " transformed to: " + trans)
+    #     elif trans == "LOG10":
+    #         mval = np.log10(mval)
+    #         mvalair = np.log10(mvalair)
+    #         if out:
+    #             print("values to " + ModFile + " transformed to: " + trans)
+    #     elif trans == "LINEAR":
+    #         pass
+
+    #     else:
+    #         print("Transformation: " + trans + " not defined!")
+    #         sys.exit(1)
+
+
+    #     trns = np.array(trans)
+
+
+    #     ModFile = os.path.splitext(ModFile)[0])
+    #     ModFile = Modfile+".rho"
+
+    #     with open(ModFile, "w") as f:
+    #         np.savetxt(
+    #             f, [header], fmt="%s")
+    #         line = np.array([nx, ny,nz, dummy, trns],dtype="object")
+    #         # line = np.array([nx, ny, nz, dummy, trans])
+    #         # np.savetxt(f, line.reshape(1, 5), fmt="   %s"*5)
+    #         np.savetxt(f, line.reshape(1, 5), fmt =["  %i","  %i","  %i","  %i", "  %s"])
+    
+    #         np.savetxt(f, dx.reshape(1, dx.shape[0]), fmt="%12.3f")
+    #         np.savetxt(f, dy.reshape(1, dy.shape[0]), fmt="%12.3f")
+    #         np.savetxt(f, dz.reshape(1, dz.shape[0]), fmt="%12.3f")
+    #         # write out the layers from resmodel
+    #         for zi in range(dz.size):
+    #             f.write("\n")
+    #             for yi in range(dy.size):
+    #                 line = mval[::-1, yi, zi]
+    #                 # line = np.flipud(mval[:, yi, zi])
+    #                 # line = mval[:, yi, zi]
+    #                 np.savetxt(f, line.reshape(1, nx), fmt="%12.5e")
+    
+    #         f.write("\n")
+    
+    #         cnt = np.asarray(reference)
+    #         np.savetxt(f, cnt.reshape(1, cnt.shape[0]), fmt="%10.1f")
+    #         f.write("%10.2f  \n" % (0.0))
+
+    dyu = np.flipud(dx.reshape(1, dx.shape[0]))
+    dxu = dy.reshape(1, dy.shape[0])
+    dzu = dz.reshape(1, dz.shape[0])
+    
+    refu = np.asarray(reference)
+    print(dyu.shape)
+    refu[1] = refu[1] - np.sum(dyu)
+    print(refu)
+
+    refu = refu.reshape(1, refu.shape[0])
+    print(refu)
+
+    
+    val = np.transpose(mval, (1,0,2))
+    
+    dimu = np.shape(val)
+    dimu = np.asarray(dimu)  
+    dimu = dimu.reshape(1, dimu.shape[0])
+    val = val.flatten(order="C")
+    
+    M = os.path.splitext(ModFile)[0]
+    ModFile = M+".mod"
+    MshFile = M+".mesh"
+
+    with open(MshFile , "w") as f:
+        np.savetxt(f, dimu, fmt="%i")
+        np.savetxt(f, refu, fmt="%12.1f")
+
+        np.savetxt(f, dxu, fmt="%12.3f")
+        np.savetxt(f, dyu, fmt="%12.3f")
+        np.savetxt(f, dzu, fmt="%12.3f")
+
+
+
+    with open(ModFile , "w") as f:
+        np.savetxt(f, val,fmt="%14.5g")
+
+
+def read_model(ModFile=None, trans="LINEAR", volumes=False, mformat="modem", out=True):
     """
     Read ModEM model input.
 
     Returns mval in physical units
 
     author: vrath
-    last changed: Aug 18, 2020
+    last changed: Aug 28, 2023
 
     In Fortran:
 

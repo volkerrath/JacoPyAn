@@ -125,7 +125,7 @@ total = 0
 start = time.time()
 
 dx, dy, dz, rho, reference = mod.read_model(ModFile_in + ".rho", out=True)
-# write_model(ModFile_out+".rho", dx, dy, dz, rho,reference,out = True)
+# write_model_mod(ModFile_out+".rho", dx, dy, dz, rho,reference,out = True)
 elapsed = (time.time() - start)
 total = total + elapsed
 print(" Used %7.4f s for reading model from %s " %
@@ -141,7 +141,7 @@ for ibody in range(nb[0]):
     rhonew[air] = rhoair
     Modout = ModFile_out + "_" + body[0] + \
         str(ibody) + "_" + smoother[0] + ".rho"
-    write_model(Modout, dx, dy, dz, rhonew, reference, out=True)
+    write_model_mod(Modout, dx, dy, dz, rhonew, reference, out=True)
 
     elapsed = (time.time() - start)
     print(

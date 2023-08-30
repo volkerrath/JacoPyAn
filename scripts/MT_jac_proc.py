@@ -92,7 +92,7 @@ aircells = np.where(rho>rhoair/10)
 
 
 # TSTFile = WorkDir+WorkName+"0_MaskTest.rho"
-# mod.write_model(TSTFile, dx, dy, dz, rho, reference, trans="LINEAR", mvalair=blank, aircells=aircells)
+# mod.write_model_mod(TSTFile, dx, dy, dz, rho, reference, trans="LINEAR", mvalair=blank, aircells=aircells)
 
 
 jacmask = jac.set_mask(rho=rho, pad=MPad, blank= blank, flat = False, out=True)
@@ -103,7 +103,7 @@ jacmask = j0.reshape(jdims)
 
 # rhotest = jacmask.reshape(dims)*rho
 # TSTFile = WorkDir+WorkName+"1_MaskTest.rho"
-# mod.write_model(TSTFile, dx, dy, dz, rhotest, reference, trans="LINEAR", mvalair=blank, aircells=aircells)
+# mod.write_model_mod(TSTFile, dx, dy, dz, rhotest, reference, trans="LINEAR", mvalair=blank, aircells=aircells)
 
 elapsed = time.time() - start
 total = total + elapsed

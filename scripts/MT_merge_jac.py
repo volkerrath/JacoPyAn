@@ -163,7 +163,7 @@ for f in np.arange(nF):
 
     start = time.time()
     SNSFile = name+nstr+".sns"
-    mod.write_model(SNSFile, dx, dy, dz, S, reference, trans="log10")
+    mod.write_model_mod(SNSFile, dx, dy, dz, S, reference, trans="log10")
     elapsed = time.time() - start
     total = total + elapsed
     print(" Used %7.4f s for writing Sensitivity from Jacobian  %s " % (elapsed, JFile[f]))

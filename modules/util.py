@@ -44,7 +44,7 @@ def idctn(x, norm="ortho"):
 
 
 def wait1d(periods=np.array([]),
-           thick=np.array([]), cond=np.array([]), out=False)
+           thick=np.array([]), cond=np.array([]), out=False):
 
     """
     Calculate magnetotelluric impedance Z , apparent resitivity rhoa, and phase phi for a given layer model.
@@ -61,10 +61,10 @@ def wait1d(periods=np.array([]),
     
     for nfreq, w in enumerate(omega):
         prop_const = np.sqrt(1j*mu*cond[-1] * w)
-        C = np.zeros(len(r), dtype=complex)
+        C = np.zeros(len(rhoa), dtype=complex)
         C[-1] = 1./prop_const
         if len(thick) > 1:
-            for k in reversed(range(len(r) - 1)):
+            for k in reversed(range(len(rhoa) - 1)):
                 prop_layer = np.sqrt(1j*w*mu*cond[k])
                 k1 = (C[k+1] * prop_layer + np.tanh(prop_layer * thick[k]))
                 k2 = ((C[k+1] * prop_layer * np.tanh(prop_layer * thick[k])) + 1)

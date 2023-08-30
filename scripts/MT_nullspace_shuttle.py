@@ -166,5 +166,5 @@ for isample in np.arange(NSamples):
 NSMFile = WorkDir+"Krafla1_Ellipsoids_median.sns"
 tmp = []
 tmp = np.reshape(tmp, dims, order="F")
-mod.write_model(NSMFile, dx, dy, dz, S, reference, trans="linear", air=aircells)
+mod.write_model_mod(NSMFile, dx, dy, dz, S, reference, trans="linear", air=aircells)
 print(" Sensitivities written to "+NSMFile)

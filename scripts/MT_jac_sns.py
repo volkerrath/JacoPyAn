@@ -158,7 +158,7 @@ aircells = np.where(rho>rhoair/10)
 
 
 # TSTFile = WorkDir+WorkName+"0_MaskTest.rho"
-# mod.write_model(TSTFile, dx, dy, dz, rho, reference, trans="LINEAR", mvalair=blank, aircells=aircells)
+# mod.write_model_mod(TSTFile, dx, dy, dz, rho, reference, trans="LINEAR", mvalair=blank, aircells=aircells)
 
 
 jacmask = jac.set_mask(rho=rho, pad=MPad, blank= blank, flat = False, out=True)
@@ -169,7 +169,7 @@ jacmask = j0.reshape(jdims)
 
 # rhotest = jacmask.reshape(dims)*rho
 # TSTFile = WorkDir+WorkName+"1_MaskTest.rho"
-# mod.write_model(TSTFile, dx, dy, dz, rhotest, reference, trans="LINEAR", mvalair=blank, aircells=aircells)
+# mod.write_model_mod(TSTFile, dx, dy, dz, rhotest, reference, trans="LINEAR", mvalair=blank, aircells=aircells)
 
 elapsed = time.time() - start
 total = total + elapsed
@@ -220,8 +220,8 @@ SensTot = jac.transform_sensitivity(S=SensTmp, V=V,
 
 SensFile = WorkDir+WorkName+"_"+Type+"_"+"_".join(Transform)+".sns"
 Head = (WorkName+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
-S = np.reshape(SensTot, dims, order="F") 
-mod.write_model(SensFile, dx, dy, dz, S, reference, trans=outform, mvalair=rhoair, aircells=aircells, header=Head)
+S = np.reshape(SensTot, dims, order="F")
+mod.write_model_mod(SensFile, dx, dy, dz, S, reference, trans=outform, mvalair=rhoair, aircells=aircells, header=Head)
 print(" Sensitivities written to "+SensFile)
 elapsed = time.time() - start
 print(" Used %7.4f s for sensitivities " % (elapsed))
@@ -255,7 +255,7 @@ for Split in Splits:
             SensFile = WorkDir+WorkName+"_"+compstr[icmp-1]+"_"+Type+"_"+"_".join(Transform)+".sns"
             Head = (WorkName+"_"+compstr[icmp-1]+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
             S = np.reshape(SensTot, dims, order="F")
-            mod.write_model(SensFile, dx, dy, dz, S, reference, trans=outform, mvalair=rhoair, aircells=aircells, header=Head)
+            mod.write_model_mod(SensFile, dx, dy, dz, S, reference, trans=outform, mvalair=rhoair, aircells=aircells, header=Head)
             print(" Comp sensitivities written to "+SensFile)
             
         elapsed = time.time() - start
@@ -279,7 +279,7 @@ for Split in Splits:
            SensFile = WorkDir+WorkName+"_"+SiteNames[isit-1].lower()+"_"+Type+"_"+"_".join(Transform)+".sns"
            Head = (WorkName+"_"+SiteNames[isit-1].lower()+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
            S = np.reshape(SensTot, dims, order="F") 
-           mod.write_model(SensFile, dx, dy, dz, S, reference, trans=outform, mvalair=rhoair, aircells=aircells, header=Head)
+           mod.write_model_mod(SensFile, dx, dy, dz, S, reference, trans=outform, mvalair=rhoair, aircells=aircells, header=Head)
            print(" Site sensitivities written to "+SensFile)
         
         elapsed = time.time() - start
@@ -320,7 +320,7 @@ for Split in Splits:
            SensFile = WorkDir+WorkName+"_freqband"+lowstr+"_to_"+uppstr+"_"+Type+"_"+"_".join(Transform)+".sns"
            Head = (WorkName+"_freqband"+lowstr+"to"+uppstr+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
            S = np.reshape(SensTot, dims, order="F") 
-           mod.write_model(SensFile, dx, dy, dz, S, reference, trans=outform, mvalair=rhoair, aircells=aircells, header=Head)
+           mod.write_model_mod(SensFile, dx, dy, dz, S, reference, trans=outform, mvalair=rhoair, aircells=aircells, header=Head)
            print(" Freq sensitivities written to "+SensFile)
         
         elapsed = time.time() - start

@@ -182,12 +182,12 @@ def transform_sensitivity(S=np.array([]), V=np.array([]),
                 else:
                     scale = get_scale(S, method=asinhpar[0])
 
-                    S = numpy.arcsinh(S/scale)
+                    S = np.arcsinh(S/scale)
 
 
     return S
 
-def get_scale(d=numpy.array([]), F=0.1, method = "other", OutInfo = False):
+def get_scale(d=np.array([]), F=0.1, method = "other", OutInfo = False):
     """
     Get optimal Scale for arcsin transformation.
 
@@ -210,16 +210,16 @@ def get_scale(d=numpy.array([]), F=0.1, method = "other", OutInfo = False):
 
     """
 
-    if numpy.size(d)==0:
+    if np.size(d)==0:
         error("get_S: No data given! Exit.")
 
     if "s2007" in method.lower():
-        S = F * numpy.nanmax(numpy.abs(d))
+        S = F * np.nanmax(np.abs(d))
 
     else:
-        dmax = numpy.nanmax(numpy.abs(d))
-        dmin = numpy.nanmin(numpy.abs(d))
-        denom =F *(numpy.log(dmax)-numpy.log(dmin))
+        dmax = np.nanmax(np.abs(d))
+        dmin = np.nanmin(np.abs(d))
+        denom =F *(np.log(dmax)-numpy.log(dmin))
         scale = numpy.abs(dmax/denom)
 
     if OutInfo:

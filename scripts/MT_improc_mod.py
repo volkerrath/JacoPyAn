@@ -85,7 +85,7 @@ if "anidiff" in action.lower():
 start = time.time()
 dx, dy, dz, rho, reference, trans = mod.read_model(ModFile_in + ".rho",
                                                trans="LINEAR", out=True)
-mod.write_model(ModFile_out + ".rho", dx, dy, dz, rho, reference,
+mod.write_model_mod(ModFile_out + ".rho", dx, dy, dz, rho, reference,
                 trans=trans, out=True)
 elapsed = time.time() - start
 total = total + elapsed
@@ -114,7 +114,7 @@ if "smooth" in  action.lower():
 
     rhonew[air] = rhoair_tmp
     Modout = ModFile_out+"_mediankernel"+str(ksize)+"_"+str(maxit)+".rho"
-    mod.write_model(Modout, dx, dy, dz, rhonew, reference, out=True)
+    mod.write_model_mod(Modout, dx, dy, dz, rhonew, reference, out=True)
     elapsed = time.time() - start
     print(
         " Used %7.4f s for processing/writing model to %s "
@@ -126,7 +126,7 @@ if "med" in  action.lower():
                            boundary_mode=bmode, maxiter=maxit)
     rhonew[air] = rhoair_tmp
     Modout = ModFile_out+"_mediankernel"+str(ksize)+"_"+str(maxit)+".rho"
-    mod.write_model(Modout, dx, dy, dz, rhonew, reference, out=True)
+    mod.write_model_mod(Modout, dx, dy, dz, rhonew, reference, out=True)
     elapsed = time.time() - start
     print(
         " Used %7.4f s for processing/writing model to %s "
@@ -139,7 +139,7 @@ if "anidiff" in  action.lower():
         Out=True, Plot=True)
     rhonew[air] = rhoair_tmp
     Modout = ModFile_out + "_anisodiff" + str(fopt) + "-" + str(maxit) + ".rho"
-    mod.write_model(Modout, dx, dy, dz, rhonew, reference, out=True)
+    mod.write_model_mod(Modout, dx, dy, dz, rhonew, reference, out=True)
     elapsed = time.time() - start
     print(" Used %7.4f s for processing/writing model to %s "
           % (elapsed, Modout))

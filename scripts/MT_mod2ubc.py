@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Aug 28 17:17:16 2023
+
+@author: vrath
+"""
+import os
+import sys
+import numpy as np
+
+from sys import exit as error
+# import struct
+import time
+from datetime import datetime
+import warnings
+
+mypath = ["/home/vrath/JacoPyAn/modules/", "/home/vrath/JacoPyAn/scripts/"]
+for pth in mypath:
+    if pth not in sys.path:
+        sys.path.insert(0,pth)
+
+
+import jacproc as jac
+import modem as mod
+from version import versionstrg
+import util as utl
+
+
+
+MFile  =  "/home/vrath/JacoPyAn/work/UBC_format_example/UBI8_Z_Alpha02_NLCG_014.rho"
+MPad=[14, 14 , 14, 14, 0, 71]
+
+start = time.time()
+dx, dy, dz, rho, reference, _, vcell = mod.read_model(MFile, trans="linear", volumes=True)
+dims = np.shape(rho)
+sdims = np.size(rho)
+
+elapsed = time.time() - start
+print(" Used %7.4f s for reading model from %s " % (elapsed, MFile))
+
+
+rhoair = 1.e17
+aircells = np.where(rho>rhoair/10)
+blank = rhoair
+
+jacmask = jac.set_mask(rho=rho, pad=MPad, blank= blank, flat = False, out=True)
+jdims= np.shape(jacmask)
+j0 = jacmask.reshape(dims)
+j0[aircells] = blank
+jacmask = j0.reshape(jdims)
+
+TSTFile = "Test_modem.rho"
+
+mod.write_model_mod(TSTFile, dx, dy, dz, rho, reference, trans="LINEAR", mvalair=blank, aircells=aircells)
+
+mod.write_model_ubc(TSTFile, dx, dy, dz, rho, reference, mvalair=blank, aircells=aircells)
+
