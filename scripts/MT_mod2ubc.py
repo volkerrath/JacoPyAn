@@ -15,7 +15,11 @@ import time
 from datetime import datetime
 import warnings
 
-mypath = ["/home/vrath/JacoPyAn/modules/", "/home/vrath/JacoPyAn/scripts/"]
+
+JACOPYAN_ROOT = os.environ["JACOPYAN_ROOT"]
+JACOPYAN_DATA = os.environ["JACOPYAN_DATA"]
+
+mypath = [JACOPYAN_ROOT+"/modules/", JACOPYAN_ROOT+"/scripts/"]
 for pth in mypath:
     if pth not in sys.path:
         sys.path.insert(0,pth)
@@ -27,12 +31,12 @@ from version import versionstrg
 import util as utl
 
 
-
+DFile  =  "/home/vrath/JacoPyAn/work/UBC_format_example/UBI8_Z_Alpha02_NLCG_014.dat"
 MFile  =  "/home/vrath/JacoPyAn/work/UBC_format_example/UBI8_Z_Alpha02_NLCG_014.rho"
 MPad=[14, 14 , 14, 14, 0, 71]
 
 start = time.time()
-dx, dy, dz, rho, reference, _, vcell = mod.read_model(MFile, trans="linear", volumes=True)
+dx, dy, dz, rho, refmod, _, vcell = mod.read_model_mod(MFile, trans="linear", volumes=True)
 dims = np.shape(rho)
 sdims = np.size(rho)
 
@@ -52,7 +56,11 @@ jacmask = j0.reshape(jdims)
 
 TSTFile = "Test_modem.rho"
 
-mod.write_model_mod(TSTFile, dx, dy, dz, rho, reference, trans="LINEAR", mvalair=blank, aircells=aircells)
+mod.write_model_mod(TSTFile, dx, dy, dz, rho, reference=refmod, trans="LINEAR", mvalair=blank, aircells=aircells)
 
-mod.write_model_ubc(TSTFile, dx, dy, dz, rho, reference, mvalair=blank, aircells=aircells)
+lat, lon =  -16.346,  -70.908
+elev = -refmod[2]
+
+refcenter =  [lat, lon, elev]
+mod.write_model_ubc(TSTFile, dx, dy, dz, rho, refcenter, mvalair=blank, aircells=aircells)
 

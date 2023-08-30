@@ -137,25 +137,25 @@ def get_filelist(searchstr=["*"], searchpath="."):
 
     return filelist
 
-# def get_utm_zone(latitude=None, longitude=None):
-#     """
-#     Find EPSG from position, using pyproj
+def get_utm_zone(latitude=None, longitude=None):
+    """
+    Find EPSG from position, using pyproj
 
-#     VR 04/21
-#     """
-#     from pyproj.aoi import AreaOfInterest
-#     from pyproj.database import query_utm_crs_info
-#     utm_list = query_utm_crs_info(
-#         datum_name="WGS 84",
-#         area_of_interest=AreaOfInterest(
-#         west_lon_degree=longitude,
-#         south_lat_degree=latitude,
-#         east_lon_degree=longitude,
-#         north_lat_degree=latitude, ), )
-#     utm_crs =CRS.from_epsg(utm_list[0].code)
-#     EPSG = CRS.to_epsg(utm_crs)
+    VR 04/21
+    """
+    from pyproj.aoi import AreaOfInterest
+    from pyproj.database import query_utm_crs_info
+    utm_list = query_utm_crs_info(
+        datum_name="WGS 84",
+        area_of_interest=AreaOfInterest(
+        west_lon_degree=longitude,
+        south_lat_degree=latitude,
+        east_lon_degree=longitude,
+        north_lat_degree=latitude, ), )
+    utm_crs =CRS.from_epsg(utm_list[0].code)
+    EPSG = CRS.to_epsg(utm_crs)
 
-#     return EPSG, utm_crs
+    return EPSG, utm_crs
 
 
 def proj_latlon_to_utm(latitude, longitude, utm_zone=32629):
@@ -165,9 +165,14 @@ def proj_latlon_to_utm(latitude, longitude, utm_zone=32629):
 
     VR 04/21
     """
-    prj_wgs = CRS("epsg:4326")
-    prj_utm = CRS("epsg:" + str(utm_zone))
-    utm_x, utm_y = pyproj.transform(prj_wgs, prj_utm, latitude, longitude)
+    # from pyproj import Transformer
+    
+    transformer = Transformer.from_crs("epsg:4326","epsg:" + str(utm_zone))
+    utm_x, utm_y = transformer.transform(latitude, longitude)
+
+    # prj_wgs = CRS("epsg:4326")
+    # prj_utm = CRS("epsg:" + str(utm_zone))
+    # utm_x, utm_y = pyproj.transform(prj_wgs, prj_utm, latitude, longitude)
 
     return utm_x, utm_y
 

@@ -8,6 +8,7 @@ from scipy.io import FortranFile
 from scipy.ndimage import laplace, convolve
 from scipy.ndimage import uniform_filter, gaussian_filter, median_filter
 
+import util as utl
 
 # import scipy.sparse as scp
 
@@ -696,7 +697,7 @@ def write_model_mod(ModFile=None, dx=None, dy=None, dz=None, mval=None, referenc
 
 
 
-def write_model_ubc(ModFile=None, dx=None, dy=None, dz=None, mval=None, reference=None,
+def write_model_ubc(ModFile=None, dx=None, dy=None, dz=None, mval=None, refcenter=None,
                 aircells = None, mvalair = 1.e17, blank = 1.e17, header="", out=True):
     """
     Write UBC model input.
@@ -705,17 +706,6 @@ def write_model_ubc(ModFile=None, dx=None, dy=None, dz=None, mval=None, referenc
 
     author: vrath
     last changed: Aug 28, 2023
-
-
-    Modem model format in Fortran:
-
-    DO iz = 1,Nz
-        DO iy = 1,Ny
-            DO ix = Nx,1,-1
-                READ(10,*) mval(ix,iy,iz)
-            ENDDO
-        ENDDO
-    ENDDO
 
     """
 
@@ -737,73 +727,19 @@ def write_model_ubc(ModFile=None, dx=None, dy=None, dz=None, mval=None, referenc
         mval.reshape(dims)[blanks] = mvalair
 
 
-    # if "mod" in mformat.lower():
-    #     if len(header)==0:
-    #         header ="# 3D MT model written by ModEM in WS format"
-
-    #     trans = trans.upper()
-
-    #     if trans == "LOGE":
-    #         mval = np.log(mval)
-    #         mvalair = np.log(mvalair)
-    #         if out:
-    #             print("values to " + ModFile + " transformed to: " + trans)
-    #     elif trans == "LOG10":
-    #         mval = np.log10(mval)
-    #         mvalair = np.log10(mvalair)
-    #         if out:
-    #             print("values to " + ModFile + " transformed to: " + trans)
-    #     elif trans == "LINEAR":
-    #         pass
-
-    #     else:
-    #         print("Transformation: " + trans + " not defined!")
-    #         sys.exit(1)
-
-
-    #     trns = np.array(trans)
-
-
-    #     ModFile = os.path.splitext(ModFile)[0])
-    #     ModFile = Modfile+".rho"
-
-    #     with open(ModFile, "w") as f:
-    #         np.savetxt(
-    #             f, [header], fmt="%s")
-    #         line = np.array([nx, ny,nz, dummy, trns],dtype="object")
-    #         # line = np.array([nx, ny, nz, dummy, trans])
-    #         # np.savetxt(f, line.reshape(1, 5), fmt="   %s"*5)
-    #         np.savetxt(f, line.reshape(1, 5), fmt =["  %i","  %i","  %i","  %i", "  %s"])
-    
-    #         np.savetxt(f, dx.reshape(1, dx.shape[0]), fmt="%12.3f")
-    #         np.savetxt(f, dy.reshape(1, dy.shape[0]), fmt="%12.3f")
-    #         np.savetxt(f, dz.reshape(1, dz.shape[0]), fmt="%12.3f")
-    #         # write out the layers from resmodel
-    #         for zi in range(dz.size):
-    #             f.write("\n")
-    #             for yi in range(dy.size):
-    #                 line = mval[::-1, yi, zi]
-    #                 # line = np.flipud(mval[:, yi, zi])
-    #                 # line = mval[:, yi, zi]
-    #                 np.savetxt(f, line.reshape(1, nx), fmt="%12.5e")
-    
-    #         f.write("\n")
-    
-    #         cnt = np.asarray(reference)
-    #         np.savetxt(f, cnt.reshape(1, cnt.shape[0]), fmt="%10.1f")
-    #         f.write("%10.2f  \n" % (0.0))
 
     dyu = np.flipud(dx.reshape(1, dx.shape[0]))
     dxu = dy.reshape(1, dy.shape[0])
     dzu = dz.reshape(1, dz.shape[0])
     
-    refu = np.asarray(reference)
-    print(dyu.shape)
-    refu[1] = refu[1] - np.sum(dyu)
-    print(refu)
-
-    refu = refu.reshape(1, refu.shape[0])
-    print(refu)
+    lat = refcenter[0]
+    lon = refcenter[1]
+    utm_zone = utl.get_utm_zone(lat,lon)
+    utme, utmn = utl.proj_latlon_to_utm(lat, lon, utm_zone=utm_zone[0])
+    ubce = utme - 0.5*np.sum(dxu)
+    ubcn = utmn - 0.5*np.sum(dyu)
+    refu = np.array([ubce, ubcn, refcenter[2]])
+    # print(refu)
 
     
     val = np.transpose(mval, (1,0,2))
@@ -815,7 +751,7 @@ def write_model_ubc(ModFile=None, dx=None, dy=None, dz=None, mval=None, referenc
     
     M = os.path.splitext(ModFile)[0]
     ModFile = M+".mod"
-    MshFile = M+".mesh"
+    MshFile = M+".msh"
 
     with open(MshFile , "w") as f:
         np.savetxt(f, dimu, fmt="%i")

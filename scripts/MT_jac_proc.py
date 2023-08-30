@@ -83,7 +83,7 @@ nF = np.size(DFiles)
 
 total = 0.0
 start = time.time()
-dx, dy, dz, rho, reference, _, vcell = mod.read_model(MFile, trans="linear", volumes=True)
+dx, dy, dz, rho, reference, _, vcell = mod.read_model_mod(MFile, trans="linear", volumes=True)
 dims = np.shape(rho)
 sdims = np.size(rho)
 

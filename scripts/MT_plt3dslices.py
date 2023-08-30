@@ -62,7 +62,7 @@ SFile = r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/Ann21_Prior100_T-Z3.sns
 
 
 start = time.time()
-dx, dy, dz, rho, reference = mod.read_model(MFile, trans="LOG10")
+dx, dy, dz, rho, reference = mod.read_model_mod(MFile, trans="LOG10")
 elapsed = time.time() - start
 total = total + elapsed
 print("Used %7.4f s for reading model from %s " % (elapsed, MFile))
@@ -70,7 +70,7 @@ print("ModEM reference is "+str(reference))
 print("Min/max rho = "+str(np.min(rho))+"/"+str(np.max(rho)))
 
 start = time.time()
-dx, dy, dz, sns, reference = mod.read_model(SFile, trans="LOG10")
+dx, dy, dz, sns, reference = mod.read_model_mod(SFile, trans="LOG10")
 elapsed = time.time() - start
 total = total + elapsed
 print("Used %7.4f s for reading model from %s " % (elapsed, SFile))

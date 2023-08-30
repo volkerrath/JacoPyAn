@@ -55,7 +55,7 @@ import jacproc as jac
 import modem as mod
 from version import versionstrg
 
-gc.enable()
+# gc.enable()
 
 
 Strng, _ = versionstrg()
@@ -103,7 +103,7 @@ res_bounds = [-0.3, 0.3]
 
 total = 0.0
 start = time.time()
-dx, dy, dz, rho, reference, _, vcell = mod.read_model(MFile, trans="log10", volumes=True)
+dx, dy, dz, rho, reference, _, vcell = mod.read_model_mod(MFile, trans="log10", volumes=True)
 elapsed = time.time() - start
 total = total + elapsed
 print(" Used %7.4f s for reading model from %s " % (elapsed, MFile))

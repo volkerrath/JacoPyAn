@@ -83,7 +83,7 @@ if "anidiff" in action.lower():
 
 
 start = time.time()
-dx, dy, dz, rho, reference, trans = mod.read_model(ModFile_in + ".rho",
+dx, dy, dz, rho, reference, trans = mod.read_model_mod(ModFile_in + ".rho",
                                                trans="LINEAR", out=True)
 mod.write_model_mod(ModFile_out + ".rho", dx, dy, dz, rho, reference,
                 trans=trans, out=True)
