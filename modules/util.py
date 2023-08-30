@@ -141,7 +141,7 @@ def get_utm_zone(latitude=None, longitude=None):
     """
     Find EPSG from position, using pyproj
 
-    VR 04/21
+    VR 08/23
     """
     from pyproj.aoi import AreaOfInterest
     from pyproj.database import query_utm_crs_info
@@ -163,28 +163,31 @@ def proj_latlon_to_utm(latitude, longitude, utm_zone=32629):
     transform latlon to utm , using pyproj
     Look for other EPSG at https://epsg.io/
 
-    VR 04/21
+    VR 08/23
     """
-    # from pyproj import Transformer
-    
-    transformer = Transformer.from_crs("epsg:4326","epsg:" + str(utm_zone))
+    prj_wgs = CRS("epsg:4326")
+    prj_utm = CRS("epsg:" + str(utm_zone))
+    transformer = Transformer.from_crs(prj_wgs, prj_utm)
     utm_x, utm_y = transformer.transform(latitude, longitude)
-
+    # transfor
     # prj_wgs = CRS("epsg:4326")
     # prj_utm = CRS("epsg:" + str(utm_zone))
     # utm_x, utm_y = pyproj.transform(prj_wgs, prj_utm, latitude, longitude)
 
     return utm_x, utm_y
 
-def proj_utm_to_latlon(utm_x, utm_y, utm_zone=32629):
+def proj_utm_to_latlon(utm_e, utm_n, utm_zone=32629):
     """
-    transform utm to latlon, using pyproj
+    transform latlon to utm , using pyproj
     Look for other EPSG at https://epsg.io/
-    VR 04/21
-    """
+    
+    VR 08/23
+    """    
     prj_wgs = CRS("epsg:4326")
     prj_utm = CRS("epsg:" + str(utm_zone))
-    latitude, longitude = pyproj.transform(prj_utm, prj_wgs, utm_x, utm_y)
+    transformer = Transformer.from_crs(prj_utm, prj_wgs)
+    latitude, longitude = transformer.transform(utm_e, utm_n)
+    
     return latitude, longitude
 
 
@@ -193,24 +196,28 @@ def proj_latlon_to_itm(longitude, latitude):
     transform latlon to itm , using pyproj
     Look for other EPSG at https://epsg.io/
 
-    VR 04/21
+    VR 08/23
     """
     prj_wgs = CRS("epsg:4326")
     prj_itm = CRS("epsg:2157")
-    itm_x, itm_y = pyproj.transform(prj_wgs, prj_itm, latitude, longitude)
-    return itm_x, itm_y
+    transformer = Transformer.from_crs(prj_wgs, prj_itm)
+    itm_e, itm_n = transformer.transform(latitude, longitude)
+
+    return itm_e, itm_n
 
 
-def proj_itm_to_latlon(itm_x, itm_y):
+def proj_itm_to_latlon(itm_e, itm_n):
     """
     transform itm to latlon, using pyproj
     Look for other EPSG at https://epsg.io/
 
-    VR 04/21
+    VR 08/23
     """
     prj_wgs = CRS("epsg:4326")
     prj_itm = CRS("epsg:2157")
-    longitude, latitude = pyproj.transform(prj_itm, prj_wgs, itm_x, itm_y)
+    transformer = Transformer.from_crs(prj_itm, prj_wgs)
+    latitude, longitude = transformer.transform(itm_e, itm_n)
+
     return latitude, longitude
 
 
@@ -219,25 +226,51 @@ def proj_itm_to_utm(itm_x, itm_y, utm_zone=32629):
     transform itm to utm, using pyproj
     Look for other EPSG at https://epsg.io/
 
-    VR 04/21
+    VR 08/23
     """
     prj_utm = CRS("epsg:" + str(utm_zone))
-    prj_itm = CRS("epsg:2157")
-    utm_x, utm_y =pyproj.transform(prj_itm, prj_utm, itm_x, itm_y)
-    return utm_x, utm_y
+    prj_itm = CRS("epsg:2157") 
+    transformer = Transformer.from_crs(prj_itm, prj_utm)
+    utm_e, utm_n = transformer.transform(itm_x, itm_y)
+    
+    return utm_e, utm_n
 
 
-def proj_utm_to_itm(utm_x, utm_y, utm_zone=32629):
+def proj_utm_to_itm(utm_e, utm_n, utm_zone=32629):
     """
     transform utm to itm, using pyproj
     Look for other EPSG at https://epsg.io/
 
-    VR 04/21
+    VR 08/23
     """
     prj_utm = CRS("epsg:" + str(utm_zone))
     prj_itm = CRS("epsg:2157")
-    itm_x, itm_y = pyproj.transform(prj_utm, prj_itm, utm_x, utm_y)
-    return itm_x, itm_y
+    
+    transformer = Transformer.from_crs(prj_utm, prj_itm)
+    itm_e, itm_n = transformer.transform(utm_e, utm_n)
+    
+    return itm_e, itm_n
+
+
+def proj_utm_to_utm(utm_e_in, utm_n_in, utmz_in=32629, utmz_out=32629):
+    """
+    transform utm to utm, using pyproj
+    Look for other EPSG at https://epsg.io/
+
+    VR 08/23
+
+    """
+    if utmz_in==utmz_out:
+        return  utm_e_in, utm_n_in
+        
+    prj_utm_in = CRS("epsg:" + str(utmz_in))
+    prj_utm_out = CRS("epsg:" + str(utmz_out))
+    
+    transformer = Transformer.from_crs(prj_utm_in, prj_utm_out)
+    utm_e, utm_n = transformer.transform(utm_e_in, utm_n_in)
+    
+    return utm_e, utm_n
+
 
 def project_wgs_to_geoid(lat, lon, alt, geoid=3855 ):
     """
@@ -275,7 +308,7 @@ def project_gk_to_latlon(gk_x, gk_y, gk_zone=5684):
     """
     transform utm to latlon, using pyproj
     Look for other EPSG at https://epsg.io/
-    VR 04/21
+    VR 08/23
     """
     prj_wgs = pyproj.CRS("epsg:4326")
     prj_gk = pyproj.CRS("epsg:" + str(gk_zone))

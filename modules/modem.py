@@ -738,7 +738,7 @@ def write_model_ubc(ModFile=None, dx=None, dy=None, dz=None, mval=None, refcente
     utme, utmn = utl.proj_latlon_to_utm(lat, lon, utm_zone=utm_zone[0])
     ubce = utme - 0.5*np.sum(dxu)
     ubcn = utmn - 0.5*np.sum(dyu)
-    refu = np.array([ubce, ubcn, refcenter[2]])
+    refu = np.array([ubce, ubcn, refcenter[2], utm_zone[0]])
     # print(refu)
 
     
@@ -765,9 +765,102 @@ def write_model_ubc(ModFile=None, dx=None, dy=None, dz=None, mval=None, refcente
 
     with open(ModFile , "w") as f:
         np.savetxt(f, val,fmt="%14.5g")
+        
+def read_model_ubc(ModFile=None, trans="LINEAR", volumes=False, out=True):   
+    """
+    Read UBC model input.
+
+    author: vrath
+    last changed: Aug 30, 2023
+
+    """
+    M = os.path.splitext(ModFile)[0]
+    ModFile = M+".mod"
+    MshFile = M+".msh"
+      
+    
+    with open(MshFile, "r") as f:
+        lines = f.readlines()
+
+    lines = [line.split() for line in lines]
+    
+    dims = [int(sub) for sub in lines[1][:2]]
+    refs = [float(sub) for sub in lines[1][:3]]
+    
+    dxu = np.array([float(sub) for sub in lines[2]])
+    dyu = np.array([float(sub) for sub in lines[3]])
+    dzu = np.array([float(sub) for sub in lines[4]])
+
+    
+    dx = np.flipud(dyu.reshape(1, dyu.shape[0]))
+    nx = dx.size
+    dy = dxu.reshape(1, dxu.shape[0])    
+    ny = dy.size
+    dz = dzu.reshape(1, dzu.shape[0])    
+    nz = dz.size
+
+    ubce, ubcn, elev, utmz = refs
+    mode = ubce + 0.5*np.sum(dxu)
+    modn = ubcn + 0.5*np.sum(dyu)
+    lat, lon = utl.proj_latlon_to_utm(mode, modn, utm_zone=utmz)
+    print(lat, lon)
+    
+    refx = -0.5*np.sum(dx)
+    refy = -0.5*np.sum(dy)
+    refz = -refs[2]
+    reference = np.array([refx, refy, refz, 0.])
 
 
-def read_model(ModFile=None, trans="LINEAR", volumes=False, mformat="modem", out=True):
+    with open(ModFile, "r") as f:
+        lines = f.readlines()
+        
+    tmp = np.array([])  
+    for line in lines:
+        tmp = np.append(tmp, np.array([float(sub) for sub in line]))
+  
+    val = np.reshape(tmp, (ny, nx, nz))
+    val = np.transpose(tmp, (1,0,2))
+    print(np.shape(val))
+    
+
+
+
+    # here mval should be in physical units, not log...
+    if "loge" in trans.lower() or "ln" in trans.lower():
+        val = np.log(val)
+        if out:
+            print("values transformed to: " + trans)
+    elif "log10" in trans.lower():
+        val = np.log10(val)
+        if out:
+            print("values transformed to: " + trans)
+    else:
+        if out:
+            print("values transformed to: " + trans)
+        pass
+
+    if out:
+        print(
+            "read_model: %i x %i x %i model read from %s" % (nx, ny, nz, ModFile))
+
+    if volumes:
+        vcell = np.zeros_like(val)
+        for ii in np.arange(nx):
+            for jj in np.arange(ny):
+                for kk in np.arange(nz):
+                    vcell[ii,jj,kk] = dx[ii]*dy[jj]*dz[kk]
+
+        if out:
+            print(
+                "read_model: %i x %i x %i cell volumes calculated" % (nx, ny, nz))
+
+        return dx, dy, dz, val, reference, trans, vcell
+
+
+    return dx, dy, dz, val, reference, trans, vcell
+
+
+def read_model_mod(ModFile=None, trans="LINEAR", volumes=False, out=True):
     """
     Read ModEM model input.
 
