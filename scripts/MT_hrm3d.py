@@ -16,7 +16,7 @@
 """
 Read ModEM model, ModEM's Jacobian.
 
-Model order reduction by discrete Hermite transform.
+Model order reduction by discrete Legendre transform.
 
 @author: vrath Feb 2021
 
