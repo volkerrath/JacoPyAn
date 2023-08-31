@@ -713,11 +713,6 @@ def write_model_ubc(ModFile=None, dx=None, dy=None, dz=None, mval=None, refcente
 
     dims = np.shape(mval)
 
-    nx = dims[0]
-    ny = dims[1]
-    nz = dims[2]
- 
-
 
     if not aircells == None:
         mval.reshape(dims)[aircells] = mvalair
@@ -738,7 +733,7 @@ def write_model_ubc(ModFile=None, dx=None, dy=None, dz=None, mval=None, refcente
     utme, utmn = utl.proj_latlon_to_utm(lat, lon, utm_zone=utm_zone[0])
     ubce = utme - 0.5*np.sum(dxu)
     ubcn = utmn - 0.5*np.sum(dyu)
-    refu = np.array([ubce, ubcn, refcenter[2], utm_zone[0]])
+    refu = np.array([ubce, ubcn, refcenter[2], utm_zone[0]]).reshape(1,4)
     # print(refu)
 
     
@@ -751,11 +746,11 @@ def write_model_ubc(ModFile=None, dx=None, dy=None, dz=None, mval=None, refcente
     
     M = os.path.splitext(ModFile)[0]
     ModFile = M+".mod"
-    MshFile = M+".msh"
+    MshFile = M+".mesh"
 
     with open(MshFile , "w") as f:
         np.savetxt(f, dimu, fmt="%i")
-        np.savetxt(f, refu, fmt="%12.1f")
+        np.savetxt(f, refu, fmt="%14.3f %14.3f %14.3f %10i")
 
         np.savetxt(f, dxu, fmt="%12.3f")
         np.savetxt(f, dyu, fmt="%12.3f")
@@ -764,7 +759,7 @@ def write_model_ubc(ModFile=None, dx=None, dy=None, dz=None, mval=None, refcente
 
 
     with open(ModFile , "w") as f:
-        np.savetxt(f, val,fmt="%14.5g")
+        np.savetxt(f, val, fmt="%14.5g")
         
 def read_model_ubc(ModFile=None, trans="LINEAR", volumes=False, out=True):   
     """
@@ -776,7 +771,7 @@ def read_model_ubc(ModFile=None, trans="LINEAR", volumes=False, out=True):
     """
     M = os.path.splitext(ModFile)[0]
     ModFile = M+".mod"
-    MshFile = M+".msh"
+    MshFile = M+".mesh"
       
     
     with open(MshFile, "r") as f:
@@ -784,9 +779,9 @@ def read_model_ubc(ModFile=None, trans="LINEAR", volumes=False, out=True):
 
     lines = [line.split() for line in lines]
     
-    dims = [int(sub) for sub in lines[1][:2]]
-    refs = [float(sub) for sub in lines[1][:3]]
-    
+    dims = [int(sub) for sub in lines[0][:2]]
+    refs = [float(sub) for sub in lines[1][:4]]
+
     dxu = np.array([float(sub) for sub in lines[2]])
     dyu = np.array([float(sub) for sub in lines[3]])
     dzu = np.array([float(sub) for sub in lines[4]])
@@ -798,30 +793,29 @@ def read_model_ubc(ModFile=None, trans="LINEAR", volumes=False, out=True):
     ny = dy.size
     dz = dzu.reshape(1, dzu.shape[0])    
     nz = dz.size
-
+    
     ubce, ubcn, elev, utmz = refs
     mode = ubce + 0.5*np.sum(dxu)
     modn = ubcn + 0.5*np.sum(dyu)
-    lat, lon = utl.proj_latlon_to_utm(mode, modn, utm_zone=utmz)
+    lat, lon = utl.proj_utm_to_latlon(mode, modn, utm_zone=utmz)
     print(lat, lon)
     
     refx = -0.5*np.sum(dx)
     refy = -0.5*np.sum(dy)
     refz = -refs[2]
-    reference = np.array([refx, refy, refz, 0.])
+    utmz = refs[3]
+    refubc = np.array([refx, refy, refz, utmz])
 
 
     with open(ModFile, "r") as f:
         lines = f.readlines()
         
-    tmp = np.array([])  
+    val = np.array([])  
     for line in lines:
-        tmp = np.append(tmp, np.array([float(sub) for sub in line]))
-  
-    val = np.reshape(tmp, (ny, nx, nz))
-    val = np.transpose(tmp, (1,0,2))
-    print(np.shape(val))
-    
+        val = np.append(val, float(line))
+    val = np.reshape(val, (ny, nx, nz))    
+    val = np.transpose(val, (1,0,2))
+
 
 
 
@@ -842,22 +836,20 @@ def read_model_ubc(ModFile=None, trans="LINEAR", volumes=False, out=True):
     if out:
         print(
             "read_model: %i x %i x %i model read from %s" % (nx, ny, nz, ModFile))
-
+    
+    vcell = np.zeros_like(val)
     if volumes:
-        vcell = np.zeros_like(val)
         for ii in np.arange(nx):
             for jj in np.arange(ny):
                 for kk in np.arange(nz):
-                    vcell[ii,jj,kk] = dx[ii]*dy[jj]*dz[kk]
+                    vcell[ii,jj,kk] = dx[0,ii]*dy[0,jj]*dz[0,kk]
 
         if out:
             print(
                 "read_model: %i x %i x %i cell volumes calculated" % (nx, ny, nz))
 
-        return dx, dy, dz, val, reference, trans, vcell
 
-
-    return dx, dy, dz, val, reference, trans, vcell
+    return dx, dy, dz, val, refubc, trans, vcell
 
 
 def read_model_mod(ModFile=None, trans="LINEAR", volumes=False, out=True):

@@ -54,7 +54,7 @@ j0 = jacmask.reshape(dims)
 j0[aircells] = blank
 jacmask = j0.reshape(jdims)
 
-TSTFile = "Test_modem.rho"
+TSTFile = "Test_modem"
 
 mod.write_model_mod(TSTFile, dx, dy, dz, rho, reference=refmod, trans="LINEAR", mvalair=blank, aircells=aircells)
 
@@ -64,3 +64,11 @@ elev = -refmod[2]
 refcenter =  [lat, lon, elev]
 mod.write_model_ubc(TSTFile, dx, dy, dz, rho, refcenter, mvalair=blank, aircells=aircells)
 
+start = time.time()
+dxu, dyu, dzu, valu, refubc, _, vcell = mod.read_model_ubc(TSTFile, volumes=True, out=True)
+elapsed = time.time() - start
+print(" Used %7.4f s for reading model from %s " % (elapsed, TSTFile))
+
+print(refmod)
+print(refubc)
+print(refmod-refubc[0:3])
