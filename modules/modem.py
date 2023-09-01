@@ -596,8 +596,9 @@ def write_model_ncd(
 #         f.write("%10.2f  \n" % (0.0))
 
 
-def write_model_mod(ModFile=None, dx=None, dy=None, dz=None, mval=None, reference=None,
-                trans=None, aircells = None, mvalair = 1.e17, blank = 1.e17, header="", out=True):
+def write_model_mod(ModFile=None, ModExt=".rho",
+                    dx=None, dy=None, dz=None, mval=None, reference=None,
+                    trans=None, aircells = None, mvalair = 1.e17, blank = 1.e17, header="", out=True):
     """
     Write ModEM model input.
 
@@ -619,7 +620,8 @@ def write_model_mod(ModFile=None, dx=None, dy=None, dz=None, mval=None, referenc
 
     """
 
-
+    M = os.path.splitext(ModFile)[0]
+    ModFile = M+ModExt
 
     dims = np.shape(mval)
 
@@ -662,13 +664,16 @@ def write_model_mod(ModFile=None, dx=None, dy=None, dz=None, mval=None, referenc
     else:
         trans == "LINEAR"
 
-
     trns = np.array(trans)
 
-
-    M = os.path.splitext(ModFile)[0]
-    ModFile = M+".rho"
-
+    if reference==None:
+        ncorner =  0.5*np.sum(dx)
+        ecorner = -0.5*np.sum(dy)
+        elev = 0.
+        cnt = np.array([ncorner, ecorner, elev])
+    else:
+        cnt = np.asarray(reference)
+        
     with open(ModFile, "w") as f:
         np.savetxt(
             f, [header], fmt="%s")
@@ -691,14 +696,15 @@ def write_model_mod(ModFile=None, dx=None, dy=None, dz=None, mval=None, referenc
 
         f.write("\n")
 
-        cnt = np.asarray(reference)
+        
         np.savetxt(f, cnt.reshape(1, cnt.shape[0]), fmt="%10.1f")
         f.write("%10.2f  \n" % (0.0))
 
 
 
-def write_model_ubc(ModFile=None, dx=None, dy=None, dz=None, mval=None, refcenter=None,
-                aircells = None, mvalair = 1.e17, blank = 1.e17, header="", out=True):
+def write_model_ubc(ModFile=None,  MshExt=".mesh", ModExt=".mod",
+                    dx=None, dy=None, dz=None, mval=None, refcenter=None,
+                    aircells = None, mvalair = 1.e17, blank = 1.e17, header="", out=True):
     """
     Write UBC model input.
 
@@ -708,7 +714,9 @@ def write_model_ubc(ModFile=None, dx=None, dy=None, dz=None, mval=None, refcente
     last changed: Aug 28, 2023
 
     """
-
+    M = os.path.splitext(ModFile)[0]
+    ModFile = M+ModExt
+    MshFile = M+MshExt
 
 
     dims = np.shape(mval)
@@ -744,9 +752,6 @@ def write_model_ubc(ModFile=None, dx=None, dy=None, dz=None, mval=None, refcente
     dimu = dimu.reshape(1, dimu.shape[0])
     val = val.flatten(order="C")
     
-    M = os.path.splitext(ModFile)[0]
-    ModFile = M+".mod"
-    MshFile = M+".mesh"
 
     with open(MshFile , "w") as f:
         np.savetxt(f, dimu, fmt="%i")
@@ -761,7 +766,8 @@ def write_model_ubc(ModFile=None, dx=None, dy=None, dz=None, mval=None, refcente
     with open(ModFile , "w") as f:
         np.savetxt(f, val, fmt="%14.5g")
         
-def read_model_ubc(ModFile=None, trans="LINEAR", volumes=False, out=True):   
+def read_model_ubc(ModFile=None, ModExt=".mod", MshExt=".mesh",
+                   trans="LINEAR", volumes=False, out=True):   
     """
     Read UBC model input.
 
@@ -770,8 +776,8 @@ def read_model_ubc(ModFile=None, trans="LINEAR", volumes=False, out=True):
 
     """
     M = os.path.splitext(ModFile)[0]
-    ModFile = M+".mod"
-    MshFile = M+".mesh"
+    ModFile = M+ModExt
+    MshFile = M+MshExt
       
     
     with open(MshFile, "r") as f:
@@ -798,7 +804,7 @@ def read_model_ubc(ModFile=None, trans="LINEAR", volumes=False, out=True):
     mode = ubce + 0.5*np.sum(dxu)
     modn = ubcn + 0.5*np.sum(dyu)
     lat, lon = utl.proj_utm_to_latlon(mode, modn, utm_zone=utmz)
-    print(lat, lon)
+    # print(lat, lon)
     
     refx = -0.5*np.sum(dx)
     refy = -0.5*np.sum(dy)
@@ -815,8 +821,6 @@ def read_model_ubc(ModFile=None, trans="LINEAR", volumes=False, out=True):
         val = np.append(val, float(line))
     val = np.reshape(val, (ny, nx, nz))    
     val = np.transpose(val, (1,0,2))
-
-
 
 
     # here mval should be in physical units, not log...
@@ -852,26 +856,21 @@ def read_model_ubc(ModFile=None, trans="LINEAR", volumes=False, out=True):
     return dx, dy, dz, val, refubc, trans, vcell
 
 
-def read_model_mod(ModFile=None, trans="LINEAR", volumes=False, out=True):
+def read_model_mod(ModFile=None, ModExt=".rho", 
+                   trans="LINEAR", volumes=False, out=True):
     """
     Read ModEM model input.
 
     Returns mval in physical units
 
     author: vrath
-    last changed: Aug 28, 2023
-
-    In Fortran:
-
-    DO iz = 1,Nz
-        DO iy = 1,Ny
-            DO ix = Nx,1,-1
-                READ(10,*) mval(ix,iy,iz)
-            ENDDO
-        ENDDO
-    ENDDO
+    last changed: Aug 31, 2023
 
     """
+   
+    M = os.path.splitext(ModFile)[0]
+    ModFile = M+ModExt
+
     with open(ModFile, "r") as f:
         lines = f.readlines()
 
