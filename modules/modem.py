@@ -667,7 +667,7 @@ def write_model_mod(ModFile=None, ModExt=".rho",
     trns = np.array(trans)
 
     if reference==None:
-        ncorner =  0.5*np.sum(dx)
+        ncorner = -0.5*np.sum(dx)
         ecorner = -0.5*np.sum(dy)
         elev = 0.
         cnt = np.array([ncorner, ecorner, elev])
