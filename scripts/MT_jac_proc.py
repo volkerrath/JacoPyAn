@@ -38,8 +38,10 @@ import scipy.linalg as spl
 import scipy.sparse as scp
 import netCDF4 as nc
 
+JACOPYAN_DATA = os.environ["JACOPYAN_DATA"]
+JACOPYAN_ROOT = os.environ["JACOPYAN_ROOT"]
 
-mypath = ["/home/vrath/Py4MT/JacoPyAn/modules/", "/home/vrath/Py4MT/JacoPyAn/scripts/"]
+mypath = [JACOPYAN_ROOT+"/modules/", JACOPYAN_ROOT+"/scripts/"]
 for pth in mypath:
     if pth not in sys.path:
         sys.path.insert(0,pth)
@@ -48,6 +50,7 @@ for pth in mypath:
 import jacproc as jac
 import modem as mod
 from version import versionstrg
+import util as utl
 
 version, _ = versionstrg()
 titstrng = utl.print_title(version=version, fname=__file__, out=False)

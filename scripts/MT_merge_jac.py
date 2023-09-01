@@ -43,8 +43,10 @@ import vtk
 import pyvista as pv
 import PVGeo as pvg
 
+JACOPYAN_DATA = os.environ["JACOPYAN_DATA"]
+JACOPYAN_ROOT = os.environ["JACOPYAN_ROOT"]
 
-mypath = ["/home/vrath/Py4MT/JacoPyAn/modules/", "/home/vrath/Py4MT/JacoPyAn/scripts/"]
+mypath = [JACOPYAN_ROOT+"/modules/", JACOPYAN_ROOT+"/scripts/"]
 for pth in mypath:
     if pth not in sys.path:
         sys.path.insert(0,pth)
@@ -54,11 +56,9 @@ import jacproc as jac
 import modem as mod
 from version import versionstrg
 
-Strng, _ = versionstrg()
-now = datetime.now()
-print("\n\n"+Strng)
-print("Merge & Sparsify "+"\n"+"".join("Date " + now.strftime("%m/%d/%Y, %H:%M:%S")))
-print("\n\n")
+version, _ = versionstrg()
+titstrng = utl.print_title(version=version, fname=__file__, out=False)
+print(titstrng+"\n\n")
 
 
 rng = np.random.default_rng()

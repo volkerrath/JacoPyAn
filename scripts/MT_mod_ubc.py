@@ -43,6 +43,7 @@ blank = rhoair
 Task = "Mod2UBC"
 
 if "mod2ubc" in Task.lower():
+    print("\n\nTransforming ModEM model file to UBC model & mesh format" )
     # MOD_Data  =  "/home/vrath/JacoPyAn/work/UBC_format_example/UBI8_Z_Alpha02_NLCG_014.dat"
     MOD_Modl  =  "/home/vrath/JacoPyAn/work/UBC_format_example/UBI8_Z_Alpha02_NLCG_014"
     MPad=[0, 0, 0, 0, 0, 0]
@@ -78,6 +79,7 @@ if "mod2ubc" in Task.lower():
     
 
 if "ubc2mod" in Task.lower():
+    print("\n\nTransforming UBC model & mesh files to ModEM format" )
     UBC_Modl  =  "/home/vrath/JacoPyAn/work/UBC_format_example/UBI8_Z_Alpha02_NLCG_014"
     MOD_Modl  =  UBC_Modl
     MshExt = ".mesh"

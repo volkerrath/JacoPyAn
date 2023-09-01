@@ -38,7 +38,10 @@ import scipy.sparse as scs
 import netCDF4 as nc
 
 
-mypath = ["/home/vrath/Py4MT/JacoPyAn/modules/", "/home/vrath/Py4MT/JacoPyAn/scripts/"]
+JACOPYAN_DATA = os.environ["JACOPYAN_DATA"]
+JACOPYAN_ROOT = os.environ["JACOPYAN_ROOT"]
+
+mypath = [JACOPYAN_ROOT+"/modules/", JACOPYAN_ROOT+"/scripts/"]
 for pth in mypath:
     if pth not in sys.path:
         sys.path.insert(0,pth)
@@ -54,7 +57,6 @@ titstrng = utl.print_title(version=version, fname=__file__, out=False)
 print(titstrng+"\n\n")
 
 
-JACOPYAN_DATA = os.environ["JACOPYAN_DATA"]
 
 
 gc.enable()
@@ -65,42 +67,6 @@ blank = np.nan
 
 outform = "LINEAR"
 outform = outform.upper()
-
-# WorkDir = r"/home/vrath/work/MT_Data/Ubaye/UB22_jac_best/"
-# MFile   = WorkDir +r"Ub22_ZoffPT_02_NLCG_014.rho"
-# MPad=[12, 12 , 12, 12, 0, 36]
-
-# # JFiles = [WorkDir+r"Ub22_Zoff.jac", ]
-# # DFiles = [WorkDir+r"Ub22_Zoff.dat", ]
-
-# # JFiles = [WorkDir+r"Ub22_P.jac", ]
-# # DFiles = [WorkDir+r"Ub22_P.dat", ]
-
-# # JFiles = [WorkDir+r"Ub22_T.jac", ]
-# # DFiles = [WorkDir+r"Ub22_T.dat", ]
-
-# JFiles = [WorkDir+r"Ub22_T.jac", WorkDir+r"Ub22_P.jac", WorkDir+r"Ub22_Zoff.jac", ]
-# DFiles = [WorkDir+r"Ub22_T.dat", WorkDir+r"Ub22_P.dat", WorkDir+r"Ub22_Zoff.dat", ]
-
-
-# # Ubaye case
-# WorkDir = JACOPYAN_DATA+"/NewJacobians/Ubaye/work/"
-# WorkName = "Ub22Jac"
-# MFile   = WorkDir +"Ub22.rho"
-# MPad=[13, 13 , 13, 13, 0, 36]
-
-# # Annecy case
-# WorkDir = JACOPYAN_DATA+"/NewJacobians/Annecy/work/"
-# WorkName = "Ann25Jac"
-# MFile   = WorkDir +"Ann25.rho"
-# MPad=[22, 22 , 22, 22, 0, 15]
-
-# # Maurienne case
-# WorkDir = JACOPYAN_DATA+"/NewJacobians/Maurienne/E10/"
-# WorkName = "MauJac"
-# MFile   = WorkDir +"Maur15_500_PTZ_E10_NLCG_016.rho"
-# # MFile   = WorkDir +"Maur15_500_PTZ_E03_NLCG_026.rho"
-# MPad=[14, 14 , 14, 14, 0, 15]
 
 # UBINAS
 WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/"

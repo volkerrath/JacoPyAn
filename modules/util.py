@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Sun Nov  1 17:08:06 2020
 
@@ -743,7 +742,7 @@ def make_pdf_catalog(WorkDir="./", PdfList= None, FileName=None):
 
     print("\n"+str(np.size(PdfList))+" files collected to "+FileName)
 
-def print_title(version="", fname="", form="%m/%d/%Y, %H:%M:%S", out=True):
+def print_title(version="", fname="", form="%m/%d/%Y, %H:%M:%S", package="JacoPyAn",out=True):
     """
     Print version, calling filename, and modification date.
     """
@@ -758,7 +757,7 @@ def print_title(version="", fname="", form="%m/%d/%Y, %H:%M:%S", out=True):
         tstr = ""
     else:
        ndat = "\n"+"".join("Date " + datetime.now().strftime(form))
-       tstr =  "Py4MT Version "+version+ndat+ "\n"
+       tstr =  package+" Version "+version+ndat+ "\n"
 
     if len(fname)==0:
         print("No calling filenane given! Not printed to title.")
