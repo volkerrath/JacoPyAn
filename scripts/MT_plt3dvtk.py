@@ -40,15 +40,15 @@ for pth in mypath:
         sys.path.insert(0,pth)
 
 
-
 import modem as mod
 import util as utl
 from version import versionstrg
 
-
-version, _ = versionstrg()
-titstrng = utl.print_title(version=version, fname=__file__, out=False)
-print(titstrng+"\n\n")
+Strng, _ = versionstrg()
+now = datetime.now()
+print("\n\n"+Strng)
+print("Image processing on model"+"\n"+"".join("Date " + now.strftime("%m/%d/%Y, %H:%M:%S")))
+print("\n\n")
 
 
 warnings.simplefilter(action="ignore", category=FutureWarning)

@@ -34,7 +34,7 @@ version, _ = versionstrg()
 titstrng = utl.print_title(version=version, fname=__file__, out=False)
 print(titstrng+"\n\n")
 
-debug = True
+debug = False
 
 rhoair = 1.e17
 blank = rhoair
@@ -44,7 +44,7 @@ Task = "Mod2UBC"
 
 if "mod2ubc" in Task.lower():
     print("\n\nTransforming ModEM model file to UBC model & mesh format" )
-    # MOD_Data  =  "/home/vrath/JacoPyAn/work/UBC_format_example/UBI8_Z_Alpha02_NLCG_014.dat"
+    MOD_Data  =  "/home/vrath/JacoPyAn/work/UBC_format_example/UBI8_Z_Alpha02_NLCG_014.dat"
     MOD_Modl  =  "/home/vrath/JacoPyAn/work/UBC_format_example/UBI8_Z_Alpha02_NLCG_014"
     MPad=[0, 0, 0, 0, 0, 0]
     UBC_Modl = MOD_Modl
