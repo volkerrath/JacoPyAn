@@ -962,7 +962,7 @@ def fix_cells( covfile_i=None,
     comments = ["#", "|",">", "+","/"]
     
     
-    dx, dy, dz, rho, reference, _ = mod.read_model(modfile_i, out=True)
+    dx, dy, dz, rho, reference, _ = read_mod(modfile_i, out=True)
     modsize = np.shape(rho)
     
     if "dist" in method[0].lower():
@@ -974,7 +974,7 @@ def fix_cells( covfile_i=None,
         cellcent = [xc, yc]
         
         # print(len(xc),len(yc))
-        Site , _, Data, _ = mod.read_data(datfile_i, out=True)
+        Site , _, Data, _ = read_data(datfile_i, out=True)
         
         xs = []
         ys = []
@@ -1089,7 +1089,7 @@ def fix_cells( covfile_i=None,
                      +str(fixdist)+"m fixed (zone "+str(fixed)+")")
             
     if "val" in fixmod[0].lower():
-        write_model(ModFile_out, dx, dy, dz, rho,reference,out = True)
+        write_mod(modfile_o, dx, dy, dz, rho,reference,out = True)
         if out:
             print("fix_cells: model written to %s" % (covfile_o))
             print("fix_cells: model in %s fixed to %g Ohm.m" % (covfile_i))
@@ -1558,7 +1558,7 @@ def crossgrad(m1=np.array([]),
     
     cgnm = np.abs(cgm)/(np.abs(gm1)*np.abs(gm2))
 
-    return cgm, cgmn
+    return cgm, cgnm
 
 def medfilt3D(
         M,

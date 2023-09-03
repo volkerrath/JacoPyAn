@@ -62,7 +62,8 @@ nan = np.nan
 
 
 
-SparseThresh = 0.  #, 1.e-6
+SparseThresh = 1.e-5
+
 
 
 
@@ -121,7 +122,7 @@ for f in np.arange(nF):
     start = time.time()
     dsh = np.shape(Data)
     err = np.reshape(Data[:, 5], (dsh[0], 1))
-    print(np.amin(err), np.amax(err))
+    # print(np.amin(err), np.amax(err))
     Jac = jac.normalize_jac(Jac, err)
     elapsed = time.time() - start
     print(" Used %7.4f s for normalizing Jacobian with data error from %s " % (elapsed, DFiles[f]))
