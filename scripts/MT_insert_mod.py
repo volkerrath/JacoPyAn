@@ -79,7 +79,7 @@ smoother = ["uniform", 3]
 total = 0
 start = time.time()
 
-dx, dy, dz, rho, reference = mod.read_model_mod(ModFile_in + ".rho", out=True)
+dx, dy, dz, rho, reference = mod.read_mod(ModFile_in + ".rho", out=True)
 # write_model_mod(ModFile_out+'.rho', dx, dy, dz, rho,reference,out = True)
 elapsed = time.time() - start
 total = total + elapsed

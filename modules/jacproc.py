@@ -219,8 +219,8 @@ def get_scale(d=np.array([]), F=0.1, method = "other", OutInfo = False):
     else:
         dmax = np.nanmax(np.abs(d))
         dmin = np.nanmin(np.abs(d))
-        denom =F *(np.log(dmax)-numpy.log(dmin))
-        scale = numpy.abs(dmax/denom)
+        denom =F *(np.log(dmax)-np.log(dmin))
+        scale = np.abs(dmax/denom)
 
     if OutInfo:
         print("Scale value S is "+str(scale)+", method "+method)

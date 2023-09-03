@@ -82,7 +82,7 @@ total = 0.0
 
 
 start = time.time()
-dx, dy, dz, rho, reference = mod.read_model_mod(MFile, trans="log10")
+dx, dy, dz, rho, reference = mod.read_mod(MFile, trans="log10")
 dims = np.shape(rho)
 # print(dims)
 elapsed = time.time() - start
