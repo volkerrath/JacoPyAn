@@ -56,8 +56,8 @@ trans = "LINEAR"
 
 OutFormat = "mod ubc" 
 # UBINAS
-#WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/"
-WorkDir = JACOPYAN_ROOT+"/work/"
+WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/"
+#WorkDir = JACOPYAN_ROOT+"/work/"
 WorkName = "UBI_ZPT"
 MFile   = WorkDir + "UBI_best.rho"
 MPad=[14, 14 , 14, 14, 0, 71]
