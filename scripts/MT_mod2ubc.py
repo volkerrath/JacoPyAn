@@ -36,7 +36,7 @@ MFile  =  "/home/vrath/JacoPyAn/work/UBC_format_example/UBI8_Z_Alpha02_NLCG_014.
 MPad=[14, 14 , 14, 14, 0, 71]
 
 start = time.time()
-dx, dy, dz, rho, refmod, _, vcell = mod.read_model_mod(MFile, trans="linear", volumes=True)
+dx, dy, dz, rho, refmod, _, vcell = mod.read_mod(MFile, trans="linear", volumes=True)
 dims = np.shape(rho)
 sdims = np.size(rho)
 

@@ -51,7 +51,7 @@ if "mod2ubc" in Task.lower():
     lat, lon =  -16.346,  -70.908
 
     start = time.time()
-    dx, dy, dz, rho, refmod, _, vcell = mod.read_model_mod(MOD_Modl, ".rho",trans="linear", volumes=True)
+    dx, dy, dz, rho, refmod, _, vcell = mod.read_mod(MOD_Modl, ".rho",trans="linear", volumes=True)
     dims = np.shape(rho)
     sdims = np.size(rho)
     

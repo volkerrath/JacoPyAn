@@ -596,7 +596,7 @@ def write_model_ncd(
 #         f.write("%10.2f  \n" % (0.0))
 
 
-def write_model_mod(ModFile=None, ModExt=".rho",
+def write_mod(ModFile=None, ModExt=".rho",
                     dx=None, dy=None, dz=None, mval=None, reference=None,
                     trans=None, aircells = None, mvalair = 1.e17, blank = 1.e17, header="", out=True):
     """
@@ -702,7 +702,7 @@ def write_model_mod(ModFile=None, ModExt=".rho",
 
 
 
-def write_model_ubc(ModFile=None,  MshExt=".mesh", ModExt=".mod",
+def write_ubc(ModFile=None,  MshExt=".mesh", ModExt=".mod",
                     dx=None, dy=None, dz=None, mval=None, refcenter=None,
                     aircells = None, mvalair = 1.e17, blank = 1.e17, header="", out=True):
     """
@@ -766,7 +766,7 @@ def write_model_ubc(ModFile=None,  MshExt=".mesh", ModExt=".mod",
     with open(ModFile , "w") as f:
         np.savetxt(f, val, fmt="%14.5g")
         
-def read_model_ubc(ModFile=None, ModExt=".mod", MshExt=".mesh",
+def read_ubc(ModFile=None, ModExt=".mod", MshExt=".mesh",
                    trans="LINEAR", volumes=False, out=True):   
     """
     Read UBC model input.
@@ -856,7 +856,7 @@ def read_model_ubc(ModFile=None, ModExt=".mod", MshExt=".mesh",
     return dx, dy, dz, val, refubc, trans, vcell
 
 
-def read_model_mod(ModFile=None, ModExt=".rho", 
+def read_mod(ModFile=None, ModExt=".rho", 
                    trans="LINEAR", volumes=False, out=True):
     """
     Read ModEM model input.

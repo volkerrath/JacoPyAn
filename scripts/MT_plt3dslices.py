@@ -20,7 +20,7 @@ from sys import exit as error
 from datetime import datetime
 
 import numpy as np
-import gdal
+# import gdal
 import scipy as sc
 import vtk
 import pyvista as pv
@@ -57,14 +57,13 @@ rhoair = 1.e17
 
 total = 0
 
-PFile = r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/Ann21_T"
-DFile = r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/Ann21_T3.dat"
-MFile = r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/Ann21_Prior100_T_NLCG_033.rho"
-SFile = r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/Ann21_Prior100_T-Z3.sns"
-
+PFile = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/Ann21_T"
+DFile = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/Ann21_T3.dat"
+MFile = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/Ann21_Prior100_T_NLCG_033.rho"
+SFile = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/Ann21_Prior100_T-Z3.sns"
 
 start = time.time()
-dx, dy, dz, rho, reference = mod.read_model_mod(MFile, trans="LOG10")
+dx, dy, dz, rho, reference = mod.read_mod(MFile, trans="LOG10")
 elapsed = time.time() - start
 total = total + elapsed
 print("Used %7.4f s for reading model from %s " % (elapsed, MFile))
@@ -72,7 +71,7 @@ print("ModEM reference is "+str(reference))
 print("Min/max rho = "+str(np.min(rho))+"/"+str(np.max(rho)))
 
 start = time.time()
-dx, dy, dz, sns, reference = mod.read_model_mod(SFile, trans="LOG10")
+dx, dy, dz, sns, reference = mod.read_mod(SFile, trans="LOG10")
 elapsed = time.time() - start
 total = total + elapsed
 print("Used %7.4f s for reading model from %s " % (elapsed, SFile))

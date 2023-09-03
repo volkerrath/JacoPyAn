@@ -61,15 +61,15 @@ rng = np.random.default_rng()
 nan = np.nan
 
 
-Tasks = ["write_npz", "normalize_err", "sparsify"]
+Tasks = ["normalize_err", "sparsify"]
 """
 "normalize_err", "sparsify". "split", "merge"
 """
 sparse_thresh = 1.e-8
 
 
-outform = "LINEAR"
-outform = outform.upper()
+OutFormat = "npz"
+
 
 WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/"
 WorkName = "UBI_best"
@@ -86,12 +86,13 @@ nF = np.size(DFiles)
 
 total = 0.0
 start = time.time()
-dx, dy, dz, rho, reference, _, vcell = mod.read_model_mod(MFile, trans="linear", volumes=True)
+dx, dy, dz, rho, reference, _, vcell = mod.read_mod(MFile, trans="linear", volumes=True)
 dims = np.shape(rho)
 sdims = np.size(rho)
 
 rhoair = 1.e17
 aircells = np.where(rho>rhoair/10)
+blank = rhoair
 
 
 # TSTFile = WorkDir+WorkName+"0_MaskTest.rho"
@@ -122,81 +123,60 @@ mxVal = 1e-30
 mxLst = []
 for f in np.arange(nF):
 
-    name, ext = os.path.splitext(JFile[f])
+    name, ext = os.path.splitext(JFiles[f])
     start =time.time()
-    print("\nReading Data from "+DFile[f])
-    Data, Site, Freq, Comp, Head = mod.read_data_jac(DFile[f])
+    print("\nReading Data from "+DFiles[f])
+    Data, Site, Freq, Comp, Head = mod.read_data_jac(DFiles[f])
     elapsed = time.time() - start
-    print(" Used %7.4f s for reading Data from %s " % (elapsed, DFile[f]))
+    print(" Used %7.4f s for reading Data from %s " % (elapsed, DFiles[f]))
     total = total + elapsed
 
     start = time.time()
-    print("Reading Jacobian from "+JFile[f])
-    Jac = mod.read_jac(JFile[f])
+    print("Reading Jacobian from "+JFiles[f])
+    Jac, Info = mod.read_jac(JFiles[f])
     elapsed = time.time() - start
-    print(" Used %7.4f s for reading Jacobian from %s " % (elapsed, JFile[f]))
+    print(" Used %7.4f s for reading Jacobian from %s " % (elapsed, JFiles[f]))
     total = total + elapsed
-    
-    nstr = ""       
-    if write_npz:
+    for subtask in Tasks:
+
+        nstr = ""
+        if "err" in subtask.lower():
+            nstr = nstr+"_nerr"
+            start = time.time()
+            dsh = np.shape(Data)
+            err = np.reshape(Data[:, 5], (dsh[0], 1))
+            print(np.amin(err), np.amax(err))
+            Jac = jac.normalize_jac(Jac, err)
+            elapsed = time.time() - start
+            print(" Used %7.4f s for normalizing Jacobian with data error from %s " % (elapsed, DFiles[f]))
+            start = time.time()
+            name = name +nstr
+        
+        sstr=""
+        if "spar" in subtask.lower():
+            sstr="_sp"+str(round(np.log10(sparse_thresh)))
+            start = time.time()
+            Jac, _= jac.sparsify_jac(Jac,sparse_thresh=sparse_thresh)
+            elapsed = time.time() - start
+            total = total + elapsed
+            print(" Used %7.4f s for sparsifying Jacobian %s " % (elapsed, JFiles[f]))
+            name = name+nstr+sstr
+      
+    if "npz" in OutFormat.lower():
         start = time.time()
-        dsh = np.shape(Data)
-        err = np.reshape(Data[:, 5], (dsh[0], 1))
-        print(np.amin(err), np.amax(err))
-        Jac = jac.normalize_jac(Jac, err)
         NPZFile = name +".npz"
         np.savez_compressed(NPZFile,
                             Jac=Jac, Data=Data, Site=Site, Comp=Comp)
         elapsed = time.time() - start
         total = total + elapsed
         print(" Used %7.4f s for writing Jacobian to %s " % (elapsed, NPZFile))
-
-    nstr = ""
-    if normalize_err:
-        nstr = nstr+"_nerr"
+        
+    if "nc" in OutFormat.lower():
         start = time.time()
-        dsh = np.shape(Data)
-        err = np.reshape(Data[:, 5], (dsh[0], 1))
-        print(np.amin(err), np.amax(err))
-        Jac = jac.normalize_jac(Jac, err)
-        elapsed = time.time() - start
-        print(" Used %7.4f s for normalizing Jacobian with data error from %s " % (elapsed, DFile))
-        start = time.time()
-        NPZFile = name +nstr+ ".npz"
-        np.savez_compressed(NPZFile,
-                            Jac=Jac, Data=Data, Site=Site, Comp=Comp)
+        NCDFile = name +".nc"    
+        mod.write_jac_ncd(NCDFile, Jac, Data, Site, Comp)
         elapsed = time.time() - start
         total = total + elapsed
-        print(" Used %7.4f s for writing Jacobian to %s " % (elapsed, NPZFile))
-    
-    sstr=""
-    if sparsify:
-        sstr="_sp"+str(round(np.log10(sparse_thresh)))
-        start = time.time()
-        Jacs= jac.sparsify_jac(Jac,sparse_thresh=sparse_thresh)
-        elapsed = time.time() - start
-        total = total + elapsed
-        print(" Used %7.4f s for sparsifying Jacobian %s " % (elapsed, JFile[f]))
-        NPZFile = name+nstr+sstr+".npz"
-        np.savez_compressed(NPZFile,
-                            Jac=Jacs, Data=Data, Site=Site, Comp=Comp)
-        elapsed = time.time() - start
-        total = total + elapsed
-        print(" Used %7.4f s for writing sparsified Jacobian to %s " % (elapsed, NPZFile))
+        print(" Used %7.4f s for writing Jacobian to %s " % (elapsed, NCDFile))
+  
 
-
-
-    start = time.time()
-    NCFile = name + nstr+".nc"
-    mod.write_jac_ncd(NCFile, Jac, Data, Site, Comp)
-    elapsed = time.time() - start
-    total = total + elapsed
-    print(" Used %7.4f s for writing Jacobian to %s " % (elapsed, NCFile))
-
-    start = time.time()
-    NPZFile = name +nstr+ ".npz"
-    np.savez_compressed(NPZFile,
-                        Jac=Jac, Data=Data, Site=Site, Comp=Comp)
-    elapsed = time.time() - start
-    total = total + elapsed
-    print(" Used %7.4f s for writing Jacobian to %s " % (elapsed, NPZFile))
