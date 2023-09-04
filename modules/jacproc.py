@@ -394,35 +394,33 @@ def sparsify_jac(Jac=None, sparse_thresh=1.0e-6, normalized=False, method=None, 
     if out:
         nel = shj[0] * shj[1]
         print(
-            "sparsifyJac: dimension of original J is %i x %i = %i elements"
+            "sparsify_jac: dimension of original J is %i x %i = %i elements"
             % (shj[0], shj[1], nel)
         )
-    Jf = np.abs(Jac.copy())
-    Jmax = np.amax(Jf)
-    thresh = sparse_thresh
-    Jf[Jf < thresh] = 0.0
+    Jf = Jac.copy()
+    Jmax = np.amax(np.abs(Jf))
+    Jf[np.abs(Jf)/Jmax < sparse_thresh] = 0.0
+
     Js = scp.csr_matrix(Jf)
 
     if out:
-        if scp.issparse(Js):
-            ns = scp.csr_matrix.count_nonzero(Js)
-            print(
-                "sparsifyJac:"
+        ns = scp.csr_matrix.count_nonzero(Js)
+        print("sparsify_jac:"
                 +" output J is sparse, and has %i nonzeros, %f percent"
-                % (ns, 100.0 * ns / nel)
-            )
-        x = np.random.normal(size=np.shape(Jac)[1])
-        # print(np.shape(x))
-        # print(np.shape(Js))
-        normx = npl.norm(x)
-        norma = npl.norm(Js@x)/normx
-        normf = npl.norm(Jf@x)/normx
+                % (ns, 100.0 * ns / nel))
+        test = np.random.normal(size=np.shape(Jac)[1])
+        normx = npl.norm(Jf@test)
+        normo = npl.norm(Jf@test-Js@test)
+        print(normx, normo, normo/normx)
+        normd = npl.norm((Jac-Jf), ord="fro")
+        normf = npl.norm(Jac, ord="fro")
         # print(norma)
         # print(normf)
         print(" Sparsified J explains "
-              +str(round(norma*100./normf))+"% of full J.")
+              +str(round(100.-100.*normd/normf))+"% of full J.")
 
     if normalized:
+        Jmax = np.amax(np.abs(Jac))
         f = 1.0 / Jmax
         Js = f * Js
 
