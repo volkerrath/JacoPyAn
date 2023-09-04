@@ -72,6 +72,8 @@ utmcenter = [utm_x, utm_y, 0.0]
 
 ell = ["ell", "rep", 0., 0., 0., 3000., 10000., 2000., 1000., 0., 0., 30.]
 box = ["box", "rep", 0., 0., 0., 1000., 2000., 1000., 1000., 0., 0., 30.]
+cyl = []
+
 bodies = [ell, box]
 nb = np.shape(bodies)
 # smoother=['gaussian',0.5]
