@@ -53,7 +53,7 @@ blank = np.nan
 rhoair = 1.e17
 
 trans = "LINEAR"
-
+InpFormat = "sparse"
 OutFormat = "mod ubc" 
 # UBINAS
 WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/"
@@ -141,19 +141,37 @@ total = total + elapsed
 
 start = time.time()
 print("Reading Jacobian from "+JFile)
-Jac, Info = mod.read_jac(JFile)
+
+if "spa" in InpFormat:
+    NPZFile = JFile +"_jac.npz"
+    tmp = np.load(NPZFile)
+    Jac = tmp["Jac"]
+    
+    NPZFile = JFile +"_info.npz"
+    tmp = np.load(NPZFile)
+    Freqs = tmp["Freq"]
+    Comps = tmp["Comp"]
+    Sites = tmp["Site"]
+    normalized = True
+else:  
+    Jac, tmp = mod.read_jac(JFile)
+    Freqs = tmp[:,0]
+    Comps = tmp[:,1]
+    Sites = tmp[:,2]
+    normalized = False
+    
 elapsed = time.time() - start
 print(" Used %7.4f s for reading Jacobian from %s " % (elapsed, JFile))
 total = total + elapsed
 
-
-start = time.time()
-dsh = np.shape(Data)
-err = np.reshape(Data[:, 5], (dsh[0], 1))
-print(np.amin(err), np.amax(err))
-Jac = jac.normalize_jac(Jac, err)
-elapsed = time.time() - start
-print(" Used %7.4f s for normalizing Jacobian with data error from %s " % (elapsed, DFile))
+if not normalized:
+    start = time.time()
+    dsh = np.shape(Data)
+    err = np.reshape(Data[:, 5], (dsh[0], 1))
+    print(np.amin(err), np.amax(err))
+    Jac = jac.normalize_jac(Jac, err)
+    elapsed = time.time() - start
+    print(" Used %7.4f s for normalizing Jacobian with data error from %s " % (elapsed, DFile))
 
 mx = np.nanmax(np.abs(Jac))
 mn = np.nanmin(np.abs(Jac))
@@ -210,7 +228,6 @@ for Split in Splits:
         """
         compstr = ["zfull", "zoff", "tp", "rpoff", "pt"]
     
-        Comps = Info[:,1]
         ExistComp = np.unique(Comps)
         
         for icmp in ExistComp:
@@ -241,7 +258,7 @@ for Split in Splits:
     if "site" in Split.lower():
         start = time.time()
         
-        Sites = Info[:,2]
+
         SiteNums = Sites[np.sort(np.unique(Sites, return_index=True)[1])] 
         SiteNames = Site[np.sort(np.unique(Site, return_index=True)[1])] 
     
@@ -276,7 +293,7 @@ for Split in Splits:
         start = time.time()
         
         nF = len(FreqBands)
-        Freqs = Info[:,0]
+       
         FreqNums = Freqs[np.sort(np.unique(Freqs, return_index=True)[1])] 
         FreqValues = Freq[np.sort(np.unique(Freq, return_index=True)[1])] 
         
