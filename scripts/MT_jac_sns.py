@@ -56,16 +56,16 @@ trans = "LINEAR"
 InpFormat = "sparse"
 OutFormat = "mod ubc" 
 # UBINAS
-WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/"
-#WorkDir = JACOPYAN_ROOT+"/work/"
+# WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/"
+WorkDir = JACOPYAN_ROOT+"/work/"
 WorkName = "UBI_ZPT"
 MFile   = WorkDir + "UBI_best.rho"
 MPad=[14, 14 , 14, 14, 0, 71]
 
 MOrig = [-16.345800 -70.908249]
 
-JFile = WorkDir + "UBI_ZPT.jac"
-DFile = WorkDir + "UBI_ZPT_jac.dat"
+
+JFile = WorkDir + "UBI_ZPT"
 
 
 Splits = [] #["comp", "site", "freq"]
@@ -132,46 +132,36 @@ jacmask = j0.reshape(jdims)
 
 
 name, ext = os.path.splitext(JFile)
-start =time.time()
-print("\nReading Data from "+DFile)
-Data, Site, Freq, Comp, Head = mod.read_data_jac(DFile)
-elapsed = time.time() - start
-print(" Used %7.4f s for reading Data from %s " % (elapsed, DFile))
-total = total + elapsed
 
 start = time.time()
 print("Reading Jacobian from "+JFile)
 
 if "spa" in InpFormat:
-    NPZFile = JFile +"_jac.npz"
-    tmp = np.load(NPZFile)
+    tmp = np.load(JFile +"_jac.npz")
     Jac = tmp["Jac"]
+    normalized = True
     
-    NPZFile = JFile +"_info.npz"
-    tmp = np.load(NPZFile)
+    tmp = np.load( JFile +"_info.npz")
     Freqs = tmp["Freq"]
     Comps = tmp["Comp"]
     Sites = tmp["Site"]
-    normalized = True
+
 else:  
-    Jac, tmp = mod.read_jac(JFile)
+    
+    Jac, tmp = mod.read_jac(JFile + ".jac")    
+    normalized = False
     Freqs = tmp[:,0]
     Comps = tmp[:,1]
     Sites = tmp[:,2]
-    normalized = False
-    
-elapsed = time.time() - start
-print(" Used %7.4f s for reading Jacobian from %s " % (elapsed, JFile))
-total = total + elapsed
-
-if not normalized:
-    start = time.time()
+    Data, Site, Freq, Comp, Head = mod.read_data_jac(JFile + "_jac.dat")
     dsh = np.shape(Data)
     err = np.reshape(Data[:, 5], (dsh[0], 1))
-    print(np.amin(err), np.amax(err))
     Jac = jac.normalize_jac(Jac, err)
-    elapsed = time.time() - start
-    print(" Used %7.4f s for normalizing Jacobian with data error from %s " % (elapsed, DFile))
+    
+elapsed = time.time() - start
+print(" Used %7.4f s for reading Jacobian/data from %s" % (elapsed, JFile))
+total = total + elapsed
+
 
 mx = np.nanmax(np.abs(Jac))
 mn = np.nanmin(np.abs(Jac))
