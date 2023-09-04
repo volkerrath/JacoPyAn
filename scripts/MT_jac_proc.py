@@ -66,7 +66,7 @@ SparseThresh = 1.e-5
 
 
 
-
+#WorkDir = JACOPYAN_ROOT+"/work/"
 WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/"
 WorkName = "UBI_best"
 MFile   = WorkDir + "UBI_best.rho"
