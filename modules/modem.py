@@ -703,7 +703,7 @@ def write_mod(ModFile=None, ModExt=".rho",
 
 
 def write_ubc(ModFile=None,  MshExt=".mesh", ModExt=".mod",
-                    dx=None, dy=None, dz=None, mval=None, refcenter=None,
+                    dx=None, dy=None, dz=None, mval=None, reference=None,
                     aircells = None, mvalair = 1.e17, blank = 1.e17, header="", out=True):
     """
     Write UBC model input.
@@ -735,13 +735,13 @@ def write_ubc(ModFile=None,  MshExt=".mesh", ModExt=".mod",
     dxu = dy.reshape(1, dy.shape[0])
     dzu = dz.reshape(1, dz.shape[0])
     
-    lat = refcenter[0]
-    lon = refcenter[1]
+    lat = reference[0]
+    lon = reference[1]
     utm_zone = utl.get_utm_zone(lat,lon)
     utme, utmn = utl.proj_latlon_to_utm(lat, lon, utm_zone=utm_zone[0])
     ubce = utme - 0.5*np.sum(dxu)
     ubcn = utmn - 0.5*np.sum(dyu)
-    refu = np.array([ubce, ubcn, refcenter[2], utm_zone[0]]).reshape(1,4)
+    refu = np.array([ubce, ubcn, reference[2], utm_zone[0]]).reshape(1,4)
     # print(refu)
 
     

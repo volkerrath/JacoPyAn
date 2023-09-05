@@ -51,7 +51,7 @@ def calc_sensitivity(Jac=np.array([]),
     Fakultaet für Geowissenschaften, Geotechnik und Bergbau,
     Technische Universitaet Bergakademie Freiberg, 2004.
 
-    author:VR 4/23
+    author:VR 9/23
 
     """
 
@@ -64,29 +64,29 @@ def calc_sensitivity(Jac=np.array([]),
 
 
     if "raw" in  Type.lower():
-        S = np.sum(Jac,axis=0)
+        S = Jac.sum(axis=0)
         if OutInfo:
             print("raw:", S)
         # else:
         #     print("raw sensitivities")
-        smax = np.max(Jac, axis = 0)
-        smin = np.max(Jac, axis = 0)
+        smax = Jac.max(axis = 0)
+        smin = Jac.max(axis = 0)
     elif "cov" in Type.lower():
-        S = np.sum(np.abs(Jac),axis=0)
+        S = Jac.abs().sum(axis=0)
         if OutInfo:
             print("cov:", S)
         # else:
         #     print("coverage")
 
     elif "euc" in Type.lower():
-        S = np.sum(np.power(Jac,2),axis=0)
+        S = Jac.power(2).sum(axis=0)
         if OutInfo:
             print("euc:", S)
         # else:
         #     print("euclidean (default)")
 
     elif "cum" in Type.lower():
-        S = np.sum(np.abs(Jac),axis=0)
+        S = Jac.abs().sum(axis=0)
         # print(np.shape(S))
         # S = np.sum(Jac,axis=0)
 
@@ -100,7 +100,7 @@ def calc_sensitivity(Jac=np.array([]),
     else:
         print("calc_sensitivity: Type "
               +Type.lower()+" not implemented! Default assumed.")
-        S = np.sum(np.power(Jac,2),axis=0)
+        S = Jac.power(2).sum(axis=0)
 
         if OutInfo:
             print("euc (default):", S)
@@ -184,7 +184,7 @@ def transform_sensitivity(S=np.array([]), V=np.array([]),
 
                     S = np.arcsinh(S/scale)
 
-
+    S = np.array(S)
     return S
 
 def get_scale(d=np.array([]), F=0.1, method = "other", OutInfo = False):
