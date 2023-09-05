@@ -35,7 +35,7 @@ from sys import exit as error
 import numpy as np
 import numpy.linalg as npl
 import scipy.linalg as spl
-import scipy.sparse as scp
+import scipy.sparse as sps
 import netCDF4 as nc
 
 JACOPYAN_DATA = os.environ["JACOPYAN_DATA"]
@@ -62,18 +62,18 @@ nan = np.nan
 
 
 
-SparseThresh = 1.e-5
+SparseThresh = 1.e-8
 
 
 
-#WorkDir = JACOPYAN_ROOT+"/work/"
-WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/"
-WorkName = "UBI_best"
+WorkDir = JACOPYAN_ROOT+"/work/"
+#WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/"
+WorkName = "UBI_ZPT"
 MFile   = WorkDir + "UBI_best.rho"
 MPad=[14, 14 , 14, 14, 0, 71]
 
-JFiles = [WorkDir+"UBI_best.jac", ]
-DFiles = [WorkDir+"UBI_best_jac.dat", ]
+JFiles = [WorkDir+"UBI_ZPT.jac", ]
+DFiles = [WorkDir+"UBI_ZPT_jac.dat", ]
 
 if np.size(DFiles) != np.size(JFiles):
     error("Data file number not equal Jac file number! Exit.")
@@ -142,10 +142,10 @@ for f in np.arange(nF):
     name = name+nstr+sstr
     start = time.time()
     NPZFile = name +"_info.npz"
-    np.savez_compressed(NPZFile, Data=Data, Site=Site, Comp=Comp)
+    np.savez_compressed(NPZFile, Freq=Freq, Data=Data, Site=Site, Comp=Comp, allow_pickle=True)
     NPZFile = name +"_jac.npz"
     if SparseThresh>0.:
-       scp.save_npz(NPZFile, Jac, compressed=True)
+       sps.save_npz(NPZFile, matrix=Jac, compressed=True)
     else: 
        np.savez_compressed(NPZFile, Jac)
     elapsed = time.time() - start

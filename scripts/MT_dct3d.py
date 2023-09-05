@@ -37,11 +37,22 @@ import modules
 import modem as mod
 import util as utl
 
+from version import versionstrg
 
-
-rng = np.random.default_rng()
-nan = np.nan  # float("NaN")
 version, _ = versionstrg()
 titstrng = utl.print_title(version=version, fname=__file__, out=False)
 print(titstrng+"\n\n")
 
+nan = np.nan  # float("NaN")
+rng = np.random.default_rng()
+blank = np.nan
+rhoair = 1.e17
+
+trans = "LINEAR"
+InpFormat = "sparse"
+OutFormat = "mod ubc"
+# UBINAS
+# WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/"
+WorkDir = JACOPYAN_ROOT+"/work/"
+WorkName = "UBI_ZPT_nerr_sp-8"
+MFile   = WorkDir + "UBI_best.rho"

@@ -21,7 +21,7 @@ import gc
 import numpy as np
 import numpy.linalg as npl
 import scipy.linalg as spl
-import scipy.sparse as scs
+import scipy.sparse as sps
 import netCDF4 as nc
 
 
@@ -58,14 +58,14 @@ OutFormat = "mod ubc"
 # UBINAS
 # WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/"
 WorkDir = JACOPYAN_ROOT+"/work/"
-WorkName = "UBI_ZPT"
+WorkName = "UBI_ZPT_nerr_sp-8"
 MFile   = WorkDir + "UBI_best.rho"
 MPad=[14, 14 , 14, 14, 0, 71]
 
-MOrig = [-16.345800 -70.908249]
+MOrig = [-16.345800, -70.908249]
 
 
-JFile = WorkDir + "UBI_ZPT"
+JFile = WorkDir + "UBI_ZPT_nerr_sp-8"
 
 
 Splits = [] #["comp", "site", "freq"]
@@ -137,11 +137,10 @@ start = time.time()
 print("Reading Jacobian from "+JFile)
 
 if "spa" in InpFormat:
-    tmp = np.load(JFile +"_jac.npz")
-    Jac = tmp["Jac"]
+    Jac = sps.load_npz(JFile +"_jac.npz")
     normalized = True
     
-    tmp = np.load( JFile +"_info.npz")
+    tmp = np.load( JFile +"_info.npz", allow_pickle=True)
     Freqs = tmp["Freq"]
     Comps = tmp["Comp"]
     Sites = tmp["Site"]
@@ -163,18 +162,19 @@ print(" Used %7.4f s for reading Jacobian/data from %s" % (elapsed, JFile))
 total = total + elapsed
 
 
-mx = np.nanmax(np.abs(Jac))
-mn = np.nanmin(np.abs(Jac))
+mx = np.amax(np.abs(Jac))
+mn = np.amin(np.abs(Jac))
 jm = jacmask.flatten(order="F")
 print(JFile+" minimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))
-mx = np.nanmax(np.abs(Jac*jm))
-mn = np.nanmin(np.abs(Jac*jm))
-print(JFile+" minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx))
+#mx = np.amax(np.abs(Jac*jm))
+#mn = np.amin(np.abs(Jac*jm))
+#print(JFile+" minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx))
 # print(JFile+" number of elements in masked Jacobian is "+str(np.count_nonzero(~np.isfinite(Jac))))
 # print( np.count_nonzero(~np.isnan(jacmask))*np.shape(Jac)[0])
 V=vcell.flatten(order="F")
 start = time.time()
 print("Jac ", np.shape(Jac))
+Jac = Jac.toarray()
 SensTmp = jac.calc_sensitivity(Jac,
                      Type = Type, OutInfo=False)
 print("Sens ",np.shape(SensTmp))
