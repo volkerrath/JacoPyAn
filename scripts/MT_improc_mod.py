@@ -1,17 +1,5 @@
-#!/usr/bin/env python3
 
-# -*- coding: utf-8 -*-
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: py:light,ipynb
-#     text_representation:
-#       extension: .py
-#       format_name: light
-#       format_version: '1.5'
-#       jupytext_version: 1.11.3
-# ---
+#!/usr/bin/env python3
 
 """
 Reads ModEM model, does fancy improc things.

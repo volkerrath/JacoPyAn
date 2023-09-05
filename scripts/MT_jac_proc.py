@@ -105,7 +105,7 @@ for f in np.arange(nF):
     name, ext = os.path.splitext(JFiles[f])
     start =time.time()
     print("\nReading Data from "+DFiles[f])
-    Data, Site, Freq, Comp, Head = mod.read_data_jac(DFiles[f])
+    Data, Site, Freq, Comp, Type, Head = mod.read_data_jac(DFiles[f])
     elapsed = time.time() - start
     print(" Used %7.4f s for reading Data from %s " % (elapsed, DFiles[f]))
     total = total + elapsed
