@@ -124,14 +124,15 @@ def read_data_jac(DatFile=None, out=True):
     Comp = []
     Head = []
     Type = []
+    """
+    !    Full_Impedance              = 1
+    !    Off_Diagonal_Impedance      = 2 (here also 1)
+    !    Full_Vertical_Components    = 3
+    !    Full_Interstation_TF        = 4
+    !    Off_Diagonal_Rho_Phase      = 5
+    !    Phase_Tensor                = 6
+    """
 
-    """
-    Impedance              = 1
-    Tipper                 = 2
-    Phase_Tensor           = 3
-    Interstation_TF        = 4
-    Off_Diagonal_Rho_Phase = 5
-    """
     with open(DatFile) as fd:
         for line in fd:
             if line.startswith("#") or line.startswith(">"):
@@ -141,9 +142,10 @@ def read_data_jac(DatFile=None, out=True):
             t = line.split()
             # print(t)
             if t:
-                if "PT" in t[5] or "RH" in t[5] or "PH" in t[5]:
-                    if "PH" in t[5] or "RH" in t[5]: Type.append(5)
-                    if "PT" in t[5]: Type.append(3)
+                if t[5].startswith("PT") or t[5].startswith("RH") in t[5].startswith("PH"):
+
+                    if t[5].startswith("RH") in t[5].startswith("PH"): Type.append(5)
+                    if t[5].startswith("PT"): Type.append(6)
                     tmp1 = [
                         float(t[0]),
                         float(t[2]),
@@ -151,13 +153,15 @@ def read_data_jac(DatFile=None, out=True):
                         float(t[4]),
                         float(t[6]),
                         float(t[7]),
+                        #float(t[8]),
                     ]
                     Data.append(tmp1)
                     Site.append([t[1]])
                     Comp.append([t[5]])
+                    #Type.append(int([t[6]))
+
                 else:
-                    if "Z" in t[5]: Type.append(1)
-                    if "PTF" in t[5]: Type.append(6)
+
                     tmp1 = [
                         float(t[0]),
                         float(t[2]),
@@ -165,8 +169,15 @@ def read_data_jac(DatFile=None, out=True):
                         float(t[4]),
                         float(t[6]),
                         float(t[8]),
+                        #float(t[7]),
+                        #float(t[9]),
                     ]
                     Data.append(tmp1)
+                    if t[5].startswith("Z"): Type.append(1)
+                    if t[5].startswith("T"): Type.append(3)
+                    if t[5].startswith("M"): Type.append(1)
+                    #Type.append(int([t[6]))
+
                     tmp2 = [
                         float(t[0]),
                         float(t[2]),
@@ -174,8 +185,14 @@ def read_data_jac(DatFile=None, out=True):
                         float(t[4]),
                         float(t[7]),
                         float(t[8]),
+                        #float(t[8]),
+                        #float(t[9]),
                     ]
                     Data.append(tmp2)
+                    if t[5].startswith("Z"): Type.append(1)
+                    if t[5].startswith("T"): Type.append(3)
+                    if t[5].startswith("M"): Type.append(1)
+                    #Type.append(int([t[6]))
                     Comp.append([t[5] + "R", t[5] + "I"])
                     Site.append([t[1], t[1]])
             else:
@@ -186,6 +203,9 @@ def read_data_jac(DatFile=None, out=True):
     Comp = [item for sublist in Comp for item in sublist]
     Comp = np.asarray(Comp, dtype=object)
 
+    #Type =  [item for sublist in Site for item in sublist]
+    Type =  np.asarray(Type, dtype=object)
+
     Data = np.asarray(Data)
     Freq = Data[:,0]
 
@@ -193,7 +213,7 @@ def read_data_jac(DatFile=None, out=True):
     if out:
         print("readDat: %i data read from %s" % (nD[0], DatFile))
 
-    return Data, Site, Freq, Comp, Head
+    return Data, Site, Freq, Comp, Type, Head
 
 
 def write_jac_ncd(NCFile=None, Jac=None, Dat=None, Site=None, Comp=None,
