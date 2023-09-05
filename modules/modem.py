@@ -123,7 +123,15 @@ def read_data_jac(DatFile=None, out=True):
     Site = []
     Comp = []
     Head = []
+    Type = []
 
+    """
+    Impedance              = 1
+    Tipper                 = 2
+    Phase_Tensor           = 3
+    Interstation_TF        = 4
+    Off_Diagonal_Rho_Phase = 5
+    """
     with open(DatFile) as fd:
         for line in fd:
             if line.startswith("#") or line.startswith(">"):
@@ -134,6 +142,8 @@ def read_data_jac(DatFile=None, out=True):
             # print(t)
             if t:
                 if "PT" in t[5] or "RH" in t[5] or "PH" in t[5]:
+                    if "PH" in t[5] or "RH" in t[5]: Type.append(5)
+                    if "PT" in t[5]: Type.append(3)
                     tmp1 = [
                         float(t[0]),
                         float(t[2]),
@@ -146,6 +156,8 @@ def read_data_jac(DatFile=None, out=True):
                     Site.append([t[1]])
                     Comp.append([t[5]])
                 else:
+                    if "Z" in t[5]: Type.append(1)
+                    if "PTF" in t[5]: Type.append(6)
                     tmp1 = [
                         float(t[0]),
                         float(t[2]),

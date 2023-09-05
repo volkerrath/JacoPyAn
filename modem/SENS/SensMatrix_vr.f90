@@ -355,7 +355,7 @@ Contains
 
                     case(1, 2, 3)
                         
-                        fmtstring = '(g12.5,3x,a20,3f16.3,a8,3g16.6)'
+                        fmtstring = '(g12.5,3x,a20,3f16.3,a8,i8,3g16.6)'
                         val = allData%d(i)%data(j)%value(:,k)
                         err = allData%d(i)%data(j)%error(:,k)
 
@@ -363,7 +363,7 @@ Contains
                         do icomp = 1,nComp/2
                             compid = typeDict(iDt)%id(icomp)
                             write(13,fmt=fmtstring) &
-                                pTx,trim(sRx),xRx,trim(compid),&
+                                pTx,trim(sRx),xRx,trim(compid),iDt,&
                                 val(2*icomp-1), val(2*icomp), err(2*icomp)
                         end do
                         
@@ -375,14 +375,15 @@ Contains
 
                     case(5, 6)
                             
-                        fmtstring = '(g12.5,3x,a20,3f16.3,a8,2g16.6)'
+                        fmtstring = '(g12.5,3x,a20,3f16.3,a8,i8,2g16.6)'
                         val = allData%d(i)%data(j)%value(:,k)
                         err = allData%d(i)%data(j)%error(:,k)
 
                         do icomp = 1,nComp
                             compid = typeDict(iDt)%id(icomp)
                             write(13,fmt=fmtstring) &
-                            pTx,trim(sRx),xRx,trim(compid),val(icomp),err(icomp)
+                            pTx,trim(sRx),xRx,trim(compid),iDt, &
+                            val(icomp),err(icomp)
                         end do
                         
                         write(header,'(a,i10,a,i10,a,i10)') &
