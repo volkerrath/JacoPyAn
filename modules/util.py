@@ -790,3 +790,35 @@ def bytes2human(n):
             value = float(n) / prefix[s]
             return '%.1f%s' % (value, s)
     return "%sB" % n
+
+
+def KLD(P=np.array([]), Q=np.array([]), epsilon= 1.e-8):
+    """
+    Calculates Kullback-Leibler distance
+
+    Parameters
+    ----------
+    P, Q: np.array 
+        pdfs
+    epsilon : TYPE
+        Epsilon is used here to avoid conditional code for
+        checking that neither P nor Q is equal to 0. 
+
+    Returns
+    -------
+    
+    distance: float
+        KL distance
+
+
+    """
+    if P.size * Q.size==0:
+        error("KLD: P or Q not defined! Exit.")
+        
+    # You may want to instead make copies to avoid changing the np arrays.
+    PP = P.copy()+epsilon
+    QQ = Q.copy()+epsilon
+
+    distance = np.sum(PP*np.log(PP/QQ))
+    
+    return distance

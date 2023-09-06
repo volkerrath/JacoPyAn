@@ -144,8 +144,7 @@ def read_data_jac(DatFile=None, out=True):
             if t:
                 if int(t[6]) in [6, 5]:
 
-
-                    print(" 1: ", t[5], t[6], len(t))
+                    # print(" 1: ", t[5], t[6], len(t))
                     tmp1 = [
                         float(t[0]),
                         float(t[2]),
@@ -161,7 +160,7 @@ def read_data_jac(DatFile=None, out=True):
                     
                 else:
                     
-                    print(" 2: ", t[5], t[6], len(t),)
+                    # print(" 2: ", t[5], t[6], len(t),)
                     tmp1 = [
                         float(t[0]),
                         float(t[2]),
