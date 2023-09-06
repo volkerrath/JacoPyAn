@@ -126,7 +126,7 @@ def read_data_jac(DatFile=None, out=True):
     Type = []
     """
     !    Full_Impedance              = 1
-    !    Off_Diagonal_Impedance      = 2 (here also 1)
+    !    Off_Diagonal_Impedance      = 2 
     !    Full_Vertical_Components    = 3
     !    Full_Interstation_TF        = 4
     !    Off_Diagonal_Rho_Phase      = 5
@@ -142,52 +142,47 @@ def read_data_jac(DatFile=None, out=True):
             t = line.split()
             # print(t)
             if t:
-                if t[5].startswith("PT") or t[5].startswith("RH") in t[5].startswith("PH"):
+                if int(t[6]) in [6, 5]:
 
-                    # if t[5].startswith("RH") in t[5].startswith("PH"): Type.append(5)
-                    # if t[5].startswith("PT"): Type.append(6)
-                    
+
+                    print(" 1: ", t[5], t[6], len(t))
                     tmp1 = [
                         float(t[0]),
                         float(t[2]),
                         float(t[3]),
                         float(t[4]),
-                        float(t[6]),
                         float(t[7]),
-                        #float(t[8]),
+                        float(t[8]),
                     ]
                     Data.append(tmp1)
                     Site.append([t[1]])
                     Comp.append([t[5]])
-                    Type.append(int([t[6]))
-
+                    Type.append([int(t[6])])
+                    
                 else:
-
+                    
+                    print(" 2: ", t[5], t[6], len(t),)
                     tmp1 = [
                         float(t[0]),
                         float(t[2]),
                         float(t[3]),
                         float(t[4]),
-                        float(t[6]),
-                        float(t[8]),
-                        #float(t[7]),
-                        #float(t[9]),
+                        float(t[7]),
+                        float(t[9]),
                     ]
                     Data.append(tmp1)
-                    Type.append(int([t[6]))
+                    Type.append([int(t[6])])
 
                     tmp2 = [
                         float(t[0]),
                         float(t[2]),
                         float(t[3]),
                         float(t[4]),
-                        float(t[7]),
                         float(t[8]),
-                        #float(t[8]),
-                        #float(t[9]),
+                        float(t[9]),
                     ]
                     Data.append(tmp2)
-                    Type.append(int([t[6]))
+                    Type.append([int(t[6])])
                     Comp.append([t[5] + "R", t[5] + "I"])
                     Site.append([t[1], t[1]])
             else:

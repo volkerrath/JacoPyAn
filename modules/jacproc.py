@@ -69,8 +69,9 @@ def calc_sensitivity(Jac=np.array([]),
             print("raw:", S)
         # else:
         #     print("raw sensitivities")
-        smax = Jac.max(axis = 0)
-        smin = Jac.max(axis = 0)
+        # smax = Jac.max(axis = 0)
+        # smin = Jac.max(axis = 0)
+        
     elif "cov" in Type.lower():
         S = Jac.abs().sum(axis=0)
         if OutInfo:
@@ -108,7 +109,8 @@ def calc_sensitivity(Jac=np.array([]),
         #     print("euclidean (default)")
 
         # S = S.reshape[-1,1]
-
+        
+    S = S.toarray()
 
     return S
 
@@ -184,7 +186,8 @@ def transform_sensitivity(S=np.array([]), V=np.array([]),
 
                     S = np.arcsinh(S/scale)
 
-    S = np.array(S)
+    S = S.toarray()
+    
     return S
 
 def get_scale(d=np.array([]), F=0.1, method = "other", OutInfo = False):

@@ -67,13 +67,13 @@ SparseThresh = 1.e-8
 
 
 WorkDir = JACOPYAN_ROOT+"/work/"
-#WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/"
+WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJacNewFormat/"
 WorkName = "UBI_ZPT"
 MFile   = WorkDir + "UBI_best.rho"
 MPad=[14, 14 , 14, 14, 0, 71]
 
-JFiles = [WorkDir+"UBI_ZPT.jac", ]
-DFiles = [WorkDir+"UBI_ZPT_jac.dat", ]
+JFiles = [WorkDir+"/Jacobians/UBI_ZPT.jac", ]
+DFiles = [WorkDir+"/Jacobians/UBI_ZPT_jac.dat", ]
 
 if np.size(DFiles) != np.size(JFiles):
     error("Data file number not equal Jac file number! Exit.")
@@ -105,7 +105,7 @@ for f in np.arange(nF):
     name, ext = os.path.splitext(JFiles[f])
     start =time.time()
     print("\nReading Data from "+DFiles[f])
-    Data, Site, Freq, Comp, Type, Head = mod.read_data_jac(DFiles[f])
+    Data, Site, Freq, Comp, Dtype, Head = mod.read_data_jac(DFiles[f])
     elapsed = time.time() - start
     print(" Used %7.4f s for reading Data from %s " % (elapsed, DFiles[f]))
     total = total + elapsed
@@ -142,7 +142,7 @@ for f in np.arange(nF):
     name = name+nstr+sstr
     start = time.time()
     NPZFile = name +"_info.npz"
-    np.savez_compressed(NPZFile, Freq=Freq, Data=Data, Site=Site, Comp=Comp, allow_pickle=True)
+    np.savez_compressed(NPZFile, Freq=Freq, Data=Data, Site=Site, Comp=Comp, Info=Info, Dtype=Dtype, allow_pickle=True)
     NPZFile = name +"_jac.npz"
     if SparseThresh>0.:
        sps.save_npz(NPZFile, matrix=Jac, compressed=True)

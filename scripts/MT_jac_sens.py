@@ -152,7 +152,7 @@ else:
     Freqs = tmp[:,0]
     Comps = tmp[:,1]
     Sites = tmp[:,2]
-    Data, Site, Freq, Comp, Head = mod.read_data_jac(JFile + "_jac.dat")
+    Data, Site, Freq, Comp, Dtype, Head = mod.read_data_jac(JFile + "_jac.dat")
     dsh = np.shape(Data)
     err = np.reshape(Data[:, 5], (dsh[0], 1))
     Jac = jac.normalize_jac(Jac, err)
