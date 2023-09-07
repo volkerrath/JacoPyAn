@@ -16,7 +16,7 @@ This may be a grave disadvantage in highly non-linear settings, but we believe t
 The Jacobian  of a data and parameter set is defined as $J_{ij} = \dfrac{\delta d_i}{\delta m_j}$.
 
 Here, the parameter vector $\mathbf(m)$ is the natural logarithm of resistivity. This Jacobian is first normalized with the data error 
-(i. e., multiplied by $\mathbf{C}^{-1/2}_{d}$) to obtain $\mathbf{\tilde{J}}$. While this procedure is uncontroversial, the definition of 
+to obtain $\mathbf{\tilde{J}}$. While this procedure is uncontroversial, the definition of 
 sensitivity is not unique, and various forms can be found in the literature, and $\texttt{JacoPyAn}$ calculates several of them:
 
 
