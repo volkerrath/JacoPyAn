@@ -62,12 +62,12 @@ nan = np.nan
 
 
 
-SparseThresh = 1.e-8
+SparseThresh = 1.e-10
 
 
 
 WorkDir = JACOPYAN_ROOT+"/work/"
-WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJacNewFormat/"
+#WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJacNewFormat/"
 WorkName = "UBI_ZPT"
 MFile   = WorkDir + "UBI_best.rho"
 MPad=[14, 14 , 14, 14, 0, 71]
