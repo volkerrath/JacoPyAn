@@ -13,14 +13,10 @@ to the everyday use of the word. Sensitivities are derived from the final model 
 itself. It needs to be kept in mind that this implies any conclusions drawn are valid in the domain of validity for the Taylor expansion involved only. 
 This may be a grave disadvantage in highly non-linear settings, but we believe that it still can be usefull for fast characterization of uncertainty.
 
-The Jacobian  of a data and parameter set is defined as
-
-$$J_{ij} = \dfrac{\delta f_d(d_i)}{\delta f_m(m_j)} = \dfrac{\delta m_j}{\delta f_m(m_j)
-    }\dfrac{\delta f_d(d_i)}{\delta d_i}
-    \cdot \dfrac{\delta d_i}{\delta m_j} $$
+The Jacobian  of a data and parameter set is defined as $J_{ij} = \dfrac{\delta d_i}{\delta m_j}$.
 
 Here, the parameter vector $\mathbf(m)$ is the natural logarithm of resistivity. This Jacobian is first normalized with the data error 
-(i. e., multiplied by $\mathbf{C}^{-1/2}_d $) to obtain $\mathbf{\tilde{J}}$. While this procedure is uncontroversial, the definition of 
+(i. e., multiplied by $\mathbf{C}^{-1/2}_{d}$) to obtain $\mathbf{\tilde{J}}$. While this procedure is uncontroversial, the definition of 
 sensitivity is not unique, and various forms can be found in the literature, and $\texttt{JacoPyAn}$ calculates several of them:
 
 
@@ -38,7 +34,7 @@ many popular inversion codes.
 For a definition of a depth of investigation (DoI), or model blanking/shading, forms (2) and (3) can be used. This, however, requires the 
 choice of a threshold/scale is required, depending on the form applied. 
 
-When moving from the error-normalised Jacobian $\mathbf{J}_d$ to sensitivity, there are more choices for further normalisation, depending 
+When moving from the error-normalised Jacobian,$\mathbf{J}_d$ to sensitivity, there are more choices for further normalisation, depending 
 on the understanding and use of this parameter. If sensitivity is to be interpreted as an approximation to a continuous field over the 
 volume of the model, it seems useful normalize by the cell volume. On the other hand, effect of the size is important when investigating 
 the true role of this cell in the inversion. Finally, for comparing different data (sub)sets, it is convenient to do a final 
