@@ -20,11 +20,11 @@ to obtain $\mathbf{\tilde{J}}$. While this procedure is uncontroversial, the def
 sensitivity is not unique, and various forms can be found in the literature, and $\texttt{JacoPyAn}$ calculates several of them:
 
 
-1. Raw sensitivities, defined as $S_j = \sum_{i=1,n_d} \tilde{J}_{ij}$. No absolute values are involved, hence there may be 
+1. "Raw" sensitivities, defined as $S_j = \sum_{i=1,n_d} \tilde{J}_{ij}$. No absolute values are involved, hence there may be 
 both, positive and negative, elements. This does not conform to what we expect of sensitivity (positivity), but carries the most direct 
 information on the role of parameter $j$ in the inversion.
 
-2. Euclidean sensitivities, which are the most commonly used form. They are is defined as: 
+2. "Euclidean" sensitivities, which are the most commonly used form. They are is defined as: 
 $\mathbf{S}^2_j = \sum_{i=1,n_d} \left|\tilde{J}_{ij}\right|^2=diag\left(\mathbf{\tilde{J}}^T\mathbf{\tilde{J}}\right)$.
 This solves the positivity issue of raw sensitivities. The square root of this sensitivity is often preferred, and implemented in 
 many popular inversion codes. 
