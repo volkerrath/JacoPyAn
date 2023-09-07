@@ -25,7 +25,7 @@ both, positive and negative, elements. This does not conform to what we expect o
 information on the role of parameter $j$ in the inversion.
 
 2. "Euclidean" sensitivities, which are the most commonly used form. They are is defined as: 
-$\mathbf{S}^2_j = \sum_{i=1,n_d} \left|\tilde{J}_{ij}\right|^2=diag\left(\mathbf{\tilde{J}}^T\mathbf{\tilde{J}}\right)$.
+$S^2_j = \sum_{i=1,n_d} \left|\tilde{J}_{ij}\right|^2=diag\left(\mathbf{\tilde{J}}^T\mathbf{\tilde{J}}\right)$.
 This solves the positivity issue of raw sensitivities. The square root of this sensitivity is often preferred, and implemented in 
 many popular inversion codes. 
     
