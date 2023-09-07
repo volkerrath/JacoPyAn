@@ -21,15 +21,12 @@ $$J_{ij} = \dfrac{\delta f_d(d_i)}{\delta f_m(m_j)} = \dfrac{\delta m_j}{\delta 
 
 Here, the parameter vector $\mathbf(m)$ is the natural logarithm of resistivity. This Jacobian is first normalized with the data error 
 (i. e., multiplied by $\mathbf{C}^{-1/2}_d $) to obtain $\mathbf{\tilde{J}}$. While this procedure is uncontroversial, the definition of 
-sensitivity is not unique, and various forms can be found in the literature, and \texttt{JacoPyAn} calculates several of them:
+sensitivity is not unique, and various forms can be found in the literature, and $\texttt{JacoPyAn}$ calculates several of them:
 
 
-(1) "Raw" sensitivities, defined as:
-    $$    
-    S_j = \sum_{i=1}^{n_d} \tilde{J}_{ij}
-    $$
-    No absolute value is involved, hence there may be both, positive and negative, values. This does not conform to what we expect of 
-    sensitivity (positivity), but carries the most direct information on the role of parameter $j$ in the inversion.
+(1) "Raw" sensitivities, defined as $ S_j = \sum_{i=1}^{n_d} \tilde{J}_{ij}$. No absolute values are involved, hence there may be 
+both, positive and negative, elements. This does not conform to what we expect of sensitivity (positivity), but carries the most direct 
+information on the role of parameter $j$ in the inversion.
 
 (2) "Euclidean" sensitivities, which are the most commonly used form. They are is defined as:
     $$
