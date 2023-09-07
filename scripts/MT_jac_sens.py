@@ -184,6 +184,8 @@ SensTot = jac.transform_sensitivity(S=SensTmp, V=V,
 SensFile = WorkDir+WorkName+"_"+Type+"_"+"_".join(Transform)
 Head = (WorkName+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
 
+print(type(SensTot))
+print(np.shape(SensTot))   
 S = np.reshape(SensTot, dims, order="F")
 
 if "mod" in OutFormat.lower():

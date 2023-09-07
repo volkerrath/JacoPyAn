@@ -109,8 +109,8 @@ def calc_sensitivity(Jac=np.array([]),
         #     print("euclidean (default)")
 
         # S = S.reshape[-1,1]
-        
-    S = S.toarray()
+ 
+    S = S.flatten()
 
     return S
 
@@ -186,8 +186,8 @@ def transform_sensitivity(S=np.array([]), V=np.array([]),
 
                     S = np.arcsinh(S/scale)
 
-    S = S.toarray()
-    
+    S = S.flatten()
+   
     return S
 
 def get_scale(d=np.array([]), F=0.1, method = "other", OutInfo = False):
@@ -404,10 +404,10 @@ def sparsify_jac(Jac=None, sparse_thresh=1.0e-6, normalized=False, method=None, 
     Jmax = np.amax(np.abs(Jf))
     Jf[np.abs(Jf)/Jmax < sparse_thresh] = 0.0
 
-    Js = scp.csr_matrix(Jf)
+    Js = scp.csr_array(Jf)
 
     if out:
-        ns = scp.csr_matrix.count_nonzero(Js)
+        ns = scp.csr_array.count_nonzero(Js)
         print("sparsify_jac:"
                 +" output J is sparse, and has %i nonzeros, %f percent"
                 % (ns, 100.0 * ns / nel))
@@ -420,7 +420,7 @@ def sparsify_jac(Jac=None, sparse_thresh=1.0e-6, normalized=False, method=None, 
         # print(norma)
         # print(normf)
         print(" Sparsified J explains "
-              +str(round(100.-100.*normd/normf))+"% of full J.")
+              +str(round(100.-100.*normd/normf),2)+"% of full J.")
 
     if normalized:
         Jmax = np.amax(np.abs(Jac))
