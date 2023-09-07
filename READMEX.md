@@ -33,7 +33,7 @@ $\mathbf{S}^2_j = \sum_{i=1,n_d} \left|\tilde{J}_{ij}\right|^2=diag\left(\mathbf
 This solves the positivity issue of raw sensitivities. The square root of this sensitivity is often preferred, and implemented in 
 many popular inversion codes. 
     
-(3) Coverage. For this form, the absolute values of the Jacobian are used: $sum_{i=1,n_d} \left|\tilde{J}_{ij}\right|$
+(3) Coverage. For this form, the absolute values of the Jacobian are used: $\sum_{i=1,n_d} \left|\tilde{J}_{ij}\right|$
 
 For a definition of a depth of investigation (DoI), or model blanking/shading, forms (2) and (3) can be used. This, however, requires the 
 choice of a threshold/scale is required, depending on the form applied. 
