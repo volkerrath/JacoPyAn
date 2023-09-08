@@ -161,7 +161,6 @@ elapsed = time.time() - start
 print(" Used %7.4f s for reading Jacobian/data from %s" % (elapsed, JFile))
 total = total + elapsed
 
-
 mx = np.amax(np.abs(Jac))
 mn = np.amin(np.abs(Jac))
 jm = jacmask.flatten(order="F")
@@ -172,12 +171,15 @@ print(JFile+" minimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))
 # print(JFile+" number of elements in masked Jacobian is "+str(np.count_nonzero(~np.isfinite(Jac))))
 # print( np.count_nonzero(~np.isnan(jacmask))*np.shape(Jac)[0])
 V=vcell.flatten(order="F")
+    
+
 start = time.time()
 #print("Jac ", np.shape(Jac))
 #Jac = Jac.toarray()
 SensTmp = jac.calc_sensitivity(Jac,
                      Type = Type, OutInfo=False)
 print("Sens ",np.shape(SensTmp))
+print(type(SensTmp))
 SensTot = jac.transform_sensitivity(S=SensTmp, V=V,
                           Transform=Transform, OutInfo=False)
 
@@ -186,7 +188,8 @@ Head = (WorkName+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
 
 print(type(SensTot))
 print(np.shape(SensTot))   
-S = np.reshape(SensTot, dims, order="F")
+S = SensTot.flatten()
+S = np.reshape(S, dims, order="F")
 
 if "mod" in OutFormat.lower():
     mod.write_mod(SensFile, ModExt=".sns",
@@ -199,8 +202,23 @@ if "ubc" in OutFormat.lower():
     refubc =  [MOrig[0], MOrig[1], elev]
     mod.write_ubc(SensFile, ModExt=".sns",
                   dx=dx, dy=dy, dz=dz, mval=S, reference=refubc, mvalair=rhoair, aircells=aircells, header=Head)
-    print(" Sensitivities (UBCformat) written to "+SensFile)
+    print(" Sensitivities (UBC format) written to "+SensFile)
     
+    
+    
+if "mod" in OutFormat.lower():
+    mod.write_mod(SensFile, ModExt=".vol",
+                  dx=dx, dy=dy, dz=dz, mval=V,
+                  reference=refmod, mvalair=rhoair, aircells=aircells, header=Head)
+    print(" Cell volumes (ModEM format) written to "+SensFile)
+    
+if "ubc" in OutFormat.lower():
+    elev = -refmod[2]
+    refubc =  [MOrig[0], MOrig[1], elev]
+    mod.write_ubc(SensFile, ModExt=".vol",
+                  dx=dx, dy=dy, dz=dz, mval=V, reference=refubc, mvalair=rhoair, aircells=aircells, header=Head)
+    print(" Cell volumes (UBC format) written to "+SensFile)
+  
   
 elapsed = time.time() - start
 print(" Used %7.4f s for full sensitivities " % (elapsed))

@@ -110,9 +110,10 @@ def calc_sensitivity(Jac=np.array([]),
 
         # S = S.reshape[-1,1]
  
-    S = S.flatten()
+    S_out = S.flatten()    
+    print(type(S_out))
 
-    return S
+    return S_out
 
 
 def transform_sensitivity(S=np.array([]), V=np.array([]),
@@ -145,6 +146,7 @@ def transform_sensitivity(S=np.array([]), V=np.array([]),
         error("transform_sensitivity: Sensitivity size is 0! Exit.")
     
     ns = np.shape(S)
+    
 
     for item in Transform:       
         
@@ -152,6 +154,7 @@ def transform_sensitivity(S=np.array([]), V=np.array([]),
              print("trans_sensitivity: Transformed by layer thickness.")
              if np.size(V)==0:
                  error("Transform_sensitivity: No thicknesses given! Exit.")
+
              else:
                  V = V.reshape(ns)
                  S = S/V
@@ -186,8 +189,10 @@ def transform_sensitivity(S=np.array([]), V=np.array([]),
 
                     S = np.arcsinh(S/scale)
 
-    S = S.flatten()
-   
+    
+    S = np.flatten(S)    
+    print(type(S))
+    
     return S
 
 def get_scale(d=np.array([]), F=0.1, method = "other", OutInfo = False):
@@ -474,39 +479,39 @@ def set_mask(rho=None, pad=[10, 10 , 10, 10, 0, 10], blank= np.nan, flat=True, o
 
 
 
-def calculate_sens(Jac=None, normalize=False, small=1.0e-15, blank=np.nan, log=False, out=True):
-    """
-    Calculate sensitivity from ModEM Jacobian.
-    Optionally blank elements smaller than theshold, take logarithm, normalize.
+# def calculate_sens(Jac=None, normalize=False, small=1.0e-15, blank=np.nan, log=False, out=True):
+#     """
+#     Calculate sensitivity from ModEM Jacobian.
+#     Optionally blank elements smaller than theshold, take logarithm, normalize.
 
-    author: vrath
-    last changed: Sep 25, 2020
-    """
-    if scp.issparse(Jac):
-        J = Jac.todense()
-    else:
-        J = Jac
+#     author: vrath
+#     last changed: Sep 25, 2020
+#     """
+#     if scp.issparse(Jac):
+#         J = Jac.todense()
+#     else:
+#         J = Jac
 
-    S = np.sum(np.power(J, 2), axis=0)
-    S = np.sqrt(S)
+#     S = np.sum(np.power(J, 2), axis=0)
+#     S = np.sqrt(S)
 
-    Smax = np.nanmax(S)
-    Smin = np.nanmin(S)
+#     Smax = np.nanmax(S)
+#     Smin = np.nanmin(S)
 
-    if out:
-        print("Range of S is "+str(Smin)+" to "+str(Smax))
+#     if out:
+#         print("Range of S is "+str(Smin)+" to "+str(Smax))
 
-    if normalize:
-        S = S / Smax
-        if out:
-            print("Normalizing with"+str(Smax))
+#     if normalize:
+#         S = S / Smax
+#         if out:
+#             print("Normalizing with"+str(Smax))
 
-    if log:
-        S = np.log10(S)
+#     if log:
+#         S = np.log10(S)
 
-    S[S < small] = blank
+#     S[S < small] = blank
 
-    return S, Smax
+#     return S, Smax
 
 
 def project_model(m=None, U=None, small=1.0e-14, out=True):
@@ -532,7 +537,7 @@ def transfrom_model(m=None, M=None, small=1.0e-14, out=True):
     Transform Model.
 
     M should be something like C_m^-1/2
-    ( see egg Kelbert 2012, Egbert & kelbert 2014)
+    ( see eg Kelbert 2012, Egbert & kelbert 2014)
     author: vrath
     last changed:  Oct 12, 2020
     """
