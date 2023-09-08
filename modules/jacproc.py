@@ -111,8 +111,11 @@ def calc_sensitivity(Jac=np.array([]),
         # S = S.reshape[-1,1]
  
     S_out = S.flatten()    
-    print(type(S_out))
-
+    print(type(np.shape(S_out)))
+    S_out = S.ravel()    
+    print(type(np.shape(S_out)))
+    S_out = S.ravel()    
+    print(type(np.shape(S_out)))   
     return S_out
 
 
@@ -222,7 +225,7 @@ def get_scale(d=np.array([]), F=0.1, method = "other", OutInfo = False):
         error("get_S: No data given! Exit.")
 
     if "s2007" in method.lower():
-        S = F * np.nanmax(np.abs(d))
+        scale = F * np.nanmax(np.abs(d))
 
     else:
         dmax = np.nanmax(np.abs(d))
@@ -409,10 +412,11 @@ def sparsify_jac(Jac=None, sparse_thresh=1.0e-6, normalized=False, method=None, 
     Jmax = np.amax(np.abs(Jf))
     Jf[np.abs(Jf)/Jmax < sparse_thresh] = 0.0
 
-    Js = scp.csr_array(Jf)
+    # Js = scp.csr_array(Jf)
+    Js = scp.csr_matrix(Jf)
 
     if out:
-        ns = scp.csr_array.count_nonzero(Js)
+        ns = Js.count_nonzero()
         print("sparsify_jac:"
                 +" output J is sparse, and has %i nonzeros, %f percent"
                 % (ns, 100.0 * ns / nel))
