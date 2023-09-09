@@ -109,7 +109,7 @@ for f in np.arange(nF):
     elapsed = time.time() - start
     print(" Used %7.4f s for reading Data from %s " % (elapsed, DFiles[f]))
     total = total + elapsed
-
+    print(np.unique(Dtype))
     start = time.time()
     print("Reading Jacobian from "+JFiles[f])
     Jac, Info = mod.read_jac(JFiles[f])

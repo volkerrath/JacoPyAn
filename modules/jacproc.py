@@ -110,13 +110,8 @@ def calc_sensitivity(Jac=np.array([]),
 
         # S = S.reshape[-1,1]
  
-    S_out = S.flatten()    
-    print(type(np.shape(S_out)))
-    S_out = S.ravel()    
-    print(type(np.shape(S_out)))
-    S_out = S.ravel()    
-    print(type(np.shape(S_out)))   
-    return S_out
+    S=S.A1 
+    return S
 
 
 def transform_sensitivity(S=np.array([]), V=np.array([]),
@@ -193,8 +188,8 @@ def transform_sensitivity(S=np.array([]), V=np.array([]),
                     S = np.arcsinh(S/scale)
 
     
-    S = np.flatten(S)    
-    print(type(S))
+    # S = S.A1    
+    # print(type(S))
     
     return S
 
@@ -237,6 +232,30 @@ def get_scale(d=np.array([]), F=0.1, method = "other", OutInfo = False):
         print("Scale value S is "+str(scale)+", method "+method)
 
     return scale
+
+def sparsmat_to_arry(mat=None):
+    """
+    
+
+    Parameters
+    ----------
+    mat : sparse scipy matrix
+        sparse scipy matrix. The default is None.
+    arr : np.array
+         The default is np.array([]).
+
+    Returns
+    -------
+    arr : Tnp.array
+         The default is np.array([]).YPE
+
+
+    """
+    arr = np.array([])
+    
+    data = mat.A1
+    
+    return arr
 
 
 def update_avg(k = None, m_k=None, m_a=None, m_v=None):

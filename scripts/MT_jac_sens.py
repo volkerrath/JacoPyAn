@@ -106,6 +106,7 @@ total = 0.0
 
 start = time.time()
 dx, dy, dz, rho, refmod, _, vcell = mod.read_mod(MFile, trans="linear", volumes=True)
+V= vcell.flatten(order="F")
 elapsed = time.time() - start
 total = total + elapsed
 print(" Used %7.4f s for reading model from %s " % (elapsed, MFile))
@@ -144,6 +145,8 @@ if "spa" in InpFormat:
     Freqs = tmp["Freq"]
     Comps = tmp["Comp"]
     Sites = tmp["Site"]
+    Dtype = tmp["Dtype"]
+    print(np.unique(Dtype))
 
 else:  
     
@@ -170,26 +173,22 @@ print(JFile+" minimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))
 #print(JFile+" minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx))
 # print(JFile+" number of elements in masked Jacobian is "+str(np.count_nonzero(~np.isfinite(Jac))))
 # print( np.count_nonzero(~np.isnan(jacmask))*np.shape(Jac)[0])
-V=vcell.flatten(order="F")
-    
 
 start = time.time()
 #print("Jac ", np.shape(Jac))
 #Jac = Jac.toarray()
 SensTmp = jac.calc_sensitivity(Jac,
                      Type = Type, OutInfo=False)
-print("Sens ",np.shape(SensTmp))
-print(type(SensTmp))
 SensTot = jac.transform_sensitivity(S=SensTmp, V=V,
                           Transform=Transform, OutInfo=False)
 
 SensFile = WorkDir+WorkName+"_"+Type+"_"+"_".join(Transform)
 Head = (WorkName+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
-
-print(type(SensTot))
-print(np.shape(SensTot))   
-S = SensTot.flatten()
-S = np.reshape(S, dims, order="F")
+# SensTot = SensTot.toarray()
+# print(type(SensTot))
+# print(np.shape(SensTot))   
+S = SensTot.reshape(dims, order="F")
+# S = np.reshape(SensTot, dims, order="F")
 
 if "mod" in OutFormat.lower():
     mod.write_mod(SensFile, ModExt=".sns",
@@ -205,7 +204,7 @@ if "ubc" in OutFormat.lower():
     print(" Sensitivities (UBC format) written to "+SensFile)
     
     
-    
+V = V.reshape(dims, order="F")   
 if "mod" in OutFormat.lower():
     mod.write_mod(SensFile, ModExt=".vol",
                   dx=dx, dy=dy, dz=dz, mval=V,
@@ -240,9 +239,9 @@ for Split in Splits:
         """
         compstr = ["zfull", "zoff", "tf", "tp", "rpoff", "pt"]
     
-        ExistComp = np.unique(Comps)
+        ExistType = np.unique(Dtype)
         
-        for icmp in ExistComp:
+        for icmp in ExistType:
             print(icmp)
             JacTmp = Jac[np.where(Comps == icmp)]
             SensTmp = jac.calc_sensitivity(JacTmp,
