@@ -449,6 +449,7 @@ def sparsify_jac(Jac=None, sparse_thresh=1.0e-6, normalized=False, method=None, 
         # print(normf)
         print(" Sparsified J explains "
               +str(round(100.-100.*normd/normf,2))+"% of full J.")
+        print("****", nel, ns, 100.0 * ns / nel, round(100.-100.*normd/normf,3) )
 
     if normalized:
         Jmax = np.amax(np.abs(Jac))

@@ -123,7 +123,7 @@ def read_data_jac(DatFile=None, out=True):
     Site = []
     Comp = []
     Head = []
-    Type = []
+    Dtyp = []
     """
     !    Full_Impedance              = 1
     !    Off_Diagonal_Impedance      = 2 
@@ -144,7 +144,7 @@ def read_data_jac(DatFile=None, out=True):
             if t:
                 if int(t[6]) in [6, 5]:
 
-                    # print(" 1: ", t[5], t[6], len(t))
+                    #print(" 1: ", t[5], t[6], len(t))
                     tmp1 = [
                         float(t[0]),
                         float(t[2]),
@@ -156,7 +156,7 @@ def read_data_jac(DatFile=None, out=True):
                     Data.append(tmp1)
                     Site.append([t[1]])
                     Comp.append([t[5]])
-                    Type.append([int(t[6])])
+                    Dtyp.append([int(t[6])])
                     
                 else:
                     
@@ -170,7 +170,7 @@ def read_data_jac(DatFile=None, out=True):
                         float(t[9]),
                     ]
                     Data.append(tmp1)
-                    Type.append([int(t[6])])
+                    Dtyp.append([int(t[6])])
 
                     tmp2 = [
                         float(t[0]),
@@ -181,7 +181,7 @@ def read_data_jac(DatFile=None, out=True):
                         float(t[9]),
                     ]
                     Data.append(tmp2)
-                    Type.append([int(t[6])])
+                    Dtyp.append([int(t[6])])
                     Comp.append([t[5] + "R", t[5] + "I"])
                     Site.append([t[1], t[1]])
             else:
@@ -192,8 +192,8 @@ def read_data_jac(DatFile=None, out=True):
     Comp = [item for sublist in Comp for item in sublist]
     Comp = np.asarray(Comp, dtype=object)
 
-    Type =  [item for sublist in Site for item in sublist]
-    Type =  np.asarray(Type, dtype=object)
+    Dtyp =  [item for sublist in Dtyp for item in sublist]
+    Dtyp =  np.asarray(Dtyp, dtype=object)
 
     Data = np.asarray(Data)
     Freq = Data[:,0]
@@ -202,7 +202,7 @@ def read_data_jac(DatFile=None, out=True):
     if out:
         print("readDat: %i data read from %s" % (nD[0], DatFile))
 
-    return Data, Site, Freq, Comp, Type, Head
+    return Data, Site, Freq, Comp, Dtyp, Head
 
 
 def write_jac_ncd(NCFile=None, Jac=None, Dat=None, Site=None, Comp=None,
