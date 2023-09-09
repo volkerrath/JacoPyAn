@@ -35,13 +35,10 @@ from sys import exit as error
 import numpy as np
 import numpy.linalg as npl
 import scipy.linalg as spl
-import scipy.sparse as scp
-import netCDF4 as nc
+import scipy.sparse as scs
 
 
-import vtk
-import pyvista as pv
-import PVGeo as pvg
+
 
 JACOPYAN_DATA = os.environ["JACOPYAN_DATA"]
 JACOPYAN_ROOT = os.environ["JACOPYAN_ROOT"]
@@ -54,131 +51,95 @@ for pth in mypath:
 
 import jacproc as jac
 import modem as mod
+import util as utl
 from version import versionstrg
 
-version, _ = versionstrg()
-titstrng = utl.print_title(version=version, fname=__file__, out=False)
-print(titstrng+"\n\n")
+
+SparseThresh = 1.e-8
+
+Task = "merge"
 
 
-rng = np.random.default_rng()
-nan = np.nan
+WorkDir = JACOPYAN_ROOT+"/work/"
+#WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJacNewFormat/"
+WorkName = "UBI_ZPT"
 
-normalize_err = True
+JFiles = [WorkDir+"//UBI_Z.jac", WorkDir+"//UBI_P.jac",WorkDir+"//UBI_T.jac",]
+DFiles = [WorkDir+"//UBI_Z_jac.dat", WorkDir+"//UBI_P_jac.dat",WorkDir+"//UBI_T_jac.dat",]
 
-normalize_max = False
-
-sparsify = False
-sparse_thresh = 1.e-7
-
-WorkDir = r"/home/vrath/work/MT_Data/Ubaye/UB22_jac_best/"
-MFile   = WorkDir +r"Ub22_ZoffPT_02_NLCG_014.rho"
-JFile = [WorkDir+r"Ub22_Zoff.jac", WorkDir+r"Ub22_T.jac", WorkDir+r"Ub22_P.jac", ]
-DFile = [WorkDir+r"Ub22_Zoff.dat", WorkDir+r"Ub22_T.dat", WorkDir+r"Ub22_P.dat", ]
-
-
-
-total = 0.0
-
-
-start = time.time()
-dx, dy, dz, rho, reference = mod.read_mod(MFile, trans="log10")
-dims = np.shape(rho)
-# print(dims)
-elapsed = time.time() - start
-total = total + elapsed
-print(" Used %7.4f s for reading model from %s " % (elapsed, MFile))
-
-
-if np.size(DFile) != np.size(JFile):
+if np.size(DFiles) != np.size(JFiles):
     error("Data file number not equal Jac file number! Exit.")
-nF = np.size(DFile)
+nF = np.size(DFiles)
 
+total = 0.
 
-mxVal = 1e-30
-mxLst = []
-for f in np.arange(nF):
-
-    name, ext = os.path.splitext(JFile[f])
-    start =time.time()
-    print("\nReading Data from "+DFile[f])
-    Data, Site, Freq, Comp, Head = mod.read_data_jac(DFile[f])
-    elapsed = time.time() - start
-    print(" Used %7.4f s for reading Data from %s " % (elapsed, DFile[f]))
-    total = total + elapsed
-
-    start = time.time()
-    print("Reading Jacobian from "+JFile[f])
-    Jac = mod.read_jac(JFile[f])
-    elapsed = time.time() - start
-    print(" Used %7.4f s for reading Jacobian from %s " % (elapsed, JFile[f]))
-    total = total + elapsed
-
-    nstr = ""
-    if normalize_err:
-        nstr = nstr+"_nerr"
-        start = time.time()
-        dsh = np.shape(Data)
-        err = np.reshape(Data[:, 7], (dsh[0], 1))
-        mx0 = np.max(np.abs(Jac))
-        Jac = jac.normalize_jac(Jac, err)
+if "merg" in Task.lower():
+    
+    
+    for ifile in np.arange(nF):
+        
+        name, ext = os.path.splitext(JFiles[ifile])
+        start =time.time()
+        print("\nReading Data from "+DFiles[ifile])
+        Data, Site, Freq, Comp, Dtype, Head = mod.read_data_jac(DFiles[ifile])
         elapsed = time.time() - start
-        print(" Used %7.4f s for normalizing Jacobian from %s " % (elapsed, JFile[f]))
-
-    mx = np.max(np.abs(Jac))
-    mxLst.append(mx)
-    mxVal = np.amax([mxVal,mx])
-
-    if normalize_max:
-        nstr = nstr+"_max"
-        start = time.time()
-        Jac = jac.normalize_jac(Jac,[mx])
-        elapsed = time.time() - start
+        print(" Used %7.4f s for reading Data from %s " % (elapsed, DFiles[ifile]))
         total = total + elapsed
-        print(" Max value is %7.4f, before was %7.4f" % (mx, mx0))
-
-
-    sstr=""
-    if sparsify:
-        sstr="_sp"+str(round(np.log10(sparse_thresh)))
+    
         start = time.time()
-        Jacs= jac.sparsify_jac(Jac,sparse_thresh=sparse_thresh)
+        print("Reading Jacobian from "+JFiles[ifile])
+        Jac = mod.read_jac(JFiles[ifile])
         elapsed = time.time() - start
+        print(" Used %7.4f s for reading Jacobian from %s " % (elapsed, JFiles[ifile]))
         total = total + elapsed
-        print(" Used %7.4f s for sparsifying Jacobian %s " % (elapsed, JFile[f]))
-        NPZFile = name+nstr+sstr+".npz"
-        np.savez_compressed(NPZFile,
-                            Jac=Jacs, Data=Data, Site=Site, Comp=Comp)
-        elapsed = time.time() - start
-        total = total + elapsed
-        print(" Used %7.4f s for writing sparsified Jacobian to %s " % (elapsed, NPZFile))
-
-
-    start = time.time()
-    S, Smax = jac.calculate_sens(Jac, normalize=False, small=1.0e-14)
-    S = np.reshape(S, dims, order="F")
-    elapsed = time.time() - start
-    total = total + elapsed
-    print(" Used %7.4f s for calculating Sensitivity from Jacobian  %s " % (elapsed, JFile[f]))
-
-    start = time.time()
-    SNSFile = name+nstr+".sns"
-    mod.write_model_mod(SNSFile, dx, dy, dz, S, reference, trans="log10")
-    elapsed = time.time() - start
-    total = total + elapsed
-    print(" Used %7.4f s for writing Sensitivity from Jacobian  %s " % (elapsed, JFile[f]))
-
-    start = time.time()
-    NCFile = name + nstr+".nc"
-    mod.write_jac_ncd(NCFile, Jac, Data, Site, Comp)
-    elapsed = time.time() - start
-    total = total + elapsed
-    print(" Used %7.4f s for writing Jacobian to %s " % (elapsed, NCFile))
-
-    start = time.time()
-    NPZFile = name +nstr+ ".npz"
-    np.savez_compressed(NPZFile,
-                        Jac=Jac, Data=Data, Site=Site, Comp=Comp)
-    elapsed = time.time() - start
-    total = total + elapsed
+        
+        if ifile==0:
+            Jac_merged = Jac 
+            Data_merged = Data 
+            Site_merged = Site
+            Freq_mergerd = Freq
+            Comp_merged = Comp
+            Dtype_merged = Dtype 
+        else:
+            Jac_merged = scs.hstack((Jac_merged, Jac))
+           #  Data_merged = Data 
+           # Site_merged = Site
+           # Freq_mergerd = Freq
+           # Comp_merged = Comp
+           # Dtype_merged = Dtype 
+          
+            
+            
+ 
+    # if SparseThresh > 0.:
+    #     sstr="_sp"+str(round(np.log10(SparseThresh)))
+    #     start = time.time()
+    #     Jacs= jac.sparsify_jac(Jac,SparseThresh=SparseThresh)
+    #     elapsed = time.time() - start
+    #     total = total + elapsed
+    # else:     
+    #     sstr = "_full"
+    #     if SparseThresh>0.:
+    
+    #         sstr="_sp"+str(round(np.log10(SparseThresh)))
+    #         start = time.time()
+    #         Jac, _= jac.sparsify_jac(Jac, SparseThresh=SparseThresh)
+    #         elapsed = time.time() - start
+    #         total = total + elapsed
+    #         print(" Used %7.4f s for sparsifying Jacobian %s " % (elapsed, JFiles[ifile]))
+    
+    
+    # name = name+
+    # start = time.time()
+    # NPZFile = name +"_info.npz"
+    # np.savez_compressed(NPZFile, Freq=Freq, Data=Data, Site=Site, Comp=Comp, Info=Info, Dtype=Dtype, allow_pickle=True)
+    # NPZFile = name +"_jac.npz"
+    # if SparseThresh>0.:
+    #    sps.save_npz(NPZFile, matrix=Jac, compressed=True)
+    # else: 
+    #    np.savez_compressed(NPZFile, Jac)
+    # elapsed = time.time() - start
+    # total = total + elapsed
     print(" Used %7.4f s for writing Jacobian to %s " % (elapsed, NPZFile))
+
+  

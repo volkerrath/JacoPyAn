@@ -62,7 +62,7 @@ nan = np.nan
 
 
 
-SparseThresh = 1.e-10
+SparseThresh = 0.
 
 
 
@@ -72,8 +72,8 @@ WorkName = "UBI_ZPT"
 MFile   = WorkDir + "UBI_best.rho"
 MPad=[14, 14 , 14, 14, 0, 71]
 
-JFiles = [WorkDir+"/Jacobians/UBI_ZPT.jac", ]
-DFiles = [WorkDir+"/Jacobians/UBI_ZPT_jac.dat", ]
+JFiles = [WorkDir+"//UBI_Z.jac", WorkDir+"//UBI_P.jac",WorkDir+"//UBI_T.jac",]
+DFiles = [WorkDir+"//UBI_Z_jac.dat", WorkDir+"//UBI_P_jac.dat",WorkDir+"//UBI_T_jac.dat",]
 
 if np.size(DFiles) != np.size(JFiles):
     error("Data file number not equal Jac file number! Exit.")
