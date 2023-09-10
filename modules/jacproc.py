@@ -413,12 +413,14 @@ def ortho_basis(M):
     return Q
 
 
-def sparsify_jac(Jac=None, sparse_thresh=1.0e-6, normalized=False, method=None, out=True):
+def sparsify_jac(Jac=None, 
+                 sparse_thresh=1.0e-6, normalized=False, scalval = -1., 
+                 method=None, out=True):
     """
     Sparsifies error_scaled Jacobian from ModEM output
 
     author: vrath
-    last changed: Sep 25, 2020
+    last changed: Sep 10, 2023
     """
     shj = np.shape(Jac)
     if out:
@@ -427,12 +429,21 @@ def sparsify_jac(Jac=None, sparse_thresh=1.0e-6, normalized=False, method=None, 
             "sparsify_jac: dimension of original J is %i x %i = %i elements"
             % (shj[0], shj[1], nel)
         )
+        
     Jf = Jac.copy()
-    Jmax = np.amax(np.abs(Jf))
-    Jf[np.abs(Jf)/Jmax < sparse_thresh] = 0.0
+    
+    if scalval <0.:
+        Scaleval = np.amax(np.abs(Jf))
+        print("sparsify_jac: output J is scaled by %g (max Jacobian)"
+            % (Scaleval))  
+    else: 
+        Scaleval = abs(scalval)
+        print("sparsify_jac: output J is scaled by %g" % (Scaleval))  
+    
+    Jf[np.abs(Jf)/Scaleval < sparse_thresh] = 0.0
 
-    # Js = scp.csr_array(Jf)
-    Js = scp.csr_matrix(Jf)
+    # Js = scp.csr_matrix(Jf)
+    Js = scp.lil_matrix(Jf)
 
     if out:
         ns = Js.count_nonzero()
@@ -452,11 +463,12 @@ def sparsify_jac(Jac=None, sparse_thresh=1.0e-6, normalized=False, method=None, 
         print("****", nel, ns, 100.0 * ns / nel, round(100.-100.*normd/normf,3) )
 
     if normalized:
-        Jmax = np.amax(np.abs(Jac))
-        f = 1.0 / Jmax
+        f = 1.0 / Scaleval
         Js = f * Js
+        
+    Js = Js.tocsr()
 
-    return Js, Jmax
+    return Js, Scaleval
 
 
 def normalize_jac(Jac=None, fn=None, out=True):

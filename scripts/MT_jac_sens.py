@@ -20,8 +20,8 @@ import gc
 
 import numpy as np
 import numpy.linalg as npl
-import scipy.linalg as spl
-import scipy.sparse as sps
+import scipy.linalg as scl
+import scipy.sparse as scs
 import netCDF4 as nc
 
 
@@ -138,7 +138,7 @@ start = time.time()
 print("Reading Jacobian from "+JFile)
 
 if "spa" in InpFormat:
-    Jac = sps.load_npz(JFile +"_jac.npz")
+    Jac = scs.load_npz(JFile +"_jac.npz")
     normalized = True
     
     tmp = np.load( JFile +"_info.npz", allow_pickle=True)

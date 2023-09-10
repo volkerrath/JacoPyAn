@@ -62,7 +62,8 @@ nan = np.nan
 
 
 
-SparseThresh = 0.
+SparseThresh = 1.e-8
+Scale = 1.
 
 
 
@@ -72,8 +73,11 @@ WorkName = "UBI_ZPT"
 MFile   = WorkDir + "UBI_best.rho"
 MPad=[14, 14 , 14, 14, 0, 71]
 
-JFiles = [WorkDir+"//UBI_Z.jac", WorkDir+"//UBI_P.jac",WorkDir+"//UBI_T.jac",]
-DFiles = [WorkDir+"//UBI_Z_jac.dat", WorkDir+"//UBI_P_jac.dat",WorkDir+"//UBI_T_jac.dat",]
+# JFiles = [WorkDir+"//UBI_Z.jac", WorkDir+"//UBI_P.jac",WorkDir+"//UBI_T.jac",]
+# DFiles = [WorkDir+"//UBI_Z_jac.dat", WorkDir+"//UBI_P_jac.dat",WorkDir+"//UBI_T_jac.dat",]
+
+JFiles = [WorkDir+"//UBI_Z.jac"]
+DFiles = [WorkDir+"//UBI_Z_jac.dat"]
 
 if np.size(DFiles) != np.size(JFiles):
     error("Data file number not equal Jac file number! Exit.")
@@ -122,7 +126,7 @@ for f in np.arange(nF):
     start = time.time()
     dsh = np.shape(Data)
     err = np.reshape(Data[:, 5], (dsh[0], 1))
-    # print(np.amin(err), np.amax(err))
+    print(np.amin(err), np.amax(err))
     Jac = jac.normalize_jac(Jac, err)
     elapsed = time.time() - start
     print(" Used %7.4f s for normalizing Jacobian with data error from %s " % (elapsed, DFiles[f]))
@@ -133,7 +137,7 @@ for f in np.arange(nF):
 
         sstr="_sp"+str(round(np.log10(SparseThresh)))
         start = time.time()
-        Jac, _= jac.sparsify_jac(Jac, sparse_thresh=SparseThresh)
+        Jac, Scale = jac.sparsify_jac(Jac, sparse_thresh=SparseThresh)
         elapsed = time.time() - start
         total = total + elapsed
         print(" Used %7.4f s for sparsifying Jacobian %s " % (elapsed, JFiles[f]))
@@ -142,10 +146,11 @@ for f in np.arange(nF):
     name = name+nstr+sstr
     start = time.time()
     NPZFile = name +"_info.npz"
-    np.savez_compressed(NPZFile, Freq=Freq, Data=Data, Site=Site, Comp=Comp, Info=Info, Dtype=Dtype, allow_pickle=True)
+    np.savez_compressed(NPZFile, Freq=Freq, Data=Data, Site=Site, Comp=Comp, 
+                        Info=Info, Dtype=Dtype, Scale=Scale, allow_pickle=True)
     NPZFile = name +"_jac.npz"
     if SparseThresh>0.:
-       sps.save_npz(NPZFile, matrix=Jac, compressed=True)
+       sps.save_npz(NPZFile, matrix=Jac) #, compressed=True)
     else: 
        np.savez_compressed(NPZFile, Jac)
     elapsed = time.time() - start
