@@ -55,8 +55,7 @@ rhoair = 1.e17
 trans = "LINEAR"
 InpFormat = "sparse"
 OutFormat = "mod ubc" 
-# UBINAS
-# WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/"
+
 WorkDir = JACOPYAN_ROOT+"/work/"
 WorkName = "UBI_ZPT_nerr_sp-8"
 MFile   = WorkDir + "UBI_best.rho"
@@ -237,7 +236,7 @@ for Split in Splits:
         Off_Diagonal_Rho_Phase      = 5
         Phase_Tensor                = 6
         """
-        compstr = ["zfull", "zoff", "tf", "tp", "rpoff", "pt"]
+        compstr = ["zfull", "zoff", "tp", "mf", "rpoff", "pt"]
     
         ExistType = np.unique(Dtype)
         

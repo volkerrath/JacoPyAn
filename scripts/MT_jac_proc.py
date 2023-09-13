@@ -35,7 +35,7 @@ from sys import exit as error
 import numpy as np
 import numpy.linalg as npl
 import scipy.linalg as spl
-import scipy.sparse as sps
+import scipy.sparse as scs
 import netCDF4 as nc
 
 JACOPYAN_DATA = os.environ["JACOPYAN_DATA"]
@@ -109,11 +109,11 @@ for f in np.arange(nF):
     name, ext = os.path.splitext(JFiles[f])
     start =time.time()
     print("\nReading Data from "+DFiles[f])
-    Data, Site, Freq, Comp, Dtype, Head = mod.read_data_jac(DFiles[f])
+    Data, Site, Freq, Comp, DTyp, Head = mod.read_data_jac(DFiles[f])
     elapsed = time.time() - start
     print(" Used %7.4f s for reading Data from %s " % (elapsed, DFiles[f]))
     total = total + elapsed
-    print(np.unique(Dtype))
+    print(np.unique(DTyp))
     start = time.time()
     print("Reading Jacobian from "+JFiles[f])
     Jac, Info = mod.read_jac(JFiles[f])
@@ -147,10 +147,10 @@ for f in np.arange(nF):
     start = time.time()
     NPZFile = name +"_info.npz"
     np.savez_compressed(NPZFile, Freq=Freq, Data=Data, Site=Site, Comp=Comp, 
-                        Info=Info, Dtype=Dtype, Scale=Scale, allow_pickle=True)
+                        Info=Info, DTyp=DTyp, Scale=Scale, allow_pickle=True)
     NPZFile = name +"_jac.npz"
     if SparseThresh>0.:
-       sps.save_npz(NPZFile, matrix=Jac) #, compressed=True)
+       scs.save_npz(NPZFile, matrix=Jac) #, compressed=True)
     else: 
        np.savez_compressed(NPZFile, Jac)
     elapsed = time.time() - start
