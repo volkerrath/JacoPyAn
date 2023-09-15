@@ -414,7 +414,7 @@ def ortho_basis(M):
 
 
 def sparsify_jac(Jac=None, 
-                 sparse_thresh=1.0e-6, normalized=False, scalval = -1., 
+                 sparse_thresh=1.0e-6, normalized=False, scalval = 1., 
                  method=None, out=True):
     """
     Sparsifies error_scaled Jacobian from ModEM output
@@ -442,8 +442,8 @@ def sparsify_jac(Jac=None,
     
     Jf[np.abs(Jf)/Scaleval < sparse_thresh] = 0.0
 
-    # Js = scp.csr_matrix(Jf)
-    Js = scp.lil_matrix(Jf)
+    Js = scp.csr_matrix(Jf)
+    #Js = scp.lil_matrix(Jf)
 
     if out:
         ns = Js.count_nonzero()
@@ -466,7 +466,7 @@ def sparsify_jac(Jac=None,
         f = 1.0 / Scaleval
         Js = f * Js
         
-    Js = Js.tocsr()
+    #Js = Js.tocsr()
 
     return Js, Scaleval
 

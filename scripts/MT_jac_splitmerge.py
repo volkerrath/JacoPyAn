@@ -61,17 +61,17 @@ print(titstrng+"\n\n")
 
 WorkDir = JACOPYAN_ROOT+"/work/"
 #WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJacNewFormat/"
+if not WorkDir.endswith("/"): WorkDir=WorkDir+"/"
 
-
-# Task = "merge"
-MergedFile = "UBI_ZPT_sp-8"
+Task = "merge"
+MergedFile = "merged/UBI_ZPT_sp-8_merged"
 MFiles = [WorkDir+"//UBI_Z_nerr_sp-8", WorkDir+"//UBI_P_nerr_sp-8",WorkDir+"//UBI_T_nerr_sp-8",]
 nF = np.size(MFiles)
 print(" The following files will be merged:")
 print(MFiles)
 
 Task = "split"
-SFile = WorkDir+"UBI_ZPT_sp-8"
+SFile = WorkDir+"merged/UBI_ZPT_sp-8"
 Split = ["comp", "site", "freq"]
 print(SFile)
 print(" The file will be split into components:")
@@ -94,7 +94,7 @@ if "mer" in Task.lower():
         Freq = tmp["Freq"]
         Comp = tmp["Comp"]
         Site = tmp["Site"]
-        Dtyp = tmp["Dtyp"]
+        DTyp = tmp["DTyp"]
         Data = tmp["Data"]
         Scale = tmp["Scale"]
         Info = tmp["Info"]
@@ -111,7 +111,7 @@ if "mer" in Task.lower():
             Site_merged = Site
             Freq_merged = Freq
             Comp_merged = Comp
-            Dtyp_merged = Dtyp 
+            DTyp_merged = DTyp 
             Infblk = Info
             Scales = Scale
         else:
@@ -121,7 +121,7 @@ if "mer" in Task.lower():
             Site_merged = np.hstack((Site_merged, Site))
             Freq_merged = np.hstack((Freq_merged, Freq))
             Comp_merged = np.hstack((Comp_merged, Comp))
-            Dtyp_merged = np.hstack((Dtyp_merged, Dtyp))
+            DTyp_merged = np.hstack((DTyp_merged, DTyp))
             Infblk = np.vstack((Infblk, Info))
             Scales = np.hstack((Scales, Scale))
           
@@ -131,7 +131,7 @@ if "mer" in Task.lower():
     start = time.time()
     np.savez_compressed(WorkDir+MergedFile+"_info.npz",
                         Freq=Freq_merged, Data=Data_merged, Site=Site_merged, 
-                        Comp=Comp_merged, Info=Infblk, Dtype=Dtyp_merged, 
+                        Comp=Comp_merged, Info=Infblk, DTyp=DTyp_merged, 
                         Scale=Scales, allow_pickle=True)
     scs.save_npz(WorkDir+MergedFile+"_jac.npz", matrix=Jac_merged, compressed=True)
 
@@ -148,58 +148,59 @@ if "spl" in Task.lower():
     Freq = tmp["Freq"]
     Comp = tmp["Comp"]
     Site = tmp["Site"]
-    Dtyp = tmp["Dtyp"]
+    DTyp = tmp["DTyp"]
     Data = tmp["Data"]
     Scal = tmp["Scale"]
     Info = tmp["Info"]
     
     if "fre" in Split.lower():
-                   
-        start = time.time()
+        pass
+    
+        # start = time.time()
         
-        nF = len(FreqBands)
+        # nF = len(FreqBands)
        
-        FreqNums = Freqs[np.sort(np.unique(Freqs, return_index=True)[1])] 
-        FreqValues = Freq[np.sort(np.unique(Freq, return_index=True)[1])] 
+        # FreqNums = Freqs[np.sort(np.unique(Freqs, return_index=True)[1])] 
+        # FreqValues = Freq[np.sort(np.unique(Freq, return_index=True)[1])] 
         
-        for ibnd in np.arange(nF):  
-           if np.log10(FreqBands[ibnd][0])<0.:
-               lowstr=str(1./FreqBands[ibnd][0])+"s"
-           else:
-               lowstr=str(FreqBands[ibnd][0])+"Hz"
+        # for ibnd in np.arange(nF):  
+        #    if np.log10(FreqBands[ibnd][0])<0.:
+        #        lowstr=str(1./FreqBands[ibnd][0])+"s"
+        #    else:
+        #        lowstr=str(FreqBands[ibnd][0])+"Hz"
                
-           if np.log10(FreqBands[ibnd][1])<0.:
-               uppstr=str(1./FreqBands[ibnd][1])+"s"
-           else:
-               uppstr=str(FreqBands[ibnd][1])+"Hz"              
+        #    if np.log10(FreqBands[ibnd][1])<0.:
+        #        uppstr=str(1./FreqBands[ibnd][1])+"s"
+        #    else:
+        #        uppstr=str(FreqBands[ibnd][1])+"Hz"              
                
 
-           freqstr = "" 
-           FreqList = FreqNums[
-               np.where((FreqValues>=FreqBands[ibnd][0]) & (FreqValues<FreqBands[ibnd][1]))
-               ]
-           print(FreqList)
+        #    freqstr = "" 
+        #    FreqList = FreqNums[
+        #        np.where((FreqValues>=FreqBands[ibnd][0]) & (FreqValues<FreqBands[ibnd][1]))
+        #        ]
+        #    print(FreqList)
         
 
-           JacTmp = Jac[np.where(np.isin(Freqs, FreqList))]
+        #    JacTmp = Jac[np.where(np.isin(Freqs, FreqList))]
            
            
-           Name = SFile+"_freqband"+lowstr+"_to_"+uppstr
-           Head =os.path.basename(Name).replace("_", " | ")              
+        #    Name = SFile+"_freqband"+lowstr+"_to_"+uppstr
+        #    Head =os.path.basename(Name).replace("_", " | ")              
            
      
-           np.savez_compressed( Name +"_info.npz", Freq=Freq, Data=Data, Site=Site, Comp=Comp, 
-                                Info=Info, Dtype=Dtype, Scale=Scale, allow_pickle=True)
-           if scs.issparse(JacTmp):
-                scs.save_npz( Name +"_jac.npz", matrix=JacTmp) #, compressed=True)
-           else:
-                np.savez_compressed(Name +"_jac.npz", JacTmp)
+        #    np.savez_compressed( Name +"_info.npz", Freq=Freq, Data=Data, Site=Site, Comp=Comp, 
+        #                         Info=Info, DType=DType, Scale=Scale, allow_pickle=True)
+        #    if scs.issparse(JacTmp):
+        #         scs.save_npz( Name +"_jac.npz", matrix=JacTmp) #, compressed=True)
+        #    else:
+        #         np.savez_compressed(Name +"_jac.npz", JacTmp)
             
        
                
-        elapsed = time.time() - start
-        print(" Used %7.4f s for splitting into frequency bands " % (elapsed))        
-        print("\n")
+        # elapsed = time.time() - start
+        # print(" Used %7.4f s for splitting into frequency bands " % (elapsed))        
+        # print("\n")
         
 
     if "com" in Split.lower():
@@ -216,18 +217,18 @@ if "spl" in Task.lower():
         """
         compstr = ["zfull", "zoff", "tp", "mf", "rpoff", "pt"]
     
-        ExistType = np.unique(Dtyp)
+        ExistType = np.unique(DTyp)
         
         for icmp in ExistType:
             
             print(icmp)
             JacTmp = Jac[np.where(Comp == icmp)]
 
-            Name = SFile+"_dtype"+compstr[icmp-1]
+            Name = SFile+"_DType"+compstr[icmp-1]
             Head =os.path.basename(Name).replace("_", " | ")
     
             np.savez_compressed( Name +"_info.npz", Freq=Freq, Data=Data, Site=Site, Comp=Comp, 
-                                Info=Info, Dtype=Dtyp, Scale=Scale, allow_pickle=True)
+                                Info=Info, DTyp=DTyp, Scale=Scale, allow_pickle=True)
             if scs.issparse(JacTmp):
                 scs.save_npz( Name +"_jac.npz", matrix=JacTmp) #, compressed=True)
             else:
@@ -254,11 +255,11 @@ if "spl" in Task.lower():
         #     Head = (WorkName+"_"+SiteNames[isit-1].lower()+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")   
 
             
-        #     Name = SFile+"_dtype"+compstr[icmp-1]
+        #     Name = SFile+"_DType"+compstr[icmp-1]
         #     Head = Name.replace("_", " | ")
             
         #     np.savez_compressed( Name +"_info.npz", Freq=Freq, Data=Data, Site=Site, Comp=Comp, 
-        #                         Info=Info, Dtype=Dtype, Scale=Scale, allow_pickle=True)
+        #                         Info=Info, DType=DType, Scale=Scale, allow_pickle=True)
         #     if scs.issparse(JacTmp):
         #         scs.save_npz( Name +"_jac.npz", matrix=JacTmp) #, compressed=True)
         #     else:

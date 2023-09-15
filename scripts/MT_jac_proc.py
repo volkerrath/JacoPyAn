@@ -69,15 +69,16 @@ Scale = 1.
 
 WorkDir = JACOPYAN_ROOT+"/work/"
 #WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJacNewFormat/"
-WorkName = "UBI_ZPT"
+if not WorkDir.endswith("/"): WorkDir=WorkDir+"/"
+
 MFile   = WorkDir + "UBI_best.rho"
 MPad=[14, 14 , 14, 14, 0, 71]
 
-# JFiles = [WorkDir+"//UBI_Z.jac", WorkDir+"//UBI_P.jac",WorkDir+"//UBI_T.jac",]
-# DFiles = [WorkDir+"//UBI_Z_jac.dat", WorkDir+"//UBI_P_jac.dat",WorkDir+"//UBI_T_jac.dat",]
+JFiles = [WorkDir+"UBI_Z.jac", WorkDir+"UBI_P.jac",WorkDir+"UBI_T.jac",]
+DFiles = [WorkDir+"UBI_Z_jac.dat", WorkDir+"UBI_P_jac.dat",WorkDir+"UBI_T_jac.dat",]
 
-JFiles = [WorkDir+"//UBI_Z.jac"]
-DFiles = [WorkDir+"//UBI_Z_jac.dat"]
+# JFiles = [WorkDir+"UBI_Z.jac"]
+# DFiles = [WorkDir+"UBI_Z_jac.dat"]
 
 if np.size(DFiles) != np.size(JFiles):
     error("Data file number not equal Jac file number! Exit.")
