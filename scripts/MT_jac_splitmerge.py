@@ -71,8 +71,8 @@ print(" The following files will be merged:")
 print(MFiles)
 
 Task = "split"
-SFile = WorkDir+"merged/UBI_ZPT_sp-8"
-Split = ["comp", "site", "freq"]
+SFile = WorkDir+"merged/UBI_ZPT_sp-8_merged"
+Split = "comp  site  freq"
 print(SFile)
 print(" The file will be split into components:")
 print(Split)
@@ -143,7 +143,7 @@ if "spl" in Task.lower():
     start =time.time()
     print("\nReading Data from "+SFile)
     Jac = scs.load_npz(SFile+"_jac.npz")
-    if Jac.issparse(): sparse= True
+    if scs.issparse(Jac): sparse= True
     tmp = np.load(SFile+"_info.npz", allow_pickle=True)
     Freq = tmp["Freq"]
     Comp = tmp["Comp"]
@@ -219,16 +219,22 @@ if "spl" in Task.lower():
     
         ExistType = np.unique(DTyp)
         
+       
+        num = -1
         for icmp in ExistType:
             
-            print(icmp)
-            JacTmp = Jac[np.where(Comp == icmp)]
+            num = num + 1
+            
+            jcmp = Info.reshape((len(Info),3))[:,1]
+            
+            JacTmp = Jac[np.where(jcmp = icmp)]
 
             Name = SFile+"_DType"+compstr[icmp-1]
             Head =os.path.basename(Name).replace("_", " | ")
     
-            np.savez_compressed( Name +"_info.npz", Freq=Freq, Data=Data, Site=Site, Comp=Comp, 
-                                Info=Info, DTyp=DTyp, Scale=Scale, allow_pickle=True)
+            np.savez_compressed(Name +"_info.npz", 
+                                Freq=Freq, Data=Data, Site=Site, Comp=Comp, 
+                                Info=Info, DTyp=DTyp, Scale=Scal[], allow_pickle=True)
             if scs.issparse(JacTmp):
                 scs.save_npz( Name +"_jac.npz", matrix=JacTmp) #, compressed=True)
             else:
