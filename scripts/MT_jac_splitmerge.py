@@ -70,9 +70,9 @@ nF = np.size(MFiles)
 print(" The following files will be merged:")
 print(MFiles)
 
-Task = "split"
+# Task = "split"
 SFile = WorkDir+"merged/UBI_ZPT_sp-8_merged"
-Split = "comp  site  freq"
+Split = "type  site  freq"
 print(SFile)
 print(" The file will be split into components:")
 print(Split)
@@ -137,6 +137,9 @@ if "mer" in Task.lower():
 
     elapsed = time.time() - start
     print(" Used %7.4f s for storing Jacobian to %s " % (elapsed, WorkDir+MergedFile))
+    
+    
+    
 
 if "spl" in Task.lower():
 
@@ -153,57 +156,72 @@ if "spl" in Task.lower():
     Scal = tmp["Scale"]
     Info = tmp["Info"]
     
-    if "fre" in Split.lower():
-        pass
+    tmpinfo =  np.reshape(Info,(len(Info),3))
+    freq =  tmpinfo[:,0]
+    jcmp =  tmpinfo[:,1]
+    nsit =  tmpinfo[:,1]
     
-        # start = time.time()
+    if "fre" in Split.lower():
+
+        start = time.time()
         
-        # nF = len(FreqBands)
+        nF = len(FreqBands)
+
+        for ibnd in np.arange(nF):  
+            if np.log10(FreqBands[ibnd][0])<0.:
+                lowstr=str(1./FreqBands[ibnd][0])+"s"
+            else:
+                lowstr=str(FreqBands[ibnd][0])+"Hz"
+               
+            if np.log10(FreqBands[ibnd][1])<0.:
+                uppstr=str(1./FreqBands[ibnd][1])+"s"
+            else:
+                uppstr=str(FreqBands[ibnd][1])+"Hz"              
+               
        
-        # FreqNums = Freqs[np.sort(np.unique(Freqs, return_index=True)[1])] 
-        # FreqValues = Freq[np.sort(np.unique(Freq, return_index=True)[1])] 
+            # FreqNums = freq[np.sort(np.unique(freq, return_index=True)[1])] 
+            # FreqVals = Freq[np.sort(np.unique(Freq, return_index=True)[1])] 
         
-        # for ibnd in np.arange(nF):  
-        #    if np.log10(FreqBands[ibnd][0])<0.:
-        #        lowstr=str(1./FreqBands[ibnd][0])+"s"
-        #    else:
-        #        lowstr=str(FreqBands[ibnd][0])+"Hz"
-               
-        #    if np.log10(FreqBands[ibnd][1])<0.:
-        #        uppstr=str(1./FreqBands[ibnd][1])+"s"
-        #    else:
-        #        uppstr=str(FreqBands[ibnd][1])+"Hz"              
-               
-
-        #    freqstr = "" 
-        #    FreqList = FreqNums[
-        #        np.where((FreqValues>=FreqBands[ibnd][0]) & (FreqValues<FreqBands[ibnd][1]))
-        #        ]
-        #    print(FreqList)
+            # freqstr = "" 
+            # FreqList = FreqNums[
+            #     np.where((FreqVals>=FreqBands[ibnd][0]) & (FreqVals<FreqBands[ibnd][1]))
+            #     ]
+            # print(FreqList)
         
+            indices = np.where((Freq>=FreqBands[ibnd][0]) & (Freq<FreqBands[ibnd][1]))
+            # np.where(np.isin(freq, FreqList))
+            JacTmp = Jac[indices]
+            
+            FreqTmp=Freq[indices]
+            DataTmp=Data[indices,:]
+            SiteTmp=Site[indices]                              
+            CompTmp=Comp[indices]
+            InfoTmp=Info[indices]
+            DTypTmp=DTyp[indices]
+            ScalTmp=Scal
 
-        #    JacTmp = Jac[np.where(np.isin(Freqs, FreqList))]
            
            
-        #    Name = SFile+"_freqband"+lowstr+"_to_"+uppstr
-        #    Head =os.path.basename(Name).replace("_", " | ")              
+            Name = SFile+"_freqband"+lowstr+"_to_"+uppstr
+            Head =os.path.basename(Name).replace("_", " | ")              
            
-     
-        #    np.savez_compressed( Name +"_info.npz", Freq=Freq, Data=Data, Site=Site, Comp=Comp, 
-        #                         Info=Info, DType=DType, Scale=Scale, allow_pickle=True)
-        #    if scs.issparse(JacTmp):
-        #         scs.save_npz( Name +"_jac.npz", matrix=JacTmp) #, compressed=True)
-        #    else:
-        #         np.savez_compressed(Name +"_jac.npz", JacTmp)
+            np.savez_compressed(Name +"_info.npz", 
+                                Freq=FreqTmp, Data=DataTmp, Site=SiteTmp, 
+                                Comp=CompTmp, Info=InfoTmp, DTyp=DTypTmp, 
+                                Scale=ScalTmp, allow_pickle=True)
+            if scs.issparse(JacTmp):
+                scs.save_npz( Name +"_jac.npz", matrix=JacTmp) #, compressed=True)
+            else:
+                np.savez_compressed(Name +"_jac.npz", JacTmp)
             
        
                
-        # elapsed = time.time() - start
-        # print(" Used %7.4f s for splitting into frequency bands " % (elapsed))        
-        # print("\n")
+        elapsed = time.time() - start
+        print(" Used %7.4f s for splitting into frequency bands " % (elapsed))        
+        print("\n")
         
 
-    if "com" in Split.lower():
+    if "typ" in Split.lower():
            
         start = time.time()
     
@@ -218,23 +236,32 @@ if "spl" in Task.lower():
         compstr = ["zfull", "zoff", "tp", "mf", "rpoff", "pt"]
     
         ExistType = np.unique(DTyp)
-        
-       
-        num = -1
+                
+        cnum= -1
         for icmp in ExistType:
+            cnum =cnum +1
             
-            num = num + 1
             
-            jcmp = Info.reshape((len(Info),3))[:,1]
+            indices = np.where(jcmp = icmp)
+            JacTmp = Jac[indices]
             
-            JacTmp = Jac[np.where(jcmp = icmp)]
-
+            FreqTmp=Freq[indices]
+            DataTmp=Data[indices,:]
+            SiteTmp=Site[indices]                              
+            CompTmp=Comp[indices]
+            InfoTmp=Info[indices]
+            DTypTmp=DTyp[indices]
+            ScalTmp=Scal[cnum]
+            
+            
+            
             Name = SFile+"_DType"+compstr[icmp-1]
             Head =os.path.basename(Name).replace("_", " | ")
     
             np.savez_compressed(Name +"_info.npz", 
-                                Freq=Freq, Data=Data, Site=Site, Comp=Comp, 
-                                Info=Info, DTyp=DTyp, Scale=Scal[], allow_pickle=True)
+                                Freq=FreqTmp, Data=DataTmp, Site=SiteTmp, 
+                                Comp=CompTmp, Info=InfoTmp, DTyp=DTypTmp, 
+                                Scale=ScalTmp, allow_pickle=True)
             if scs.issparse(JacTmp):
                 scs.save_npz( Name +"_jac.npz", matrix=JacTmp) #, compressed=True)
             else:
@@ -246,33 +273,40 @@ if "spl" in Task.lower():
         print("\n")
         
     if "sit" in Split.lower():          
-        pass
-        # start = time.time()
         
-        # SiteNums = Sites[np.sort(np.unique(Sites, return_index=True)[1])] 
-        # SiteNames = Site[np.sort(np.unique(Site, return_index=True)[1])] 
-    
+        start = time.time()
         
-        # for isit in SiteNums:        
+        SiteNums = freq[np.sort(np.unique(nsit, return_index=True)[1])] 
+        SiteNams = Site[np.sort(np.unique(Site, return_index=True)[1])] 
+        
+        for isit in SiteNums:  
             
-        #     JacTmp = Jac[np.where(Sites == isit)]
- 
-        #     SensFile = WorkDir+WorkName+"_"+SiteNames[isit-1].lower()+"_"+Type+"_"+"_".join(Transform)
-        #     Head = (WorkName+"_"+SiteNames[isit-1].lower()+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")   
-
+            indices = np.where(nsit == isit)
+            JacTmp = Jac[indices]
             
-        #     Name = SFile+"_DType"+compstr[icmp-1]
-        #     Head = Name.replace("_", " | ")
+            FreqTmp=Freq[indices]
+            DataTmp=Data[indices,:]
+            SiteTmp=Site[indices]                              
+            CompTmp=Comp[indices]
+            InfoTmp=Info[indices]
+            DTypTmp=DTyp[indices] 
+            ScalTmp=Scal
             
-        #     np.savez_compressed( Name +"_info.npz", Freq=Freq, Data=Data, Site=Site, Comp=Comp, 
-        #                         Info=Info, DType=DType, Scale=Scale, allow_pickle=True)
-        #     if scs.issparse(JacTmp):
-        #         scs.save_npz( Name +"_jac.npz", matrix=JacTmp) #, compressed=True)
-        #     else:
-        #         np.savez_compressed(Name +"_jac.npz", JacTmp)
-  
+           
+            Name = SFile+"_"+SiteNams[isit].lower()
+            Head =os.path.basename(Name).replace("_", " | ")              
+           
+            np.savez_compressed(Name +"_info.npz", 
+                                Freq=FreqTmp, Data=DataTmp, Site=SiteTmp, 
+                                Comp=CompTmp, Info=InfoTmp, DTyp=DTypTmp, 
+                                Scale=ScalTmp, allow_pickle=True)
+            if scs.issparse(JacTmp):
+                scs.save_npz( Name +"_jac.npz", matrix=JacTmp) #, compressed=True)
+            else:
+                np.savez_compressed(Name +"_jac.npz", JacTmp)
+            
                 
-        # elapsed = time.time() - start
-        # print(" Used %7.4f s for splitting into sites " % (elapsed))        
-        # print("\n")
+        elapsed = time.time() - start
+        print(" Used %7.4f s for splitting into sites " % (elapsed))        
+        print("\n")
         
