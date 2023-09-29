@@ -22,10 +22,7 @@ Reads ModEM's Jacobian, does fancy things.
 
 # Import required modules
 
-import util as utl
-from version import versionstrg
-import modem as mod
-import jacproc as jac
+
 import os
 import sys
 
@@ -50,6 +47,10 @@ for pth in mypath:
     if pth not in sys.path:
         sys.path.insert(0, pth)
 
+import util as utl
+from version import versionstrg
+import modem as mod
+import jacproc as jac
 
 version, _ = versionstrg()
 titstrng = utl.print_title(version=version, fname=__file__, out=False)
@@ -66,20 +67,23 @@ Sparse = SparseThresh > 0
 Scale = 1.
 
 
-WorkDir = JACOPYAN_ROOT+"/work/"
-#WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJacNewFormat/"
+WorkDir = JACOPYAN_ROOT+"/work/SABA/"
+#WorkDir = JACOPYAN_DATA+"/Peru/SABAnas/SABAJacNewFormat/"
 if not WorkDir.endswith("/"):
     WorkDir = WorkDir+"/"
 
-MFile = WorkDir + "UBI_best.rho"
+MFile = WorkDir + "SABA8_best.rho"
 MPad = [14, 14, 14, 14, 0, 71]
 
-JFiles = [WorkDir+"UBI_Z.jac", WorkDir+"UBI_P.jac", WorkDir+"UBI_T.jac",]
-DFiles = [WorkDir+"UBI_Z_jac.dat", WorkDir +
-          "UBI_P_jac.dat", WorkDir+"UBI_T_jac.dat",]
+JFiles = [WorkDir+"SABA_Z.jac", WorkDir+"SABA_P.jac", WorkDir+"SABA_T.jac",]
+DFiles = [WorkDir+"SABA_Z_jac.dat", WorkDir +
+          "SABA_P_jac.dat", WorkDir+"SABA_T_jac.dat",]
 
-# JFiles = [WorkDir+"UBI_Z.jac"]
-# DFiles = [WorkDir+"UBI_Z_jac.dat"]
+JFiles = [ WorkDir+"SABA8_Z.jac",]
+DFiles = [ WorkDir+"SABA8_Z_jac.dat",]
+
+# JFiles = [WorkDir+"SABA_Z.jac"]
+# DFiles = [WorkDir+"SABA_Z_jac.dat"]
 
 if np.size(DFiles) != np.size(JFiles):
     error("Data file number not equal Jac file number! Exit.")
