@@ -79,8 +79,8 @@ JFiles = [WorkDir+"SABA_Z.jac", WorkDir+"SABA_P.jac", WorkDir+"SABA_T.jac",]
 DFiles = [WorkDir+"SABA_Z_jac.dat", WorkDir +
           "SABA_P_jac.dat", WorkDir+"SABA_T_jac.dat",]
 
-JFiles = [ WorkDir+"SABA8_PT.jac", WorkDir+"SABA8_Z.jac",]
-DFiles = [ WorkDir+"SABA8_PT_jac.dat",WorkDir+"SABA8_Z_jac.dat",]
+JFiles = [ WorkDir+"SABA8_P.jac", WorkDir+"SABA8_T.jac",]
+DFiles = [ WorkDir+"SABA8_P_jac.dat",WorkDir+"SABA8_T_jac.dat",]
 
 # JFiles = [WorkDir+"SABA_Z.jac"]
 # DFiles = [WorkDir+"SABA_Z_jac.dat"]
@@ -127,7 +127,10 @@ for f in np.arange(nF):
     elapsed = time.time() - start
     print(" Used %7.4f s for reading Jacobian from %s " % (elapsed, JFiles[f]))
     total = total + elapsed
-    print(np.shape(Jac),np.shape(Data))
+
+    if np.shape(Jac)[0]!=np.shape(Data)[0]:
+        print(np.shape(Jac),np.shape(Data))
+        error(" Dimensions of Jacobian and data do not match! Exit.")
 
     nstr = nstr+"_nerr"
     start = time.time()

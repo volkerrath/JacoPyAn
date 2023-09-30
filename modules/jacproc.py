@@ -486,7 +486,10 @@ def normalize_jac(Jac=None, fn=None, out=True):
         f = 1.0 / fn[0]
         Jac = f * Jac
     else:
-        erri = scs.diags(1./fn[:], 0, format="csr")
+        fd = 1./fn[:]
+        fd = fd.flatten()
+        print(fd.shape)
+        erri = scs.diags([fd], [0], format="csr")
         Jac = erri @ Jac
         #erri = np.reshape(1.0 / fn, (shj[0], 1))
         #Jac = erri[:] * Jac
