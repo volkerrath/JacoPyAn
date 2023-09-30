@@ -10,7 +10,7 @@ from scipy.ndimage import uniform_filter, gaussian_filter, median_filter
 
 import util as utl
 
-# import scipy.sparse as scp
+# import scipy.sparse as scs
 
 import netCDF4 as nc
 

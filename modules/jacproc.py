@@ -6,7 +6,7 @@ Created on Sun Sep 27 17:36:08 2020
 """
 from sys import exit as error
 import numpy as np
-import scipy.sparse as scp
+import scipy.sparse as scs
 import numpy.linalg as npl
 
 
@@ -442,8 +442,8 @@ def sparsify_jac(Jac=None,
     
     Jf[np.abs(Jf)/Scaleval < sparse_thresh] = 0.0
 
-    Js = scp.csr_matrix(Jf)
-    #Js = scp.lil_matrix(Jf)
+    Js = scs.csr_matrix(Jf)
+    #Js = scs.lil_matrix(Jf)
 
     if out:
         ns = Js.count_nonzero()
@@ -464,7 +464,7 @@ def sparsify_jac(Jac=None,
 
     if normalized:
         f = 1.0 / Scaleval
-        Js = f * Js
+        Js = normalize_jac(Jac=Js, fn=f)
         
     #Js = Js.tocsr()
 
@@ -476,16 +476,20 @@ def normalize_jac(Jac=None, fn=None, out=True):
     normalize Jacobian from ModEM data err.
 
     author: vrath
-    last changed: Mar 8, 2021
+    last changed: Sep30, 2023
     """
     shj = np.shape(Jac)
     shf = np.shape(fn)
+    print("fn = ")
+    print(fn)
     if shf[0] == 1:
         f = 1.0 / fn[0]
         Jac = f * Jac
     else:
-        erri = np.reshape(1.0 / fn, (shj[0], 1))
-        Jac = erri[:] * Jac
+        erri = scs.diags(1./fn[:], 0, format="csr")
+        Jac = erri @ Jac
+        #erri = np.reshape(1.0 / fn, (shj[0], 1))
+        #Jac = erri[:] * Jac
 
     return Jac
 
@@ -523,7 +527,7 @@ def set_mask(rho=None, pad=[10, 10 , 10, 10, 0, 10], blank= np.nan, flat=True, o
 #     author: vrath
 #     last changed: Sep 25, 2020
 #     """
-#     if scp.issparse(Jac):
+#     if scs.issparse(Jac):
 #         J = Jac.todense()
 #     else:
 #         J = Jac
