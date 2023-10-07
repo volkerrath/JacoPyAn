@@ -413,7 +413,9 @@ Contains
     close(ioSens)
 
   end subroutine write_sensMatrixMTX
+
 #else
+
     !*********************************************************************
   ! output is a quick fix, as always - reduces to nearly the same thing
   ! as before, a vector of model parameters
@@ -468,7 +470,7 @@ Contains
 
     close(ioSens)
 
-  end subroutine write_sensMatrixMT
+  end subroutine write_sensMatrixMTX
 #endif
 
 
