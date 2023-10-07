@@ -91,7 +91,7 @@ nF = np.size(DFiles)
 
 
 total = 0.0
-start = time.time()
+start = time.perf_counter()
 dx, dy, dz, rho, reference, _, vcell = mod.read_mod(
     MFile, trans="linear", volumes=True)
 dims = np.shape(rho)
@@ -101,7 +101,7 @@ rhoair = 1.e17
 aircells = np.where(rho > rhoair/10)
 blank = rhoair
 
-elapsed = time.time() - start
+elapsed = time.perf_counter() - start
 total = total + elapsed
 print(" Used %7.4f s for reading model from %s " % (elapsed, MFile))
 
@@ -114,17 +114,17 @@ nF = np.size(DFiles)
 for f in np.arange(nF):
     nstr = ""
     name, ext = os.path.splitext(JFiles[f])
-    start = time.time()
+    start = time.perf_counter()
     print("\nReading Data from "+DFiles[f])
     Data, Site, Freq, Comp, DTyp, Head = mod.read_data_jac(DFiles[f])
-    elapsed = time.time() - start
+    elapsed = time.perf_counter() - start
     print(" Used %7.4f s for reading Data from %s " % (elapsed, DFiles[f]))
     total = total + elapsed
     print(np.unique(DTyp))
-    start = time.time()
+    start = time.perf_counter()
     print("Reading Jacobian from "+JFiles[f])
     Jac, Info = mod.read_jac(JFiles[f])
-    elapsed = time.time() - start
+    elapsed = time.perf_counter() - start
     print(" Used %7.4f s for reading Jacobian from %s " % (elapsed, JFiles[f]))
     total = total + elapsed
 
@@ -133,29 +133,29 @@ for f in np.arange(nF):
         error(" Dimensions of Jacobian and data do not match! Exit.")
 
     nstr = nstr+"_nerr"
-    start = time.time()
+    start = time.perf_counter()
     dsh = np.shape(Data)
     err = np.reshape(Data[:, 5], (dsh[0], 1))
     print(np.amin(err), np.amax(err))
     Jac = jac.normalize_jac(Jac, err)
-    elapsed = time.time() - start
+    elapsed = time.perf_counter() - start
     print(" Used %7.4f s for normalizing Jacobian with data error from %s " %
           (elapsed, DFiles[f]))
-    start = time.time()
+    start = time.perf_counter()
 
     sstr = "_full"
     if SparseThresh > 0.:
 
         sstr = "_sp"+str(round(np.log10(SparseThresh)))
-        start = time.time()
+        start = time.perf_counter()
         Jac, Scale = jac.sparsify_jac(Jac, sparse_thresh=SparseThresh)
-        elapsed = time.time() - start
+        elapsed = time.perf_counter() - start
         total = total + elapsed
         print(" Used %7.4f s for sparsifying Jacobian %s " %
               (elapsed, JFiles[f]))
 
     name = name+nstr+sstr
-    start = time.time()
+    start = time.perf_counter()
 
     np.savez_compressed(name + "_info.npz", Freq=Freq, Data=Data, Site=Site, Comp=Comp,
                         Info=Info, DTyp=DTyp, Scale=Scale, allow_pickle=True)
@@ -163,6 +163,6 @@ for f in np.arange(nF):
         scs.save_npz(name + "_jac.npz", matrix=Jac)  # , compressed=True)
     else:
         np.savez_compressed(name +"_jac.npz", Jac)
-    elapsed = time.time() - start
+    elapsed = time.perf_counter() - start
     total = total + elapsed
     print(" Used %7.4f s for writing Jacobian and infp to %s " % (elapsed, name))

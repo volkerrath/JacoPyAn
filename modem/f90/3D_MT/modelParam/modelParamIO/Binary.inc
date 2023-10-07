@@ -16,8 +16,11 @@
       type(rscalar)           :: ccond
       type(grid_t)          :: grid
       real(kind=prec) :: AirCond
+#ifdef JAC
+      character(128)           :: paramType
+#else
       character(80)           :: paramType
-
+#endif
       paramType = LOGE
 
       call getValue_modelParam(m,paramType,ccond,AirCond)

@@ -103,10 +103,10 @@ Options:
 
 total = 0.0
 
-start = time.time()
+start = time.perf_counter()
 dx, dy, dz, rho, refmod, _, vcell = mod.read_mod(MFile, trans="linear", volumes=True)
 V= vcell.flatten(order="F")
-elapsed = time.time() - start
+elapsed = time.perf_counter() - start
 total = total + elapsed
 print(" Used %7.4f s for reading model from %s " % (elapsed, MFile))
 
@@ -133,7 +133,7 @@ jacmask = j0.reshape(jdims)
 
 name, ext = os.path.splitext(JFile)
 
-start = time.time()
+start = time.perf_counter()
 print("Reading Jacobian from "+JFile)
 
 if "spa" in InpFormat:
@@ -159,7 +159,7 @@ else:
     err = np.reshape(Data[:, 5], (dsh[0], 1))
     Jac = jac.normalize_jac(Jac, err)
     
-elapsed = time.time() - start
+elapsed = time.perf_counter() - start
 print(" Used %7.4f s for reading Jacobian/data from %s" % (elapsed, JFile))
 total = total + elapsed
 
@@ -173,7 +173,7 @@ print(JFile+" minimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))
 # print(JFile+" number of elements in masked Jacobian is "+str(np.count_nonzero(~np.isfinite(Jac))))
 # print( np.count_nonzero(~np.isnan(jacmask))*np.shape(Jac)[0])
 
-start = time.time()
+start = time.perf_counter()
 #print("Jac ", np.shape(Jac))
 #Jac = Jac.toarray()
 SensTmp = jac.calc_sensitivity(Jac,
@@ -218,7 +218,7 @@ if "ubc" in OutFormat.lower():
     print(" Cell volumes (UBC format) written to "+SensFile)
   
   
-elapsed = time.time() - start
+elapsed = time.perf_counter() - start
 print(" Used %7.4f s for full sensitivities " % (elapsed))
         
         
@@ -226,7 +226,7 @@ for Split in Splits:
         
     if "comp" in Split.lower():
         
-        start = time.time()
+        start = time.perf_counter()
     
         """
         Full_Impedance              = 1
@@ -264,12 +264,12 @@ for Split in Splits:
                               reference=refubc, mvalair=rhoair, aircells=aircells, header=Head)
                 print(" Component sensitivities (UBC format) written to "+SensFile)
             
-        elapsed = time.time() - start
+        elapsed = time.perf_counter() - start
         print(" Used %7.4f s for comp sensitivities " % (elapsed))        
         print("\n")
     
     if "site" in Split.lower():
-        start = time.time()
+        start = time.perf_counter()
         
 
         SiteNums = Sites[np.sort(np.unique(Sites, return_index=True)[1])] 
@@ -300,12 +300,12 @@ for Split in Splits:
                 print(" Site sensitivities (UBC format) written to "+SensFile)           
            
         
-        elapsed = time.time() - start
+        elapsed = time.perf_counter() - start
         print(" Used %7.4f s for site sensitivities " % (elapsed))
         print("\n")
     
     if "freq" in Split.lower():
-        start = time.time()
+        start = time.perf_counter()
         
         nF = len(FreqBands)
        
@@ -354,6 +354,6 @@ for Split in Splits:
            
 
         
-        elapsed = time.time() - start
+        elapsed = time.perf_counter() - start
         print(" Used %7.4f s for Freq sensitivities " % (elapsed))
         print("\n")

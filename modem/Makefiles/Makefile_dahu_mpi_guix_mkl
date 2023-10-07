@@ -3,7 +3,7 @@
 include Makefile.local
 OBJDIR = ./objs/3D_MT/GFortReleaseMPI_MKL
 F90 = mpifort
-#FFLAGS = -O3 -g -fbounds-check -ffree-line-length-none -std=legacy -fcheck=all  -I/home/sbyrd/.guix-profile/include
+#FFLAGS = -O3 -g -DJAC -fbounds-check -ffree-line-length-none -std=legacy -fcheck=all  -I/home/sbyrd/.guix-profile/include
 FFLAGS = -O -g -fbounds-check -ffree-line-length-none -std=legacy -m64  -fcheck=all -I/home/sbyrd/.guix-profile/include
 # FFLAGS = -fbounds-check -g -O -ffree-line-length-none -std=legacy
 MPIFLAGS = -x f95-cpp-input -DMPI

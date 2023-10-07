@@ -62,23 +62,23 @@ DFile = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/Ann21_T3.dat"
 MFile = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/Ann21_Prior100_T_NLCG_033.rho"
 SFile = JACOPYAN_DATA+"/Peru/Ubinas/UbiJac/Ann21_Prior100_T-Z3.sns"
 
-start = time.time()
+start = time.perf_counter()
 dx, dy, dz, rho, reference = mod.read_mod(MFile, trans="LOG10")
-elapsed = time.time() - start
+elapsed = time.perf_counter() - start
 total = total + elapsed
 print("Used %7.4f s for reading model from %s " % (elapsed, MFile))
 print("ModEM reference is "+str(reference))
 print("Min/max rho = "+str(np.min(rho))+"/"+str(np.max(rho)))
 
-start = time.time()
+start = time.perf_counter()
 dx, dy, dz, sns, reference = mod.read_mod(SFile, trans="LOG10")
-elapsed = time.time() - start
+elapsed = time.perf_counter() - start
 total = total + elapsed
 print("Used %7.4f s for reading model from %s " % (elapsed, SFile))
 
-start = time.time()
+start = time.perf_counter()
 Site, Comp, Data, Head = mod.read_data(DFile)
-elapsed = time.time() - start
+elapsed = time.perf_counter() - start
 total = total + elapsed
 print("Used %7.4f s for reading data from %s " % (elapsed, DFile))
 

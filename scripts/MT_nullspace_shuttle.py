@@ -103,19 +103,19 @@ res_bounds = [-0.3, 0.3]
 
 
 total = 0.0
-start = time.time()
+start = time.perf_counter()
 dx, dy, dz, rho, reference, _, vcell = mod.read_mod(MFile, trans="log10", volumes=True)
-elapsed = time.time() - start
+elapsed = time.perf_counter() - start
 total = total + elapsed
 print(" Used %7.4f s for reading model from %s " % (elapsed, MFile))
 dims = np.shape(rho)
 resair = 1.e17
 aircells = np.where(rho>resair/100)
 
-start = time.time()
+start = time.perf_counter()
 
 Jac = mod.read_jac(JFile)
-elapsed = time.time() - start
+elapsed = time.perf_counter() - start
 total = total + elapsed
 print(" Used %7.4f s for reading Jacobian from %s " % (elapsed, JFile))
 
@@ -124,9 +124,9 @@ sigma = 0.5
 r = rho.flat
 nproj = 1000
 
-start = time.time()
+start = time.perf_counter()
 U, S, Vt = jac.rsvd(Jac.T, rank=NSingulr, n_oversamples=0, n_subspace_iters=0)
-elapsed = time.time() - start
+elapsed = time.perf_counter() - start
 print(
     "Used %7.4f s for calculating k = %i SVD from %s " % (elapsed, NSingulr, JFile)
 )
@@ -141,7 +141,7 @@ print(" Op-norm J_k = "+str(n_op)+", explains "
 
 # m_avg = 0.
 # v_avg = 0.
-# s = time.time()
+# s = time.perf_counter()
 for isample in np.arange(NSamples):
 
     body = [
@@ -152,14 +152,14 @@ for isample in np.arange(NSamples):
     0., 0., 30.]
 
 # m = r + np.random.normal(mu, sigma, size=np.shape(r))
-#     t = time.time() - s
+#     t = time.perf_counter() - s
 #     print(" Used %7.4f s for generating m  " % (t))
 
-#     s = time.time()
+#     s = time.perf_counter()
 #     for proj in range(nproj):
 #         p = jac.projectMod(m, U)
 
-#     t = time.time() - s
+#     t = time.perf_counter() - s
 #     print(" Used %7.4f s for %i projections" % (t, nproj))
 
 # total = total + elapsed

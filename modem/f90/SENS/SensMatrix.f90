@@ -6,11 +6,13 @@ module sensMatrix
   use DataSpace
   use ModelSpace
 
+#ifdef JAC
   use transmitters
   use dataTypes
   use receivers
 
   use dataio
+#endif
 
   implicit none
 
@@ -79,7 +81,7 @@ module sensMatrix
       logical       :: allocated = .false.
 
   end type sensMatrix_t
-
+#ifdef JAC
   type :: data_file_block
 
       ! this block of information constitutes user preferences about the data format;
@@ -108,6 +110,7 @@ module sensMatrix
 
   type (data_file_block), pointer, save, private, dimension(:,:) :: fileInfo
     
+#endif
 
 
 Contains
@@ -278,35 +281,39 @@ Contains
   !*********************************************************************
   ! output is a quick fix, as always - reduces to nearly the same thing
   ! as before, a vector of model parameters
-  subroutine write_sensMatrixMTX(sens,allData,cfile)
+#ifdef JAC
+  subroutine write_sensMatrixMTX(sens, CmSqrt, allData, cfile)
+    type(dataVectorMTX_t), intent(in)         :: allData
 
     type(sensMatrix_t), pointer	:: sens(:)
-    type(dataVectorMTX_t), intent(in)         :: allData
 
     character(*), intent(in)				:: cfile
     ! local
     integer  iTx,iDt,iRx,nTx,nDt,nSite,nComp,icomp,i,j,k,l,istat,ios,nAll,iTxt
+
     real(8), allocatable            :: val(:) ! (ncomp)
     real(8), allocatable            :: err(:) ! (ncomp)
-    ! logical, allocatable            :: exist(:) ! (ncomp)
     real(8) :: pTx, xRx(3)
     character(80) header, fmtstring
     character(40) sRx, cRx
     character(20) compid
-    logical  :: SensWork
     character(200) tmp
-    ! real(kind=prec)	:: xRx(3)
-    ! real :: xRx(3)
-    
-    SensWork = .true.
-	iTxt = 1   
+
+	iTxt = 1
+
     if(.not. associated(sens)) then
         call errStop('sensitivity matrix not allocated in write_sensMatrixMTX')
     end if
 
+    tmp=trim(cfile)
+    dotpos = scan(tmp,".", BACK= .true.)
+    if (dotpos>0) then
+      tmp = tmp(1:dotpos-1)//'_jac.dat'
+      open(13,file=tmp)
+    end if
+
     open(unit=ioSens, file=cfile, form='unformatted', iostat=ios)
 	write(0,*) 'Output sensitivity matrix...'
-
 
     write(header,*) 'Sensitivity Matrix'
 	nAll = count_sensMatrixMTX(sens)
@@ -340,67 +347,60 @@ Contains
             iRx = sens(i)%v(j)%rx(k)
             sRx = rxDict(iRx)%id
             xRx = rxDict(iRx)%x
- 
-            if (SensWork) then
-                !write(*,*) 'Data Type: ', iDt, nComp, 
-                select case (iDt)
 
-                    !    Full_Impedance              = 1
-                    !    Off_Diagonal_Impedance      = 2
-                    !    Full_Vertical_Components    = 3
-                    !    Full_Interstation_TF        = 4
-                    !    Off_Diagonal_Rho_Phase      = 5
-                    !    Phase_Tensor                = 6
+            !write(*,*) 'Data Type: ', iDt, nComp,
+            select case (iDt)
 
-
-                    case(1, 2, 3)
-                        
-                        fmtstring = '(g12.5,3x,a20,3f16.3,a8,i8,3g16.6)'
-                        val = allData%d(i)%data(j)%value(:,k)
-                        err = allData%d(i)%data(j)%error(:,k)
-
-                            
-                        do icomp = 1,nComp/2
-                            compid = typeDict(iDt)%id(icomp)
-                            write(13,fmt=fmtstring) &
-                                pTx,trim(sRx),xRx,trim(compid),iDt,&
-                                val(2*icomp-1), val(2*icomp), err(2*icomp)
-                        end do
-                        
-                        write(header,'(a,i10,a,i10,a,i10)') &
-                            'Sensitivity for freq=',iTx,'; dataType=',iDt,'; site=',iRx
-
-                        call writeVec_modelParam(nComp,sens(i)%v(j)%dm(:,k),header,cfile)                       
+                !    Full_Impedance              = 1
+                !    Off_Diagonal_Impedance      = 2
+                !    Full_Vertical_Components    = 3
+                !    Full_Interstation_TF        = 4
+                !    Off_Diagonal_Rho_Phase      = 5
+                !    Phase_Tensor                = 6
 
 
-                    case(5, 6)
-                            
-                        fmtstring = '(g12.5,3x,a20,3f16.3,a8,i8,2g16.6)'
-                        val = allData%d(i)%data(j)%value(:,k)
-                        err = allData%d(i)%data(j)%error(:,k)
+                case(1, 2, 3)
 
-                        do icomp = 1,nComp
-                            compid = typeDict(iDt)%id(icomp)
-                            write(13,fmt=fmtstring) &
-                            pTx,trim(sRx),xRx,trim(compid),iDt, &
-                            val(icomp),err(icomp)
-                        end do
-                        
-                        write(header,'(a,i10,a,i10,a,i10)') &
-                            'Sensitivity for freq=',iTx,'; dataType=',iDt,'; site=',iRx
-                                
-                        call writeVec_modelParam(nComp,sens(i)%v(j)%dm(:,k),header,cfile)
-                    
-                    end select
+                    fmtstring = '(g12.5,3x,a20,3f16.3,a8,i8,3g16.6)'
+                    val = allData%d(i)%data(j)%value(:,k)
+                    err = allData%d(i)%data(j)%error(:,k)
 
 
-	        else
-	           	write(header,'(a,i10,a,i10,a,i10)') &
-					'Sensitivity for freq=',iTx,'; dataType=',iDt,'; site=',iRx
-	                write(13,*) header
-	        	call writeVec_modelParam(nComp,sens(i)%v(j)%dm(:,k),header,cfile)
+                    do icomp = 1,nComp/2
+                        compid = typeDict(iDt)%id(icomp)
+                        write(13,fmt=fmtstring) &
+                            pTx,trim(sRx),xRx,trim(compid),iDt,&
+                            val(2*icomp-1), val(2*icomp), err(2*icomp)
+                            call RecursiveAR(sens(i)%v(icomp)%dm(:,k),sens(i)%v(icomp)%dm(:,k),CmSqrt%N)
+                    end do
 
-        	end if
+                    write(header,'(a,i10,a,i10,a,i10)') &
+                        'Sensitivity for freq=',iTx,'; dataType=',iDt,'; site=',iRx
+
+                    call writeVec_modelParam(nComp,sens(i)%v(j)%dm(:,k),header,cfile)
+
+
+                case(5, 6)
+
+                    fmtstring = '(g12.5,3x,a20,3f16.3,a8,i8,2g16.6)'
+                    val = allData%d(i)%data(j)%value(:,k)
+                    err = allData%d(i)%data(j)%error(:,k)
+
+                    do icomp = 1,nComp
+                        compid = typeDict(iDt)%id(icomp)
+                        write(13,fmt=fmtstring) &
+                        pTx,trim(sRx),xRx,trim(compid),iDt, &
+                        val(icomp),err(icomp)
+                        call RecursiveAR(sens(i)%v(icomp)%dm(:,k),sens(i)%v(icomp)%dm(:,k),CmSqrt%N)
+                    end do
+
+                    write(header,'(a,i10,a,i10,a,i10)') &
+                        'Sensitivity for freq=',iTx,'; dataType=',iDt,'; site=',iRx
+
+                    call writeVec_modelParam(nComp,sens(i)%v(j)%dm(:,k),header,cfile)
+
+                end select
+
 
         end do ! rx
         
@@ -413,6 +413,64 @@ Contains
     close(ioSens)
 
   end subroutine write_sensMatrixMTX
+#else
+    !*********************************************************************
+  ! output is a quick fix, as always - reduces to nearly the same thing
+  ! as before, a vector of model parameters
+  subroutine write_sensMatrixMTX(sens,cfile)
+
+    type(sensMatrix_t), pointer	:: sens(:)
+    character(*), intent(in)				:: cfile
+    ! local
+    integer  iTx,iDt,iRx,nTx,nDt,nSite,nComp,i,j,k,istat,ios,nAll
+    character(80) header
+
+    if(.not. associated(sens)) then
+        call errStop('sensitivity matrix not allocated in write_sensMatrixMTX')
+    end if
+
+    open(unit=ioSens, file=cfile, form='unformatted', iostat=ios)
+	write(0,*) 'Output sensitivity matrix...'
+
+    write(header,*) 'Sensitivity Matrix'
+	nAll = count_sensMatrixMTX(sens)
+	write(ioSens) header
+	write(ioSens) nAll
+
+    nTx = size(sens)
+    write(ioSens) nTx
+
+    do i = 1,nTx
+
+      nDt = sens(i)%nDt
+      iTx = sens(i)%tx
+      write(ioSens) nDt
+
+      do j = 1,nDt
+
+        nComp = sens(i)%v(j)%nComp
+        nSite = sens(i)%v(j)%nSite
+        iDt   = sens(i)%v(j)%dataType
+        write(ioSens) nSite
+
+        do k = 1,nSite
+        	! append to the file: writes nComp, header and the values;
+        	! could also write the full transmitter, receiver and data type...
+        	iRx = sens(i)%v(j)%rx(k)
+        	write(header,'(a19,i4,a11,i4,a5,i4)') &
+        		'Sensitivity for tx=',iTx,'; dataType=',iDt,'; rx=',iRx
+        	call writeVec_modelParam(nComp,sens(i)%v(j)%dm(:,k),header,cfile)
+        end do ! rx
+
+      end do  ! data type
+
+    end do  ! tx
+
+    close(ioSens)
+
+  end subroutine write_sensMatrixMT
+#endif
+
 
   !*********************************************************************
   ! implements direct (real) matrix vector multiplication d = J m

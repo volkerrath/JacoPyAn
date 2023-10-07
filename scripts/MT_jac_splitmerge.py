@@ -85,7 +85,7 @@ if "mer" in Task.lower():
     
     for ifile in np.arange(nF):     
        
-        start =time.time()
+        start =time.perf_counter()
         print("\nReading Data from "+MFiles[ifile])
         Jac = scs.load_npz(MFiles[ifile] +"_jac.npz")
         
@@ -99,7 +99,7 @@ if "mer" in Task.lower():
         Scale = tmp["Scale"]
         Info = tmp["Info"]
         
-        elapsed = time.time() - start
+        elapsed = time.perf_counter() - start
         print(" Used %7.4f s for reading Jacobian from %s " % (elapsed, MFiles[ifile]))
         
         
@@ -128,14 +128,14 @@ if "mer" in Task.lower():
     # Scale = np.amax(Scales)
             
 
-    start = time.time()
+    start = time.perf_counter()
     np.savez_compressed(WorkDir+MergedFile+"_info.npz",
                         Freq=Freq_merged, Data=Data_merged, Site=Site_merged, 
                         Comp=Comp_merged, Info=Infblk, DTyp=DTyp_merged, 
                         Scale=Scales, allow_pickle=True)
     scs.save_npz(WorkDir+MergedFile+"_jac.npz", matrix=Jac_merged, compressed=True)
 
-    elapsed = time.time() - start
+    elapsed = time.perf_counter() - start
     print(" Used %7.4f s for storing Jacobian to %s " % (elapsed, WorkDir+MergedFile))
     
     
@@ -143,7 +143,7 @@ if "mer" in Task.lower():
 
 if "spl" in Task.lower():
 
-    start =time.time()
+    start =time.perf_counter()
     print("\nReading Data from "+SFile)
     Jac = scs.load_npz(SFile+"_jac.npz")
     if scs.issparse(Jac): sparse= True
@@ -163,7 +163,7 @@ if "spl" in Task.lower():
     
     if "fre" in Split.lower():
 
-        start = time.time()
+        start = time.perf_counter()
         
         nF = len(FreqBands)
 
@@ -216,14 +216,14 @@ if "spl" in Task.lower():
             
        
                
-        elapsed = time.time() - start
+        elapsed = time.perf_counter() - start
         print(" Used %7.4f s for splitting into frequency bands " % (elapsed))        
         print("\n")
         
 
     if "typ" in Split.lower():
            
-        start = time.time()
+        start = time.perf_counter()
     
         """
         Full_Impedance              = 1
@@ -268,13 +268,13 @@ if "spl" in Task.lower():
                 np.savez_compressed(Name +"_jac.npz", JacTmp)
   
                 
-        elapsed = time.time() - start
+        elapsed = time.perf_counter() - start
         print(" Used %7.4f s for splitting into components " % (elapsed))        
         print("\n")
         
     if "sit" in Split.lower():          
         
-        start = time.time()
+        start = time.perf_counter()
         
         SiteNums = freq[np.sort(np.unique(nsit, return_index=True)[1])] 
         SiteNams = Site[np.sort(np.unique(Site, return_index=True)[1])] 
@@ -306,7 +306,7 @@ if "spl" in Task.lower():
                 np.savez_compressed(Name +"_jac.npz", JacTmp)
             
                 
-        elapsed = time.time() - start
+        elapsed = time.perf_counter() - start
         print(" Used %7.4f s for splitting into sites " % (elapsed))        
         print("\n")
         

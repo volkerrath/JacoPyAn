@@ -50,12 +50,12 @@ if "mod2ubc" in Task.lower():
     UBC_Modl = MOD_Modl
     lat, lon =  -16.346,  -70.908
 
-    start = time.time()
+    start = time.perf_counter()
     dx, dy, dz, rho, refmod, _, vcell = mod.read_mod(MOD_Modl, ".rho",trans="linear", volumes=True)
     dims = np.shape(rho)
     sdims = np.size(rho)
     
-    elapsed = time.time() - start
+    elapsed = time.perf_counter() - start
     print(" Used %7.4f s for reading MOD model from %s " % (elapsed, MOD_Modl))
 
    
@@ -67,14 +67,14 @@ if "mod2ubc" in Task.lower():
                             dx, dy, dz, rho, 
                             reference=refmod, trans="LINEAR", mvalair=blank, aircells=aircells)
 
-    start = time.time()    
+    start = time.perf_counter()
     elev = -refmod[2]
     refcenter =  [lat, lon, elev]
     MshExt = ".mesh"
     ModExt = ".mod"
     mod.write_model_ubc(UBC_Modl, MshExt, ModExt, 
                         dx, dy, dz, rho, refcenter, mvalair=blank, aircells=aircells)
-    elapsed = time.time() - start
+    elapsed = time.perf_counter() - start
     print(" Used %7.4f s for Writing UBC model to %s " % (elapsed, UBC_Modl))
     
 
@@ -85,10 +85,10 @@ if "ubc2mod" in Task.lower():
     MshExt = ".mesh"
     ModExt = ".mod"
     
-    start = time.time()
+    start = time.perf_counter()
     dx, dy, dz, val, refubc, _, vcell = mod.read_model_ubc(UBC_Modl, MshExt, ModExt,  
                                                         volumes=True, out=True)
-    elapsed = time.time() - start
+    elapsed = time.perf_counter() - start
     print(" Used %7.4f s for reading UBC model from %s " % (elapsed, UBC_Modl))
 
 

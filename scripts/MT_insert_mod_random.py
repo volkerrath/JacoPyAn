@@ -110,9 +110,9 @@ SnsFile = r"/home/vrath/work/MT/Jacobians/Maurienne/Maur_PT_R500_NLCG_016.sns"
 total = 0.
 
 
-start = time.time()
+start = time.perf_counter()
 dx, dy, dz, rho, reference = mod.read_mod(ModFile)
-elapsed = (time.time() - start)
+elapsed = (time.perf_counter() - start)
 total = total + elapsed
 print(" Used %7.4f s for reading model from %s " % (elapsed, DatFile))
 
@@ -122,11 +122,11 @@ nb = np.shape(body)
 # smoother=["gaussian",0.5]
 smoother = ["uniform", 3]
 total = 0
-start = time.time()
+start = time.perf_counter()
 
 dx, dy, dz, rho, reference = mod.read_mod(ModFile_in + ".rho", out=True)
 # write_model_mod(ModFile_out+".rho", dx, dy, dz, rho,reference,out = True)
-elapsed = (time.time() - start)
+elapsed = (time.perf_counter() - start)
 total = total + elapsed
 print(" Used %7.4f s for reading model from %s " %
       (elapsed, ModFile_in + ".rho"))
@@ -143,7 +143,7 @@ for ibody in range(nb[0]):
         str(ibody) + "_" + smoother[0] + ".rho"
     write_model_mod(Modout, dx, dy, dz, rhonew, reference, out=True)
 
-    elapsed = (time.time() - start)
+    elapsed = (time.perf_counter() - start)
     print(
         " Used %7.4f s for processing/writing model to %s " %
         (elapsed, Modout))

@@ -1,10 +1,10 @@
 ! *****************************************************************************
-program Mod3DMT
+program Mod3DMTS
 ! Program for running 3D MT forward, sensitivity and inverse modelling
 ! Copyright (c) 2004-2014 Oregon State University
 !              AUTHORS  Gary Egbert, Anna Kelbert & Naser Meqbel
 !              College of Earth, Ocean and Atmospheric Sciences
-
+! With changes by Volker Rath, DIAS
      use SensComp
      use SymmetryTest
      use Main
@@ -34,7 +34,11 @@ program Mod3DMT
 #ifdef MPI
               call  MPI_constructor
 			  if (taskid==0) then
+#ifdef JAC
 			      call parseArgs('Mod3DMTS',cUserDef) ! OR readStartup(rFile_Startup,cUserDef)
+#else
+			      call parseArgs('Mod3DMT',cUserDef) ! OR readStartup(rFile_Startup,cUserDef)
+#endif
 			      write(6,*)'I am a PARALLEL version'
 			      call Master_job_Distribute_userdef_control(cUserDef)
 	              open(ioMPI,file=cUserDef%wFile_MPI)
@@ -121,17 +125,22 @@ program Mod3DMT
 
      case (COMPUTE_J)
         write(*,*) 'Calculating the full sensitivity matrix...'
-        tmp=trim(cUserDef%wFile_Sens)
-        dotpos = scan(tmp,".", BACK= .true.)
-        if (dotpos>0) tmp = tmp(1:dotpos-1)//'_jac.dat'
-        open(13,file=tmp)
+
+
 #ifdef MPI
         call Master_job_fwdPred(sigma0,allData,eAll)
         call Master_job_calcJ(allData,sigma0,sens,eAll)
 #else
         call calcJ(allData,sigma0,sens)
 #endif
+
+#ifdef JAC
+        ! create square root of Cm
+    	call create_CmSqrt(sigma0, cUserDef%rFile_Cov)
+        call write_sensMatrixMTX(sens,Cmsqrt, allData,cUserDef%wFile_Sens)
+#else
         call write_sensMatrixMTX(sens,allData,cUserDef%wFile_Sens)
+#endif
 
 
 !#ifdef MPI

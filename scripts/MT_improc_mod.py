@@ -70,12 +70,12 @@ if "anidiff" in action.lower():
     fopt = 1
 
 
-start = time.time()
+start = time.perf_counter()
 dx, dy, dz, rho, reference, trans = mod.read_mod(ModFile_in + ".rho",
                                                trans="LINEAR", out=True)
 mod.write_model_mod(ModFile_out + ".rho", dx, dy, dz, rho, reference,
                 trans=trans, out=True)
-elapsed = time.time() - start
+elapsed = time.perf_counter() - start
 total = total + elapsed
 print(" Used %7.4f s for reading model from %s "
       % (elapsed, ModFile_in + ".rho"))
@@ -88,7 +88,7 @@ rho = mod.prepare_mod(rho, rhoair=rhoair)
 rho_tmp = np.log(rho.copy())
 rhoair_tmp = np.log(rhoair)
 
-start = time.time()
+start = time.perf_counter()
 if "smooth" in  action.lower():
     for ii in range(maxit):
         print("Smooting iteration: "+str(ii))
@@ -103,7 +103,7 @@ if "smooth" in  action.lower():
     rhonew[air] = rhoair_tmp
     Modout = ModFile_out+"_mediankernel"+str(ksize)+"_"+str(maxit)+".rho"
     mod.write_model_mod(Modout, dx, dy, dz, rhonew, reference, out=True)
-    elapsed = time.time() - start
+    elapsed = time.perf_counter() - start
     print(
         " Used %7.4f s for processing/writing model to %s "
         % (elapsed, Modout))
@@ -115,7 +115,7 @@ if "med" in  action.lower():
     rhonew[air] = rhoair_tmp
     Modout = ModFile_out+"_mediankernel"+str(ksize)+"_"+str(maxit)+".rho"
     mod.write_model_mod(Modout, dx, dy, dz, rhonew, reference, out=True)
-    elapsed = time.time() - start
+    elapsed = time.perf_counter() - start
     print(
         " Used %7.4f s for processing/writing model to %s "
         % (elapsed, Modout))
@@ -128,7 +128,7 @@ if "anidiff" in  action.lower():
     rhonew[air] = rhoair_tmp
     Modout = ModFile_out + "_anisodiff" + str(fopt) + "-" + str(maxit) + ".rho"
     mod.write_model_mod(Modout, dx, dy, dz, rhonew, reference, out=True)
-    elapsed = time.time() - start
+    elapsed = time.perf_counter() - start
     print(" Used %7.4f s for processing/writing model to %s "
           % (elapsed, Modout))
 

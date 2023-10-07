@@ -35,12 +35,12 @@ DFile  =  "/home/vrath/JacoPyAn/work/UBC_format_example/UBI8_Z_Alpha02_NLCG_014.
 MFile  =  "/home/vrath/JacoPyAn/work/UBC_format_example/UBI8_Z_Alpha02_NLCG_014.rho"
 MPad=[14, 14 , 14, 14, 0, 71]
 
-start = time.time()
+start = time.perf_counter()
 dx, dy, dz, rho, refmod, _, vcell = mod.read_mod(MFile, trans="linear", volumes=True)
 dims = np.shape(rho)
 sdims = np.size(rho)
 
-elapsed = time.time() - start
+elapsed = time.perf_counter() - start
 print(" Used %7.4f s for reading model from %s " % (elapsed, MFile))
 
 
@@ -64,9 +64,9 @@ elev = -refmod[2]
 refcenter =  [lat, lon, elev]
 mod.write_model_ubc(TSTFile, dx, dy, dz, rho, refcenter, mvalair=blank, aircells=aircells)
 
-start = time.time()
+start = time.perf_counter()
 dxu, dyu, dzu, valu, refubc, _, vcell = mod.read_model_ubc(TSTFile, volumes=True, out=True)
-elapsed = time.time() - start
+elapsed = time.perf_counter() - start
 print(" Used %7.4f s for reading model from %s " % (elapsed, TSTFile))
 
 print(refmod)

@@ -1,9 +1,10 @@
 
 # ------------------Macro-Defs---------------------
 include Makefile.local
+
 OBJDIR = ./objs/3D_MT/GFortReleaseMPI
 F90 = mpifort
-FFLAGS = -O3 -g  -ffree-line-length-none -I/usr/include/mpi
+FFLAGS = -O3 -g -DJAC -ffree-line-length-none -I/usr/include/mpi
 # FFLAGS = -fbounds-check -g -O -ffree-line-length-none -std=legacy
 MPIFLAGS = -x f95-cpp-input -DMPI
 MODULE = --sysroot=$(OBJDIR)
@@ -13,6 +14,7 @@ OUTDIR=/mnt/store/vrath/bin
 EXEFILE=gMod3DMTS.x
 LIBS_PATH = -L/mnt/store/vrath/lib
 LIBS = -lopenblas
+
 # -------------------End-macro-Defs---------------------------
 OBJ = $(OBJDIR)/math_constants.o $(OBJDIR)/utilities.o $(OBJDIR)/file_units.o $(OBJDIR)/transmitters.o $(OBJDIR)/receivers.o $(OBJDIR)/dataTypes.o $(OBJDIR)/ioAscii.o $(OBJDIR)/DataIO.o $(OBJDIR)/DataSpace.o $(OBJDIR)/GridDef.o $(OBJDIR)/sg_vector.o $(OBJDIR)/sg_scalar.o $(OBJDIR)/sg_spherical.o $(OBJDIR)/elements.o $(OBJDIR)/GridCalc.o $(OBJDIR)/sg_sparse_vector.o $(OBJDIR)/MPI_declaration.o $(OBJDIR)/ModelSpace.o $(OBJDIR)/SensMatrix.o $(OBJDIR)/EMfieldInterp.o $(OBJDIR)/sg_boundary.o  $(OBJDIR)/SolnSpace.o $(OBJDIR)/DataFunc.o $(OBJDIR)/DataSens.o $(OBJDIR)/SolverSens.o $(OBJDIR)/sg_diff_oper.o $(OBJDIR)/WSfwd2Dpar.o $(OBJDIR)/WSutils.o $(OBJDIR)/WSfwd1Dmod.o $(OBJDIR)/WSfwd2Dmod.o $(OBJDIR)/FwdTEmod.o $(OBJDIR)/boundary_ws.o $(OBJDIR)/nestedEM.o $(OBJDIR)/modelOperator3D.o $(OBJDIR)/solver.o $(OBJDIR)/EMsolve3D.o $(OBJDIR)/ForwardSolver.o $(OBJDIR)/SensComp.o $(OBJDIR)/SymmetryTest.o $(OBJDIR)/UserCtrl.o $(OBJDIR)/Main.o $(OBJDIR)/MPI_sub.o $(OBJDIR)/MPI_main.o $(OBJDIR)/NLCG.o $(OBJDIR)/DCG.o $(OBJDIR)/Mod3DMT.o 
 

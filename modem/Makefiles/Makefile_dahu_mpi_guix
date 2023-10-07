@@ -3,7 +3,7 @@
 include Makefile.local
 OBJDIR = ./objs/3D_MT/GFortReleaseMPI
 F90 = mpifort
-FFLAGS = -O -g -fbounds-check -ffree-line-length-none -std=legacy
+FFLAGS = -O -g -DJAC -fbounds-check -ffree-line-length-none -std=legacy
 # FFLAGS = -fbounds-check -g -O -ffree-line-length-none -std=legacy
 MPIFLAGS = -x f95-cpp-input -DMPI
 MODULE = --sysroot=$(OBJDIR)

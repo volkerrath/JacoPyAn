@@ -194,8 +194,11 @@ Contains
         end do
       end if
 
+
+#ifdef
       ! write the data type header
       call compact(fileInfo(iTxt,iDt)%info_in_file)
+
       write(ioDat,'(a)',iostat=ios) '# ModEM impedance responses for '//adjustl(trim(fileInfo(iTxt,iDt)%info_in_file))
       write(*,*) adjustl(trim(fileInfo(iTxt,iDt)%info_in_file))
       write(*,*) adjustl(trim(DataBlockHeader(iTxt,iDt)))
@@ -213,6 +216,33 @@ Contains
       write(ioDat,'(a2,f8.2)',iostat=ios) temp,fileInfo(iTxt,iDt)%geographic_orientation
       write(ioDat,'(a2,2f9.3)',iostat=ios) temp,fileInfo(iTxt,iDt)%origin_in_file(1),fileInfo(iTxt,iDt)%origin_in_file(2)
       write(ioDat,'(a2,2i6)',iostat=ios) temp,nTx,nRx
+#else
+
+      ! write the data type header
+      call compact(fileInfo(iTxt,iDt)%info_in_file)
+      write(strtemp,*) adjustl(trim(fileInfo(iTxt,iDt)%info_in_file))
+      write(ioDat,'(a32)',advance='no') '# ModEM impedance responses for '
+      write(ioDat,*,iostat=ios) strtemp(1:100)
+      write(strtemp,*) adjustl(trim(DataBlockHeader(iTxt,iDt)))
+      write(ioDat,'(a2)',advance='no') '# '
+      write(ioDat,*,iostat=ios) strtemp(1:100)
+      !if (.not. (tx_type_name(iTxt) .eq. 'MT')) then
+      !    write(ioDat,'(a2)',advance='no') '+ '
+      !    write(ioDat,*,iostat=ios) trim(tx_type_name(iTxt))
+      !end if
+      call compact(typeDict(iDt)%name)
+      write(ioDat,'(a2)',advance='no') temp
+      write(ioDat,*,iostat=ios) trim(typeDict(iDt)%name)
+      call compact(fileInfo(iTxt,iDt)%sign_info_in_file)
+      write(ioDat,'(a2)',advance='no') temp
+      write(ioDat,*,iostat=ios) trim(fileInfo(iTxt,iDt)%sign_info_in_file)
+      call compact(fileInfo(iTxt,iDt)%units_in_file)
+      write(ioDat,'(a2)',advance='no') temp
+      write(ioDat,*,iostat=ios) trim(fileInfo(iTxt,iDt)%units_in_file)
+      write(ioDat,'(a2,f8.2)',iostat=ios) temp,fileInfo(iTxt,iDt)%geographic_orientation
+      write(ioDat,'(a2,2f9.3)',iostat=ios) temp,fileInfo(iTxt,iDt)%origin_in_file(1),fileInfo(iTxt,iDt)%origin_in_file(2)
+      write(ioDat,'(a2,2i6)',iostat=ios) temp,nTx,nRx
+#endif
 
       if (fileInfo(iTxt,iDt)%sign_in_file == ISIGN) then
           conjugate = .false.
@@ -256,9 +286,15 @@ Contains
                             cycle
                         end if
                         compid = typeDict(iDt)%id(icomp)
+#ifdef JAC
                         write(ioDat,'(es14.6)',    iostat=ios,advance='no') Period
                         write(ioDat, '(a4)', iostat=ios,advance='no') '    '
                         write(ioDat,'(4x,a40,3f15.3)',iostat=ios,advance='no') trim(siteid),x(:)
+#else
+                        write(ioDat,'(es12.6)',    iostat=ios,advance='no') Period
+                        write(ioDat, '(a1)', iostat=ios,advance='no') ' '
+                        write(ioDat,'(a40,3f15.3)',iostat=ios,advance='no') trim(siteid),x(:)
+#endif
                         if (conjugate) then
                             write(ioDat,'(a8,3es15.6)',iostat=ios) trim(compid),value(2*icomp-1),-value(2*icomp),error(2*icomp)
                         else
@@ -276,10 +312,17 @@ Contains
                         compid = typeDict(iDt)%id(icomp)
                         ref_siteid = rxDict(iRx)%id_ref
                         ref_x = rxDict(iRx)%r
+#ifdef JAC
                         write(ioDat,'(es14.6)',    iostat=ios,advance='no') Period
                         write(ioDat, '(a4)', iostat=ios,advance='no') '    '
                         write(ioDat,'(4x,a40,3f15.3)',iostat=ios,advance='no') trim(siteid),x(:)
                         write(ioDat,'(4x,a40,3f15.3)',iostat=ios,advance='no') trim(ref_siteid),ref_x(:)
+#else
+                        write(ioDat,'(es12.6)',    iostat=ios,advance='no') Period
+                        write(ioDat, '(a1)', iostat=ios,advance='no') ' '
+                        write(ioDat,'(a40,3f15.3)',iostat=ios,advance='no') trim(siteid),x(:)
+                        write(ioDat,'(a40,3f15.3)',iostat=ios,advance='no') trim(ref_siteid),ref_x(:)
+#endif
                         if (conjugate) then
                             write(ioDat,'(a8,3es15.6)',iostat=ios) trim(compid),value(2*icomp-1),-value(2*icomp),error(2*icomp)
                         else
@@ -306,10 +349,18 @@ Contains
                                 error(icomp) = 10**error(icomp)
                             endif
                         end if
+
+#ifdef JAC
                         write(ioDat,'(es14.6)',    iostat=ios,advance='no') Period
                         write(ioDat, '(a4)', iostat=ios,advance='no') '    '
                         write(ioDat,'(4x,a40,3f15.3)',iostat=ios,advance='no') trim(siteid),x(:)
                         write(ioDat,'(a8,3es15.6)',iostat=ios) trim(compid),value(icomp),error(icomp)
+#else
+                        write(ioDat,'(es12.6)',    iostat=ios,advance='no') Period
+                        write(ioDat, '(a1)', iostat=ios,advance='no') ' '
+                        write(ioDat,'(a40,3f15.3)',iostat=ios,advance='no') trim(siteid),x(:)
+                        write(ioDat,'(a8,3es15.6)',iostat=ios) trim(compid),value(icomp),error(icomp)
+#endif
                         countData = countData + 1
                     end do
 
