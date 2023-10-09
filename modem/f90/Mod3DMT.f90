@@ -27,7 +27,7 @@ program Mod3DMTS
      ! Output variable
      character(128)          :: header
      character(128)          :: tmp
-     integer                :: ios, dotpos
+     integer                :: ios
 
 
 
@@ -137,9 +137,9 @@ program Mod3DMTS
 #ifdef JAC
         ! create square root of Cm
     	call create_CmSqrt(sigma0, cUserDef%rFile_Cov)
-        call write_sensMatrixMTX(sens,Cmsqrt, allData,cUserDef%wFile_Sens)
+        call write_sensMatrixMTX(sens,sigma0,Cmsqrt, allData,cUserDef%wFile_Sens)
 #else
-        call write_sensMatrixMTX(sens,cUserDef%wFile_Sens)
+        call write_sensMatrixMTX(sens,allData,cUserDef%wFile_Sens)
 #endif
 
 

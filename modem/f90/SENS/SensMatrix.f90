@@ -282,38 +282,44 @@ Contains
   ! output is a quick fix, as always - reduces to nearly the same thing
   ! as before, a vector of model parameters
 #ifdef JAC
-  subroutine write_sensMatrixMTX(sens, CmSqrt, allData, cfile)
+  subroutine write_sensMatrixMTX(sens, Sigma, CmSqrt, allData, cfile)
     type(dataVectorMTX_t), intent(in)         :: allData
-
+    type(modelCov_t), intent(in)     ::  CmSqrt
     type(sensMatrix_t), pointer	:: sens(:)
-
+    type(modelParam_t)            :: Sigma, tmp
     character(*), intent(in)				:: cfile
     ! local
-    integer  iTx,iDt,iRx,nTx,nDt,nSite,nComp,icomp,i,j,k,l,istat,ios,nAll,iTxt
+    integer  iTx,iDt,iRx,nTx,nDt,nSite,nComp,icomp,i,j,k,l,istat,ios,nAll,iTxt,dotpos
 
     real(8), allocatable            :: val(:) ! (ncomp)
     real(8), allocatable            :: err(:) ! (ncomp)
     real(8) :: pTx, xRx(3)
+
     character(80) header, fmtstring
     character(40) sRx, cRx
     character(20) compid
-    character(200) tmp
+    character(200) tmpstr
 
-	iTxt = 1
+    iTxt = 1
 
     if(.not. associated(sens)) then
         call errStop('sensitivity matrix not allocated in write_sensMatrixMTX')
     end if
 
-    tmp=trim(cfile)
-    dotpos = scan(tmp,".", BACK= .true.)
+    tmp = Sigma
+
+    tmpstr=trim(cfile)
+    dotpos = scan(tmpstr,".", BACK= .true.)
     if (dotpos>0) then
-      tmp = tmp(1:dotpos-1)//'_jac.dat'
-      open(13,file=tmp)
+      tmpstr = tmpstr(1:dotpos-1)//'_jac.dat'
+      open(13,file=tmpstr)
     end if
+
 
     open(unit=ioSens, file=cfile, form='unformatted', iostat=ios)
 	write(0,*) 'Output sensitivity matrix...'
+
+
 
     write(header,*) 'Sensitivity Matrix'
 	nAll = count_sensMatrixMTX(sens)
@@ -371,7 +377,9 @@ Contains
                         write(13,fmt=fmtstring) &
                             pTx,trim(sRx),xRx,trim(compid),iDt,&
                             val(2*icomp-1), val(2*icomp), err(2*icomp)
-                            call RecursiveAR(sens(i)%v(icomp)%dm(:,k),sens(i)%v(icomp)%dm(:,k),CmSqrt%N)
+                        tmp = sens(i)%v(j)%dm(icomp,k)
+                        call RecursiveAR(tmp%cellCond%v,tmp%cellCond%v,CmSqrt%N)
+                        sens(i)%v(j)%dm(icomp,k) = tmp
                     end do
 
                     write(header,'(a,i10,a,i10,a,i10)') &
@@ -389,9 +397,12 @@ Contains
                     do icomp = 1,nComp
                         compid = typeDict(iDt)%id(icomp)
                         write(13,fmt=fmtstring) &
-                        pTx,trim(sRx),xRx,trim(compid),iDt, &
-                        val(icomp),err(icomp)
-                        call RecursiveAR(sens(i)%v(icomp)%dm(:,k),sens(i)%v(icomp)%dm(:,k),CmSqrt%N)
+                          pTx,trim(sRx),xRx,trim(compid),iDt, &
+                          val(icomp),err(icomp)
+
+                        tmp = sens(i)%v(j)%dm(icomp,k)
+                        call RecursiveAR(tmp%cellCond%v,tmp%cellCond%v,CmSqrt%N)
+                        sens(i)%v(j)%dm(icomp,k) = tmp
                     end do
 
                     write(header,'(a,i10,a,i10,a,i10)') &

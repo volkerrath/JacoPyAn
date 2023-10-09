@@ -195,7 +195,7 @@ Contains
       end if
 
 
-#ifdef
+#ifdef JAC
       ! write the data type header
       call compact(fileInfo(iTxt,iDt)%info_in_file)
 
