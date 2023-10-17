@@ -282,12 +282,12 @@ Contains
   ! output is a quick fix, as always - reduces to nearly the same thing
   ! as before, a vector of model parameters
 #ifdef JAC
-  subroutine write_sensMatrixMTX(sens, Sigma, CmSqrt, allData, cfile)
+  subroutine write_sensMatrixMTX(sens, sigma, allData, jfile, cfile)
     type(dataVectorMTX_t), intent(in)         :: allData
-    type(modelCov_t), intent(in)     ::  CmSqrt
+    ! type(modelCov_t), intent(in)     ::  CmSqrt
     type(sensMatrix_t), pointer	:: sens(:)
-    type(modelParam_t)            :: Sigma, tmp
-    character(*), intent(in)				:: cfile
+    type(modelParam_t)            :: sigma, tmp, sns
+    character(*), intent(in)				:: jfile, cfile
     ! local
     integer  iTx,iDt,iRx,nTx,nDt,nSite,nComp,icomp,i,j,k,l,istat,ios,nAll,iTxt,dotpos
 
@@ -307,18 +307,32 @@ Contains
     end if
 
     tmp = Sigma
+    sns = Sigma
 
-    tmpstr=trim(cfile)
+    ! create square root of Cm
+    write(*,*) 'Generate covariance matrix from ',cfile
+    call create_CmSqrt(Sigma, cfile)
+
+
+
+    open(unit=ioJac, file=jfile, form='unformatted', iostat=ios)
+	write(*,*) 'Output sensitivity matrix...'
+
+    tmpstr=trim(jfile)
     dotpos = scan(tmpstr,".", BACK= .true.)
     if (dotpos>0) then
       tmpstr = tmpstr(1:dotpos-1)//'_jac.dat'
-      open(13,file=tmpstr)
+      open(ioJdt,file=tmpstr)
     end if
+    write(*,*) 'written to ',tmpstr
 
-
-    open(unit=ioSens, file=cfile, form='unformatted', iostat=ios)
-	write(0,*) 'Output sensitivity matrix...'
-
+!     tmpstr=trim(jfile)
+!     dotpos = scan(tmpstr,".", BACK= .true.)
+!     if (dotpos>0) then
+!       tmpstr = tmpstr(1:dotpos-1)//'.sns'
+!       open(ioJdt,file=tmpstr)
+!     end if
+!     write(*,*) 'written to ',tmpstr
 
 
     write(header,*) 'Sensitivity Matrix'
@@ -377,15 +391,21 @@ Contains
                         write(13,fmt=fmtstring) &
                             pTx,trim(sRx),xRx,trim(compid),iDt,&
                             val(2*icomp-1), val(2*icomp), err(2*icomp)
-                        tmp = sens(i)%v(j)%dm(icomp,k)
-                        call RecursiveAR(tmp%cellCond%v,tmp%cellCond%v,CmSqrt%N)
+
+                        tmp =sens(i)%v(j)%dm(icomp,k)
+                        tmp = multBy_CmSqrt(tmp)
                         sens(i)%v(j)%dm(icomp,k) = tmp
+
+!                         tmp = sens(i)%v(j)%dm(icomp,k)
+!                         call RecursiveAR(tmp%cellCond%v,tmp%cellCond%v,CmSqrt%N)
+!                         sens(i)%v(j)%dm(icomp,k) = tmp
+
                     end do
 
                     write(header,'(a,i10,a,i10,a,i10)') &
                         'Sensitivity for freq=',iTx,'; dataType=',iDt,'; site=',iRx
 
-                    call writeVec_modelParam(nComp,sens(i)%v(j)%dm(:,k),header,cfile)
+                    call writeVec_modelParam(nComp,sens(i)%v(j)%dm(:,k),header,jfile)
 
 
                 case(5, 6)
@@ -400,15 +420,20 @@ Contains
                           pTx,trim(sRx),xRx,trim(compid),iDt, &
                           val(icomp),err(icomp)
 
-                        tmp = sens(i)%v(j)%dm(icomp,k)
-                        call RecursiveAR(tmp%cellCond%v,tmp%cellCond%v,CmSqrt%N)
+                        tmp =sens(i)%v(j)%dm(icomp,k)
+                        tmp = multBy_CmSqrt(tmp)
                         sens(i)%v(j)%dm(icomp,k) = tmp
+
+!                         tmp = sens(i)%v(j)%dm(icomp,k)
+!                         call RecursiveAR(tmp%cellCond%v,tmp%cellCond%v,CmSqrt%N)
+!                         sens(i)%v(j)%dm(icomp,k) = tmp
+
                     end do
 
                     write(header,'(a,i10,a,i10,a,i10)') &
                         'Sensitivity for freq=',iTx,'; dataType=',iDt,'; site=',iRx
 
-                    call writeVec_modelParam(nComp,sens(i)%v(j)%dm(:,k),header,cfile)
+                    call writeVec_modelParam(nComp,sens(i)%v(j)%dm(:,k),header,jfile)
 
                 end select
 
