@@ -233,7 +233,7 @@ def get_scale(d=np.array([]), F=0.1, method = "other", OutInfo = False):
 
     return scale
 
-def sparsmat_to_arry(mat=None):
+def sparsmat_to_array(mat=None):
     """
     
 
@@ -453,13 +453,16 @@ def sparsify_jac(Jac=None,
         test = np.random.normal(size=np.shape(Jac)[1])
         normx = npl.norm(Jf@test)
         normo = npl.norm(Jf@test-Js@test)
-        print(normx, normo, normo/normx)
+        
+
         normd = npl.norm((Jac-Jf), ord="fro")
         normf = npl.norm(Jac, ord="fro")
         # print(norma)
-        # print(normf)
+        # print(normf)        
         print(" Sparsified J explains "
-              +str(round(100.-100.*normd/normf,2))+"% of full J.")
+              +str(round(100.-100.*normo/normx,2))+"% of full J (Spectral norm.")
+        print(" Sparsified J explains "
+              +str(round(100.-100.*normd/normf,2))+"% of full J (Frobenius norm.")
         print("****", nel, ns, 100.0 * ns / nel, round(100.-100.*normd/normf,3) )
 
     if normalized:

@@ -64,8 +64,8 @@ MPad=[0, 0, 0, 0, 0, 0]
 # 
 MOrig = [-15.767401, -71.854095]
 
-# WorkName = "SABA8_Z_sp-8" #
-WorkName = "SABA8_T_sp-8"
+WorkName = "SABA8_Z_sp-8" #
+# WorkName = "SABA8_T_sp-8"
 # WorkName = "SABA8_P_sp-8"
 
 JFile = WorkDir + WorkName
@@ -91,14 +91,16 @@ Usesigma:
     if true, sensitivities with respect to sigma  are calculated.
 """
 
+
 Transform = [ "max", "sqr"]
+Transform = [ "max"]
 """
 Transform sensitivities. 
 Options:
     Transform = "siz",          Normalize by the values optional array V ("volume"), 
                                 i.e in our case layer thickness. This should always 
                                 be the first value in Transform list.
-    Transform = "max"           Normalize by maximum value.
+    Transform = "max"           Normalize by maximum (absolute) value.
     Transform = "sur"           Normalize by surface value.
     Transform = "sqr"           Take the square root. Only usefull for euc sensitivities. 
     Transform = "log"           Take the logaritm. This should always be the 
@@ -119,7 +121,21 @@ sdims = np.size(rho)
 
 aircells = np.where(rho>rhoair/10)
 
+name, ext = os.path.splitext(MFile)
+OFile = name
+Head = (WorkName)
 
+mod.write_mod(OFile, ModExt="_mod.rho",
+                  dx=dx, dy=dy, dz=dz, mval=rho,
+                  reference=refmod, mvalair=rhoair, aircells=aircells, header=Head)
+print(" Model (ModEM format) written to "+OFile)
+    
+elev = -refmod[2]
+refubc =  [MOrig[0], MOrig[1], elev]
+mod.write_ubc(OFile, ModExt="_rho_ubc.mod", MshExt="_rho_ubc.msh",
+                  dx=dx, dy=dy, dz=dz, mval=rho, reference=refubc, mvalair=rhoair, aircells=aircells, header=Head)
+print(" Model (UBC format) written to "+OFile)
+    
 # TSTFile = WorkDir+WorkName+"0_MaskTest.rho"
 # mod.write_mod(TSTFile, dx, dy, dz, rho, refmod, trans="LINEAR", mvalair=blank, aircells=aircells)
 
@@ -178,20 +194,15 @@ print(JFile+" minimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))
 # print( np.count_nonzero(~np.isnan(jacmask))*np.shape(Jac)[0])
 
 start = time.perf_counter()
-#print("Jac ", np.shape(Jac))
-#Jac = Jac.toarray()
+
 SensTmp = jac.calc_sensitivity(Jac,
                      Type = Type, OutInfo=False)
 SensTot = jac.transform_sensitivity(S=SensTmp, V=V,
                           Transform=Transform, OutInfo=False)
 
-SensFile = WorkDir+WorkName+"_"+Type+"_"+"_".join(Transform)
+SensFile = WorkDir+WorkName+"_total_"+Type+"_"+"_".join(Transform)
 Head = (WorkName+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
-# SensTot = SensTot.toarray()
-# print(type(SensTot))
-# print(np.shape(SensTot))   
 S = SensTot.reshape(dims, order="F")
-# S = np.reshape(SensTot, dims, order="F")
 
 if "mod" in OutFormat.lower():
     mod.write_mod(SensFile, ModExt="_mod.sns",
