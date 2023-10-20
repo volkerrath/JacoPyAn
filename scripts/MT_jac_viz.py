@@ -226,7 +226,12 @@ if "ubc" in OutFormat.lower():
 elapsed = time.perf_counter() - start
 print(" Used %7.4f s for full sensitivities " % (elapsed))
         
-        
+    #       for j in range(lower_bound_on_rows, upper_bound_on_rows): nums.append(j)
+    # partial_matrix = my_matrix[nums, :] 
+
+    # plt.matshow(partial_matrix, fignum=100)
+    # plt.gca().set_aspect('auto')
+    # plt.savefig('filename.png', dpi=600)
 for Split in Splits:
         
     if "comp" in Split.lower():

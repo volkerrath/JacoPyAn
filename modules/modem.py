@@ -723,7 +723,7 @@ def write_mod(ModFile=None, ModExt=".rho",
 
 
 
-def write_ubc(ModFile=None,  MshExt=".mesh", ModExt=".mod",
+def write_ubc(ModFile=None,  MshExt=".mesh", ModExt=".ubc",
                     dx=None, dy=None, dz=None, mval=None, reference=None,
                     aircells = None, mvalair = 1.e17, blank = 1.e17, header="", out=True):
     """
