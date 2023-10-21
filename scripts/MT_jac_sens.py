@@ -136,8 +136,8 @@ mod.write_ubc(OFile, ModExt="_rho_ubc.mod", MshExt="_rho_ubc.msh",
                   dx=dx, dy=dy, dz=dz, mval=rho, reference=refubc, mvalair=rhoair, aircells=aircells, header=Head)
 print(" Model (UBC format) written to "+OFile)
     
-# TSTFile = WorkDir+WorkName+"0_MaskTest.rho"
-# mod.write_mod(TSTFile, dx, dy, dz, rho, refmod, trans="LINEAR", mvalair=blank, aircells=aircells)
+TSTFile = WorkDir+WorkName+"0_MaskTest.rho"
+mod.write_mod(TSTFile, dx, dy, dz, rho, refmod, trans="LINEAR", mvalair=blank, aircells=aircells)
 
 
 jacmask = jac.set_mask(rho=rho, pad=MPad, blank= blank, flat = False, out=True)
@@ -146,9 +146,9 @@ j0 = jacmask.reshape(dims)
 j0[aircells] = blank
 jacmask = j0.reshape(jdims)
 
-# rhotest = jacmask.reshape(dims)*rho
-# TSTFile = WorkDir+WorkName+"1_MaskTest.rho"
-# mod.write_mod(TSTFile, dx, dy, dz, rhotest, refmod, trans="LINEAR", mvalair=blank, aircells=aircells)
+rhotest = jacmask.reshape(dims)*rho
+TSTFile = WorkDir+WorkName+"1_MaskTest.rho"
+mod.write_mod(TSTFile, dx, dy, dz, rhotest, refmod, trans="LINEAR", mvalair=blank, aircells=aircells)
 
 
 name, ext = os.path.splitext(JFile)

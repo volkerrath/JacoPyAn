@@ -72,9 +72,12 @@ WorkDir = JACOPYAN_ROOT+"/work/SABA/"
 if not WorkDir.endswith("/"):
     WorkDir = WorkDir+"/"
 MFile = WorkDir + "SABA8_best.rho"
+MPad=[10, 10 , 10, 10, 0, 20]
+
 # JFiles = [WorkDir+"SABA8_Z.jac", WorkDir+"SABA8_P.jac", WorkDir+"SABA8_T.jac",]
 # DFiles = [WorkDir+"SABA8_Z_jac.dat", WorkDir +
 #           "SABA8_P_jac.dat", WorkDir+"SABA8_T_jac.dat",]
+
 JFiles = [WorkDir+"SABA8_Z.jac",]
 DFiles = [WorkDir+"SABA8_Z_jac.dat",]
 
@@ -107,6 +110,25 @@ elapsed = time.perf_counter() - start
 total = total + elapsed
 print(" Used %7.4f s for reading model from %s " % (elapsed, MFile))
 
+name, ext = os.path.splitext(MFile)
+
+TSTFile = MFile.replace("rho","_0_MaskTest.rho")
+mod.write_mod(TSTFile, dx, dy, dz, rho, reference, trans="LINEAR", mvalair=blank, aircells=aircells)
+
+
+jacmask = jac.set_mask(rho=rho, pad=MPad, blank= blank, flat = False, out=True)
+jdims= np.shape(jacmask)
+j0 = jacmask.reshape(dims)
+j0[aircells] = blank
+jacmask = j0.reshape(jdims)
+
+rhotest = jacmask.reshape(dims)*rho
+TSTFile = MFile.replace("rho","_1_MaskTest.rho")
+mod.write_mod(TSTFile, dx, dy, dz, rhotest, reference, trans="LINEAR", mvalair=blank, aircells=aircells)
+
+
+
+
 
 if np.size(DFiles) != np.size(JFiles):
     error("Data file number not equal Jac file number! Exit.")
@@ -129,6 +151,15 @@ for f in np.arange(nF):
     elapsed = time.perf_counter() - start
     print(" Used %7.4f s for reading Jacobian from %s " % (elapsed, JFiles[f]))
     total = total + elapsed
+    
+    mx = np.amax(np.abs(Jac))
+    mn = np.amin(np.abs(Jac))
+    print(JFiles[f]+" minimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))
+    jm = jacmask.flatten(order="F")
+    mx = np.amax(np.abs(Jac*jm))
+    mn = np.amin(np.abs(Jac*jm))
+    print(JFiles[f]+" minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx))
+    
 
     if np.shape(Jac)[0]!=np.shape(Data)[0]:
         print(np.shape(Jac),np.shape(Data))
@@ -156,6 +187,8 @@ for f in np.arange(nF):
         total = total + elapsed
         print(" Used %7.4f s for sparsifying Jacobian %s " %
               (elapsed, JFiles[f]))
+
+    
 
     name = name+nstr+sstr
     start = time.perf_counter()

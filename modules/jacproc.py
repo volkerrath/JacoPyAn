@@ -460,9 +460,9 @@ def sparsify_jac(Jac=None,
         # print(norma)
         # print(normf)        
         print(" Sparsified J explains "
-              +str(round(100.-100.*normo/normx,2))+"% of full J (Spectral norm.")
+              +str(round(100.-100.*normo/normx,2))+"% of full J (Spectral norm.)")
         print(" Sparsified J explains "
-              +str(round(100.-100.*normd/normf,2))+"% of full J (Frobenius norm.")
+              +str(round(100.-100.*normd/normf,2))+"% of full J (Frobenius norm.)")
         print("****", nel, ns, 100.0 * ns / nel, round(100.-100.*normd/normf,3) )
 
     if normalized:
