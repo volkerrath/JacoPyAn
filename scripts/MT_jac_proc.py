@@ -64,6 +64,7 @@ nan = np.nan
 SparseThresh = 1.e-8
 Sparse = SparseThresh > 0
 
+ErrorScale = False
 Scale = 1.
 
 
@@ -133,16 +134,17 @@ for f in np.arange(nF):
         print(np.shape(Jac),np.shape(Data))
         error(" Dimensions of Jacobian and data do not match! Exit.")
 
-    nstr = nstr+"_nerr"
-    start = time.perf_counter()
-    dsh = np.shape(Data)
-    err = np.reshape(Data[:, 5], (dsh[0], 1))
-    print(np.amin(err), np.amax(err))
-    Jac = jac.normalize_jac(Jac, err)
-    elapsed = time.perf_counter() - start
-    print(" Used %7.4f s for normalizing Jacobian with data error from %s " %
-          (elapsed, DFiles[f]))
-    start = time.perf_counter()
+    if ErrorScale:
+        nstr = nstr+"_nerr"
+        start = time.perf_counter()
+        dsh = np.shape(Data)
+        err = np.reshape(Data[:, 5], (dsh[0], 1))
+        print(np.amin(err), np.amax(err))
+        Jac = jac.normalize_jac(Jac, err)
+        elapsed = time.perf_counter() - start
+        print(" Used %7.4f s for normalizing Jacobian with data error from %s " %
+              (elapsed, DFiles[f]))
+        start = time.perf_counter()
 
     sstr = "_full"
     if SparseThresh > 0.:
