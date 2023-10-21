@@ -58,8 +58,8 @@ WorkDir = JACOPYAN_ROOT+"/work/Sabancaya/"
 
 
 MFile   = WorkDir + "SABA8_best.rho"
-# MPad=[14, 14 , 14, 14, 0, 71]
-MPad=[0, 0, 0, 0, 0, 0]
+MPad=[10, 10 , 10, 10, 0, 20]
+# MPad=[0, 0, 0, 0, 0, 0]
 
 # 
 MOrig = [-15.767401, -71.854095]
@@ -92,7 +92,7 @@ Usesigma:
 """
 
 
-Transform = [ "max", "sqr"]
+# Transform = [ "max", "sqr"]
 Transform = [ "max"]
 """
 Transform sensitivities. 
@@ -140,11 +140,11 @@ print(" Model (UBC format) written to "+OFile)
 # mod.write_mod(TSTFile, dx, dy, dz, rho, refmod, trans="LINEAR", mvalair=blank, aircells=aircells)
 
 
-# jacmask = jac.set_mask(rho=rho, pad=MPad, blank= blank, flat = False, out=True)
-# jdims= np.shape(jacmask)
-# j0 = jacmask.reshape(dims)
-# j0[aircells] = blank
-# jacmask = j0.reshape(jdims)
+jacmask = jac.set_mask(rho=rho, pad=MPad, blank= blank, flat = False, out=True)
+jdims= np.shape(jacmask)
+j0 = jacmask.reshape(dims)
+j0[aircells] = blank
+jacmask = j0.reshape(jdims)
 
 # rhotest = jacmask.reshape(dims)*rho
 # TSTFile = WorkDir+WorkName+"1_MaskTest.rho"
@@ -185,10 +185,11 @@ total = total + elapsed
 
 mx = np.amax(np.abs(Jac))
 mn = np.amin(np.abs(Jac))
-# jm = jacmask.flatten(order="F")
+
 print(JFile+" minimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))
-#mx = np.amax(np.abs(Jac*jm))
-#mn = np.amin(np.abs(Jac*jm))
+jm = jacmask.flatten(order="F")
+mx = np.amax(np.abs(Jac*jm))
+mn = np.amin(np.abs(Jac*jm))
 #print(JFile+" minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx))
 # print(JFile+" number of elements in masked Jacobian is "+str(np.count_nonzero(~np.isfinite(Jac))))
 # print( np.count_nonzero(~np.isnan(jacmask))*np.shape(Jac)[0])
