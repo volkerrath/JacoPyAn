@@ -483,8 +483,8 @@ def normalize_jac(Jac=None, fn=None, out=True):
     """
     shj = np.shape(Jac)
     shf = np.shape(fn)
-    print("fn = ")
-    print(fn)
+    # print("fn = ")
+    # print(fn)
     if shf[0] == 1:
         f = 1.0 / fn[0]
         Jac = f * Jac

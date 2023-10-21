@@ -104,7 +104,7 @@ sdims = np.size(rho)
 
 rhoair = 1.e17
 aircells = np.where(rho > rhoair/10)
-blank = rhoair
+blank = np.nan
 
 elapsed = time.perf_counter() - start
 total = total + elapsed
@@ -113,8 +113,8 @@ print(" Used %7.4f s for reading model from %s " % (elapsed, MFile))
 
 name, ext = os.path.splitext(MFile)
 
-TSTFile = name # +"_0_MaskTest.rho"
-print(TSTFile, type(TSTFile))
+
+TSTFile = name 
 Head = "original model"
 mod.write_mod(TSTFile, ModExt="_0_MaskTest.rho",
                   dx=dx, dy=dy, dz=dz, mval=rho,
@@ -127,7 +127,7 @@ j0[aircells] = blank
 jacmask = j0.reshape(jdims)
 
 rhotest = jacmask.reshape(dims)*rho
-mod.write_mod(TSTFile, ModExt="_0_MaskTest.rho",
+mod.write_mod(TSTFile, ModExt="_1_MaskTest.rho",
                   dx=dx, dy=dy, dz=dz, mval=rhotest,
                   reference=reference, mvalair=rhoair, aircells=aircells, header=Head)
 
