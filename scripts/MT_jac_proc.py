@@ -158,7 +158,7 @@ for f in np.arange(nF):
     mn = np.amin(np.abs(Jac))
     print(JFiles[f]+" minimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))
     jm = jacmask.flatten(order="F")
-    mx = np.nanmmax(np.abs(Jac*jm))
+    mx = np.nanmax(np.abs(Jac*jm))
     mn = np.nanmin(np.abs(Jac*jm))
     print(JFiles[f]+" minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx))
     
