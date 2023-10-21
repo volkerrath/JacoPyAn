@@ -110,11 +110,15 @@ elapsed = time.perf_counter() - start
 total = total + elapsed
 print(" Used %7.4f s for reading model from %s " % (elapsed, MFile))
 
+
 name, ext = os.path.splitext(MFile)
 
-TSTFile = MFile.replace("rho","_0_MaskTest.rho")
-mod.write_mod(TSTFile, dx, dy, dz, rho, reference, trans="LINEAR", mvalair=blank, aircells=aircells)
-
+TSTFile = name # +"_0_MaskTest.rho"
+print(TSTFile, type(TSTFile))
+Head = "original model"
+mod.write_mod(TSTFile, ModExt="_0_MaskTest.rho",
+                  dx=dx, dy=dy, dz=dz, mval=rho,
+                  reference=reference, mvalair=rhoair, aircells=aircells, header=Head)
 
 jacmask = jac.set_mask(rho=rho, pad=MPad, blank= blank, flat = False, out=True)
 jdims= np.shape(jacmask)
@@ -123,11 +127,9 @@ j0[aircells] = blank
 jacmask = j0.reshape(jdims)
 
 rhotest = jacmask.reshape(dims)*rho
-TSTFile = MFile.replace("rho","_1_MaskTest.rho")
-mod.write_mod(TSTFile, dx, dy, dz, rhotest, reference, trans="LINEAR", mvalair=blank, aircells=aircells)
-
-
-
+mod.write_mod(TSTFile, ModExt="_0_MaskTest.rho",
+                  dx=dx, dy=dy, dz=dz, mval=rhotest,
+                  reference=reference, mvalair=rhoair, aircells=aircells, header=Head)
 
 
 if np.size(DFiles) != np.size(JFiles):

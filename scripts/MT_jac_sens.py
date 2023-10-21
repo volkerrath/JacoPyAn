@@ -123,7 +123,7 @@ aircells = np.where(rho>rhoair/10)
 
 name, ext = os.path.splitext(MFile)
 OFile = name
-Head = (WorkName)
+Head = WorkName
 
 mod.write_mod(OFile, ModExt="_mod.rho",
                   dx=dx, dy=dy, dz=dz, mval=rho,
@@ -185,12 +185,11 @@ total = total + elapsed
 
 mx = np.amax(np.abs(Jac))
 mn = np.amin(np.abs(Jac))
-
 print(JFile+" minimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))
 jm = jacmask.flatten(order="F")
 mx = np.amax(np.abs(Jac*jm))
 mn = np.amin(np.abs(Jac*jm))
-#print(JFile+" minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx))
+print(JFile+" minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx))
 # print(JFile+" number of elements in masked Jacobian is "+str(np.count_nonzero(~np.isfinite(Jac))))
 # print( np.count_nonzero(~np.isnan(jacmask))*np.shape(Jac)[0])
 
