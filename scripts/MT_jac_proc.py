@@ -67,24 +67,24 @@ Sparse = SparseThresh > 0
 Scale = 1.
 
 
-# WorkDir = JACOPYAN_ROOT+"/work/SABA/"
-# if not WorkDir.endswith("/"):
-#     WorkDir = WorkDir+"/"
-# MFile = WorkDir + "SABA8_best.rho"
-# MPad = [14, 14, 14, 14, 0, 71]
-# MPad = [0, 0,    0,  0,    0, 0]
+WorkDir = JACOPYAN_ROOT+"/work/SABA/"
+if not WorkDir.endswith("/"):
+    WorkDir = WorkDir+"/"
+MFile = WorkDir + "SABA8_best.rho"
 # JFiles = [WorkDir+"SABA8_Z.jac", WorkDir+"SABA8_P.jac", WorkDir+"SABA8_T.jac",]
 # DFiles = [WorkDir+"SABA8_Z_jac.dat", WorkDir +
 #           "SABA8_P_jac.dat", WorkDir+"SABA8_T_jac.dat",]
+JFiles = [WorkDir+"SABA8_Z.jac",]
+DFiles = [WorkDir+"SABA8_Z_jac.dat",]
 
-WorkDir = JACOPYAN_ROOT+"/work/TestJac/"
-if not WorkDir.endswith("/"):
-    WorkDir = WorkDir+"/"
-MFile = WorkDir + "TestJac.rho"
-MPad = [0, 0,    0,  0,    0, 0]
-JFiles = [WorkDir+"TestJac_Z.jac", WorkDir+"TestJac_P.jac", WorkDir+"TestJac_T.jac",]
-DFiles = [WorkDir+"TestJac_Z_jac.dat", WorkDir +
-          "TestJac_P_jac.dat", WorkDir+"TestJac_T_jac.dat",]
+# WorkDir = JACOPYAN_ROOT+"/work/TestJac/"
+# if not WorkDir.endswith("/"):
+#     WorkDir = WorkDir+"/"
+# MFile = WorkDir + "TestJac.rho"
+# MPad = [0, 0,    0,  0,    0, 0]
+# JFiles = [WorkDir+"TestJac_Z.jac", WorkDir+"TestJac_P.jac", WorkDir+"TestJac_T.jac",]
+# DFiles = [WorkDir+"TestJac_Z_jac.dat", WorkDir +
+#           "TestJac_P_jac.dat", WorkDir+"TestJac_T_jac.dat",]
 
 if np.size(DFiles) != np.size(JFiles):
     error("Data file number not equal Jac file number! Exit.")
