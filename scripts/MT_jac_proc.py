@@ -162,6 +162,8 @@ for f in np.arange(nF):
     mn = np.nanmin(Jac*jm)
     print(JFiles[f]+" minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx))
     
+    print(np.argmax(np.abs(Jac)))
+    
 
     if np.shape(Jac)[0]!=np.shape(Data)[0]:
         print(np.shape(Jac),np.shape(Data))
