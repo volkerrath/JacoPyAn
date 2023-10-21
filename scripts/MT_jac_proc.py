@@ -154,12 +154,12 @@ for f in np.arange(nF):
     print(" Used %7.4f s for reading Jacobian from %s " % (elapsed, JFiles[f]))
     total = total + elapsed
     
-    mx = np.amax(np.abs(Jac))
+    mx = np.max(np.abs(Jac))
     mn = np.amin(np.abs(Jac))
     print(JFiles[f]+" minimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))
     jm = jacmask.flatten(order="F")
-    mx = np.amax(np.abs(Jac*jm))
-    mn = np.amin(np.abs(Jac*jm))
+    mx = np.nanmmax(np.abs(Jac*jm))
+    mn = np.nanmin(np.abs(Jac*jm))
     print(JFiles[f]+" minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx))
     
 
