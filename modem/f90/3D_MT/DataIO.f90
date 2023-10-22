@@ -58,8 +58,11 @@ module DataIO
   !       nDt  = number of all possible data types
   ! number of transmitter types comes from the DICT/txTypes module
   ! and defines the number of conceptually different types of sources
+#ifdef JAC
+  type (data_file_block), pointer, save, public, dimension(:,:) :: fileInfo
+#else
   type (data_file_block), pointer, save, private, dimension(:,:) :: fileInfo
-
+#endif
 
 Contains
 
@@ -463,6 +466,7 @@ Contains
     	end if
 
         read(ioDat,'(a2,a20)',iostat=ios) temp,fileInfo(iTxt,iDt)%units_in_file
+
         SI_factor = ImpUnits(fileInfo(iTxt,iDt)%units_in_file,typeDict(iDt)%units)
 
         read(ioDat,*,iostat=ios) temp,fileInfo(iTxt,iDt)%geographic_orientation

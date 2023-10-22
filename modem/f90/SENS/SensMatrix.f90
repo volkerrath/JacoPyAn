@@ -81,36 +81,36 @@ module sensMatrix
       logical       :: allocated = .false.
 
   end type sensMatrix_t
-#ifdef JAC
-  type :: data_file_block
-
-      ! this block of information constitutes user preferences about the data format;
-      ! there is one entry per each transmitter type and data type... (iTxt,iDt)
-      ! if there are multiple data blocks of the same transmitter & data types,
-      ! the last value is used.
-      character(200) :: info_in_file
-      character(20)  :: sign_info_in_file
-      integer        :: sign_in_file
-      character(20)  :: units_in_file
-      real           :: origin_in_file(2)
-      real           :: geographic_orientation
-
-     ! these lists contain the indices into the data vector for each data type;
-     ! they make it possible to sort the data by receiver for output.
-     ! no data denoted by zero index; dimensions (nTx) and (nTx,nRx).
-     ! these indices are typically allocated as we read the data file
-     integer, pointer, dimension(:)   :: tx_index
-     integer, pointer, dimension(:)   :: dt_index
-     integer, pointer, dimension(:,:) :: rx_index
-
-     ! some transmitter types and data types don't go together
-     logical         :: defined
-
-  end type data_file_block
-
-  type (data_file_block), pointer, save, private, dimension(:,:) :: fileInfo
-    
-#endif
+! #ifdef JAC
+!   type :: data_file_block
+!
+!       ! this block of information constitutes user preferences about the data format;
+!       ! there is one entry per each transmitter type and data type... (iTxt,iDt)
+!       ! if there are multiple data blocks of the same transmitter & data types,
+!       ! the last value is used.
+!       character(200) :: info_in_file
+!       character(20)  :: sign_info_in_file
+!       integer        :: sign_in_file
+!       character(20)  :: units_in_file
+!       real           :: origin_in_file(2)
+!       real           :: geographic_orientation
+!
+!      ! these lists contain the indices into the data vector for each data type;
+!      ! they make it possible to sort the data by receiver for output.
+!      ! no data denoted by zero index; dimensions (nTx) and (nTx,nRx).
+!      ! these indices are typically allocated as we read the data file
+!      integer, pointer, dimension(:)   :: tx_index
+!      integer, pointer, dimension(:)   :: dt_index
+!      integer, pointer, dimension(:,:) :: rx_index
+!
+!      ! some transmitter types and data types don't go together
+!      logical         :: defined
+!
+!   end type data_file_block
+!
+!   type (data_file_block), pointer, save, private, dimension(:,:) :: fileInfo
+!
+!#endif
 
 
 Contains
@@ -281,6 +281,17 @@ Contains
   !*********************************************************************
   ! output is a quick fix, as always - reduces to nearly the same thing
   ! as before, a vector of model parameters
+  ! write data
+  !       do iRx = 1,size(rxDict)
+  !         do iTx = 1,size(txDict)
+  !
+  !             k = fileInfo(iTxt,iDt)%rx_index(iTx,iRx)
+  !             i = fileInfo(iTxt,iDt)%dt_index(iTx)
+  !             j = fileInfo(iTxt,iDt)%tx_index(iTx)
+  !             if (k == 0) then
+  !                 cycle
+  !             end if
+
 #ifdef JAC
   subroutine write_sensMatrixMTX(sens, sigma, allData, jfile, cfile)
     type(dataVectorMTX_t), intent(in)         :: allData
@@ -293,7 +304,7 @@ Contains
 
     real(8), allocatable            :: val(:) ! (ncomp)
     real(8), allocatable            :: err(:) ! (ncomp)
-    real(8) :: pTx, xRx(3)
+    real(8) :: pTx, xRx(3), SI_factor
 
     character(80) header, fmtstring
     character(40) sRx, cRx
@@ -355,12 +366,12 @@ Contains
         nComp = sens(i)%v(j)%nComp
         nSite = sens(i)%v(j)%nSite
         iDt   = sens(i)%v(j)%dataType
+
         
-        
-!       SI_factor = ImpUnits(typeDict(iDt)%units,fileInfo(iTxt,iDt)%units_in_file)
-        
+        SI_factor = ImpUnits(typeDict(iDt)%units,fileInfo(iTxt,iDt)%units_in_file)
+
         allocate(val(nComp),err(nComp),STAT=istat)
-        ! write(*,*)
+
         write(ioSens) nSite
 
         do k = 1,nSite
@@ -382,8 +393,10 @@ Contains
                 case(1, 2, 3)
 
                     fmtstring = '(g12.5,3x,a20,3f16.3,a8,i8,3g16.6)'
+
                     val = allData%d(i)%data(j)%value(:,k)
                     err = allData%d(i)%data(j)%error(:,k)
+
 
 
                     do icomp = 1,nComp/2
@@ -394,6 +407,7 @@ Contains
 
                         tmp =sens(i)%v(j)%dm(icomp,k)
                         tmp = multBy_CmSqrt(tmp)
+                        tmp%cellCond%v = tmp%cellCond%v*SI_factor
                         sens(i)%v(j)%dm(icomp,k) = tmp
 
 !                         tmp = sens(i)%v(j)%dm(icomp,k)
@@ -422,6 +436,7 @@ Contains
 
                         tmp =sens(i)%v(j)%dm(icomp,k)
                         tmp = multBy_CmSqrt(tmp)
+                        tmp%cellCond%v = tmp%cellCond%v*SI_factor
                         sens(i)%v(j)%dm(icomp,k) = tmp
 
 !                         tmp = sens(i)%v(j)%dm(icomp,k)

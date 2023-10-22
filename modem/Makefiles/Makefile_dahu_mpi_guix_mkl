@@ -11,7 +11,7 @@ OUTDIR=/home/sbyrd/bin/
 
 ######################################### with Jacobian-related changes #########################################
 #FFLAGS = -O3 -g -DJAC -fbounds-check -ffree-line-length-none -std=legacy -fcheck=all  -I/home/sbyrd/.guix-profile/include
-FFLAGS = -O -g -DJAC -fbounds-check -ffree-line-length-none -std=legacy -m64  -fcheck=all -I/home/sbyrd/.guix-profile/include
+FFLAGS = -O3 -g -DJAC -fbounds-check -ffree-line-length-none -std=legacy -m64  -fcheck=all -I/home/sbyrd/.guix-profile/include
 EXEFILE=gMod3DMTJ_MKL.x
 
 

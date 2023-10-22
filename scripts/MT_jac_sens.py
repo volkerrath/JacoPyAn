@@ -47,10 +47,9 @@ print(titstrng+"\n\n")
 gc.enable()
 
 rng = np.random.default_rng()
-blank = np.nan
+blank = 1.e-30 # np.nan
 rhoair = 1.e17
 
-trans = "LINEAR"
 InpFormat = "sparse"
 OutFormat = "mod ubc" 
 
@@ -125,19 +124,19 @@ name, ext = os.path.splitext(MFile)
 OFile = name
 Head = WorkName
 
-mod.write_mod(OFile, ModExt="_mod.rho",
+mod.write_mod(OFile, ModExt="_mod.rho", trans = "LOGE",
                   dx=dx, dy=dy, dz=dz, mval=rho,
-                  reference=refmod, mvalair=rhoair, aircells=aircells, header=Head)
+                  reference=refmod, mvalair=blank, aircells=aircells, header=Head)
 print(" Model (ModEM format) written to "+OFile)
     
 elev = -refmod[2]
 refubc =  [MOrig[0], MOrig[1], elev]
 mod.write_ubc(OFile, ModExt="_rho_ubc.mod", MshExt="_rho_ubc.msh",
-                  dx=dx, dy=dy, dz=dz, mval=rho, reference=refubc, mvalair=rhoair, aircells=aircells, header=Head)
+                  dx=dx, dy=dy, dz=dz, mval=rho, reference=refubc, mvalair=blank, aircells=aircells, header=Head)
 print(" Model (UBC format) written to "+OFile)
     
 TSTFile = WorkDir+WorkName+"0_MaskTest.rho"
-mod.write_mod(TSTFile, dx, dy, dz, rho, refmod, trans="LINEAR", mvalair=blank, aircells=aircells)
+mod.write_mod(TSTFile, dx, dy, dz, rho, refmod, trans="LOGE", mvalair=blank, aircells=aircells)
 
 
 jacmask = jac.set_mask(rho=rho, pad=MPad, blank= blank, flat = False, out=True)
@@ -148,7 +147,7 @@ jacmask = j0.reshape(jdims)
 
 rhotest = jacmask.reshape(dims)*rho
 TSTFile = WorkDir+WorkName+"1_MaskTest.rho"
-mod.write_mod(TSTFile, dx, dy, dz, rhotest, refmod, trans="LINEAR", mvalair=blank, aircells=aircells)
+mod.write_mod(TSTFile, dx, dy, dz, rhotest, refmod, trans="LOGE", mvalair=blank, aircells=aircells)
 
 
 name, ext = os.path.splitext(JFile)
@@ -207,14 +206,14 @@ S = SensTot.reshape(dims, order="F")
 if "mod" in OutFormat.lower():
     mod.write_mod(SensFile, ModExt="_mod.sns",
                   dx=dx, dy=dy, dz=dz, mval=S,
-                  reference=refmod, mvalair=rhoair, aircells=aircells, header=Head)
+                  reference=refmod, mvalair=blank, aircells=aircells, header=Head)
     print(" Sensitivities (ModEM format) written to "+SensFile)
     
 if "ubc" in OutFormat.lower():
     elev = -refmod[2]
     refubc =  [MOrig[0], MOrig[1], elev]
     mod.write_ubc(SensFile, ModExt="_ubc.sns", MshExt="_ubc.msh",
-                  dx=dx, dy=dy, dz=dz, mval=S, reference=refubc, mvalair=rhoair, aircells=aircells, header=Head)
+                  dx=dx, dy=dy, dz=dz, mval=S, reference=refubc, mvalair=blank, aircells=aircells, header=Head)
     print(" Sensitivities (UBC format) written to "+SensFile)
     
     
@@ -222,14 +221,14 @@ V = V.reshape(dims, order="F")
 if "mod" in OutFormat.lower():
     mod.write_mod(SensFile, ModExt="_mod.vol",
                   dx=dx, dy=dy, dz=dz, mval=V,
-                  reference=refmod, mvalair=rhoair, aircells=aircells, header=Head)
+                  reference=refmod, mvalair=blank, aircells=aircells, header=Head)
     print(" Cell volumes (ModEM format) written to "+SensFile)
     
 if "ubc" in OutFormat.lower():
     elev = -refmod[2]
     refubc =  [MOrig[0], MOrig[1], elev]
     mod.write_ubc(SensFile, ModExt="_ubc.vol", MshExt="_ubc.msh",
-                  dx=dx, dy=dy, dz=dz, mval=V, reference=refubc, mvalair=rhoair, aircells=aircells, header=Head)
+                  dx=dx, dy=dy, dz=dz, mval=V, reference=refubc, mvalair=blank, aircells=aircells, header=Head)
     print(" Cell volumes (UBC format) written to "+SensFile)
   
   
@@ -268,7 +267,7 @@ for Split in Splits:
             if "mod" in OutFormat.lower():
                 mod.write_mod(SensFile, "_mod.sns",
                               dx=dx, dy=dy, dz=dz, mval=S,
-                              reference=refmod, mvalair=rhoair, aircells=aircells, header=Head)
+                              reference=refmod, mvalair=blank, aircells=aircells, header=Head)
                 print(" Component sensitivities (ModEM format) written to "+SensFile)
                 
             if "ubc" in OutFormat.lower():
@@ -276,7 +275,7 @@ for Split in Splits:
                 refubc =  [MOrig[0], MOrig[1], elev]
                 mod.write_ubc(SensFile, ModExt="_ubc.sns" ,MshExt="_ubc.msh",
                               dx=dx, dy=dy, dz=dz, mval=S,
-                              reference=refubc, mvalair=rhoair, aircells=aircells, header=Head)
+                              reference=refubc, mvalair=blank, aircells=aircells, header=Head)
                 print(" Component sensitivities (UBC format) written to "+SensFile)
             
         elapsed = time.perf_counter() - start
@@ -302,7 +301,7 @@ for Split in Splits:
            if "mod" in OutFormat.lower():
                 mod.write_mod(SensFile, ModExt="_mod.sns",
                               dx=dx, dy=dy, dz=dz, mval=S,
-                              reference=refmod, mvalair=rhoair, aircells=aircells, header=Head)
+                              reference=refmod, mvalair=blank, aircells=aircells, header=Head)
                 print(" Site sensitivities (ModEM format) written to "+SensFile)
                 
            if "ubc" in OutFormat.lower():
@@ -310,7 +309,7 @@ for Split in Splits:
                 refubc =  [MOrig[0], MOrig[1], elev]
                 mod.write_ubc(SensFile, ModExt="_ubc.sns", MshExt="_ubc.msh",
                               dx=dx, dy=dy, dz=dz, mval=S,
-                              reference=refubc, mvalair=rhoair, aircells=aircells, header=Head)
+                              reference=refubc, mvalair=blank, aircells=aircells, header=Head)
                 print(" Site sensitivities (UBC format) written to "+SensFile)           
            
         
@@ -349,7 +348,7 @@ for Split in Splits:
            if "mod" in OutFormat.lower():
                mod.write_mod(SensFile, ModExt="_mod.sns",
                              dx=dx, dy=dy, dz=dz, mval=S,
-                             reference=refmod, mvalair=rhoair, aircells=aircells, header=Head)
+                             reference=refmod, mvalair=blank, aircells=aircells, header=Head)
                print(" Frequency band sensitivities (ModEM format) written to "+SensFile)
      
            if "ubc" in OutFormat.lower():
@@ -357,7 +356,7 @@ for Split in Splits:
                refubc =  [MOrig[0], MOrig[1], elev]
                mod.write_ubc(SensFile, ModExt="_ubc.sns", MshExt="_ubc.msh",
                              dx=dx, dy=dy, dz=dz, mval=S,
-                             reference=refubc, mvalair=rhoair, aircells=aircells, header=Head)
+                             reference=refubc, mvalair=blank, aircells=aircells, header=Head)
                print(" Frequency band sensitivities (UBC format) written to "+SensFile)   
            
 

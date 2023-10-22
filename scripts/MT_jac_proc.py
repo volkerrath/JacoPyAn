@@ -104,7 +104,7 @@ sdims = np.size(rho)
 
 rhoair = 1.e17
 aircells = np.where(rho > rhoair/10)
-blank = np.nan
+blank = 1.e-30 #np.nan
 
 elapsed = time.perf_counter() - start
 total = total + elapsed
@@ -115,8 +115,8 @@ name, ext = os.path.splitext(MFile)
 
 
 TSTFile = name 
-Head = "original model"
-mod.write_mod(TSTFile, ModExt="_0_MaskTest.rho",
+Head = "#  original model"
+mod.write_mod(TSTFile, ModExt="_0_MaskTest.rho", trans="LOGE",
                   dx=dx, dy=dy, dz=dz, mval=rho,
                   reference=reference, mvalair=rhoair, aircells=aircells, header=Head)
 
@@ -127,7 +127,7 @@ j0[aircells] = blank
 jacmask = j0.reshape(jdims)
 
 rhotest = jacmask.reshape(dims)*rho
-mod.write_mod(TSTFile, ModExt="_1_MaskTest.rho",
+mod.write_mod(TSTFile, ModExt="_1_MaskTest.rho", trans="LOGE",
                   dx=dx, dy=dy, dz=dz, mval=rhotest,
                   reference=reference, mvalair=rhoair, aircells=aircells, header=Head)
 
@@ -162,9 +162,7 @@ for f in np.arange(nF):
     mn = np.nanmin(Jac*jm)
     print(JFiles[f]+" minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx))
     
-    print(np.argmax(np.abs(Jac)))
     
-
     if np.shape(Jac)[0]!=np.shape(Data)[0]:
         print(np.shape(Jac),np.shape(Data))
         error(" Dimensions of Jacobian and data do not match! Exit.")
