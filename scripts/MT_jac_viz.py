@@ -57,7 +57,6 @@ rng = np.random.default_rng()
 blank = np.nan
 rhoair = 1.e17
 
-trans = "LINEAR"
 InpFormat = "sparse"
 OutFormat = "mod ubc" 
 

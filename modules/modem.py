@@ -578,43 +578,7 @@ def write_model_ncd(
         )
 
 
-# def write_model_vtk(ModFile=None, dx=None, dy=None, dz=None, rho=None, reference=None,
-#                  out=True):
-#     """
-#     write ModEM model input in .
 
-#     Expects rho in physical units
-
-#     author: vrath
-#     last changed: Mar 13, 2021
-
-#     """
-#     dims = np.shape(rho)
-#     nx = dims[0]
-#     ny = dims[1]
-#     nz = dims[2]
-
-#     with open(ModFile, "w") as f:
-#         np.savetxt(
-#             f, [" # 3D MT model written by ModEM in WS format"], fmt="%s")
-#         # line = np.array([nx, ny,nz, dummy, trans],dtype=('i8,i8,i8,i8,U10'))
-#         np.savetxt(f, dx.reshape(1, dx.shape[0]), fmt="%12.3f")
-#         np.savetxt(f, dy.reshape(1, dy.shape[0]), fmt="%12.3f")
-#         np.savetxt(f, dz.reshape(1, dz.shape[0]), fmt="%12.3f")
-#         # write out the layers from resmodel
-#         for zi in range(dz.size):
-#             f.write("\n")
-#             for yi in range(dy.size):
-#                 # line = rho[::-1, yi, zi]
-#                 # line = np.flipud(rho[:, yi, zi])
-#                 line = rho[:, yi, zi]
-#                 np.savetxt(f, line.reshape(1, nx), fmt="%12.5e")
-
-#         f.write("\n")
-
-#         cnt = np.asarray(reference)
-#         np.savetxt(f, cnt.reshape(1, cnt.shape[0]), fmt="%10.1f")
-#         f.write("%10.2f  \n" % (0.0))
 
 
 def write_mod(ModFile=None, ModExt=".rho",
@@ -959,6 +923,54 @@ def read_mod(ModFile=None, ModExt=".rho",
 
     else:
         return dx, dy, dz, mval, reference, trans
+    
+    
+def write_model_vtk(ModFile=None, dx=None, dy=None, dz=None, rho=None, 
+                    reference=None, scale = [1., 1., -1.], trans="LINEAR",
+                    out=True):
+    """
+    write ModEM model input in 
+
+
+    Expects rho in physical units
+
+    author: vrath
+    last changed: Mar 13, 2021
+
+    """
+    from evtk.hl import gridToVTK
+    
+   
+    N =  np.append(0.0, np.cumsum(dx))*scale[0] 
+    E =  np.append(0.0, np.cumsum(dy))*scale[1]
+    D =  np.append(0.0, np.cumsum(dz))*scale[2]
+    
+   
+    gridToVTK(ModFile, N, E, D, cellData = {'resistivity (in Ohm)' : rho})
+    print("model-like parameter written to %s" % (ModFile))
+    
+
+def write_data_vtk(SitFile=None, sx=None, sy=None, sz=None, sname=None,
+                   reference=None, scale = [1., 1., -1.], out=True):
+    """
+    Convert ModEM data file to VTK station set (unstructured grid)
+
+    
+    """
+    from evtk.hl import pointsToVTK
+
+    
+    N = sx*scale[0] 
+    E = sy*scale[1]
+    D = sz*scale[2]
+
+
+    #dummy scalar values
+    dummy = np.ones((len(N)))
+
+    pointsToVTK(SitFile, N, E, D, data = {"value" : dummy})
+
+    print("site positions written to %s" % (SitFile))
 
 
 def fix_cells( covfile_i=None,
@@ -1119,6 +1131,7 @@ def fix_cells( covfile_i=None,
             print("fix_cells: model in %s fixed to prior" % (modfile_i))
 
 
+    
 def linear_interpolation(p1, p2, x0):
     """
     Function that receives as arguments the coordinates of two points (x,y)
