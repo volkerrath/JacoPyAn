@@ -295,7 +295,6 @@ Contains
 #ifdef JAC
   subroutine write_sensMatrixMTX(sens, sigma, allData, jfile, cfile)
     type(dataVectorMTX_t), intent(in)         :: allData
-    ! type(modelCov_t), intent(in)     ::  CmSqrt
     type(sensMatrix_t), pointer	:: sens(:)
     type(modelParam_t)            :: sigma, tmp, sns
     character(*), intent(in)				:: jfile, cfile
@@ -326,7 +325,7 @@ Contains
 
 
 
-    open(unit=ioJac, file=jfile, form='unformatted', iostat=ios)
+    open(unit=ioSens, file=jfile, form='unformatted', iostat=ios)
 	write(*,*) 'Output sensitivity matrix...'
 
     tmpstr=trim(jfile)
@@ -401,7 +400,7 @@ Contains
 
                     do icomp = 1,nComp/2
                         compid = typeDict(iDt)%id(icomp)
-                        write(13,fmt=fmtstring) &
+                        write(ioJdt,fmt=fmtstring) &
                             pTx,trim(sRx),xRx,trim(compid),iDt,&
                             val(2*icomp-1), val(2*icomp), err(2*icomp)
 
@@ -430,7 +429,7 @@ Contains
 
                     do icomp = 1,nComp
                         compid = typeDict(iDt)%id(icomp)
-                        write(13,fmt=fmtstring) &
+                        write(ioJdt,fmt=fmtstring) &
                           pTx,trim(sRx),xRx,trim(compid),iDt, &
                           val(icomp),err(icomp)
 
