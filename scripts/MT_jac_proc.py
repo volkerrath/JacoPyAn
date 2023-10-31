@@ -72,7 +72,7 @@ WorkDir = JACOPYAN_ROOT+"/work/SABA/"
 if not WorkDir.endswith("/"):
     WorkDir = WorkDir+"/"
 MFile = WorkDir + "SABA8_best.rho"
-MPad=[10, 10 , 10, 10, 0, 20]
+MPad=[0, 0 , 0, 0, 0, 0]
 
 # JFiles = [WorkDir+"SABA8_Z.jac", WorkDir+"SABA8_P.jac", WorkDir+"SABA8_T.jac",]
 # DFiles = [WorkDir+"SABA8_Z_jac.dat", WorkDir +
