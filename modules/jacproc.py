@@ -549,40 +549,6 @@ def set_airmask(rho=None, aircells=np.array([]), blank= np.nan, flat=True, out=T
     return mask
 
 
-# def calculate_sens(Jac=None, normalize=False, small=1.0e-15, blank=np.nan, log=False, out=True):
-#     """
-#     Calculate sensitivity from ModEM Jacobian.
-#     Optionally blank elements smaller than theshold, take logarithm, normalize.
-
-#     author: vrath
-#     last changed: Sep 25, 2020
-#     """
-#     if scs.issparse(Jac):
-#         J = Jac.todense()
-#     else:
-#         J = Jac
-
-#     S = np.sum(np.power(J, 2), axis=0)
-#     S = np.sqrt(S)
-
-#     Smax = np.nanmax(S)
-#     Smin = np.nanmin(S)
-
-#     if out:
-#         print("Range of S is "+str(Smin)+" to "+str(Smax))
-
-#     if normalize:
-#         S = S / Smax
-#         if out:
-#             print("Normalizing with"+str(Smax))
-
-#     if log:
-#         S = np.log10(S)
-
-#     S[S < small] = blank
-
-#     return S, Smax
-
 
 def project_model(m=None, U=None, small=1.0e-14, out=True):
     """
