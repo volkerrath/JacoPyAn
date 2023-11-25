@@ -116,7 +116,7 @@ def calc_sensitivity(Jac=np.array([]),
 
 def transform_sensitivity(S=np.array([]), V=np.array([]),
                           Transform=["size","max", "sqrt"],
-                          asinhpar=[0.], OutInfo=False):
+                          asinhpar=[0.], Maxval=None, OutInfo=False):
     """
     Transform sensitivities.
 
@@ -161,7 +161,10 @@ def transform_sensitivity(S=np.array([]), V=np.array([]),
                  
         if "max" in item.lower():
              print("trans_sensitivity: Transformed by maximum value.")
-             maxval = np.amax(np.abs(S))
+             if Maxval==None:
+                 maxval = np.amax(np.abs(S))
+             else:
+                 maxval = Maxval
              print("maximum value: ", maxval)
              S = S/maxval
              # print("S0m", np.shape(S))
@@ -499,7 +502,7 @@ def normalize_jac(Jac=None, fn=None, out=True):
 
     return Jac
 
-def set_mask(rho=None, pad=[10, 10 , 10, 10, 0, 10], blank= np.nan, flat=True, out=True):
+def set_padmask(rho=None, pad=[0, 0 , 0, 0, 0, 0], blank= np.nan, flat=True, out=True):
     """
     Set model masc for Jacobian calculations.
 
@@ -523,6 +526,27 @@ def set_mask(rho=None, pad=[10, 10 , 10, 10, 0, 10], blank= np.nan, flat=True, o
 
     return mask
 
+
+
+def set_airmask(rho=None, aircells=np.array([]), blank= np.nan, flat=True, out=True):
+    """
+    Set aircell masc for Jacobian calculations.
+
+    author: vrath
+    last changed: Dec 29, 2021
+
+    """
+    shr = np.shape(rho)
+    # jm = np.full(shr, np.nan)
+    jm = np.full(shr, 1.)
+    print(np.shape(jm))
+    jm[aircells] = blank
+    mask = jm
+    if flat:
+        # mask = jm.flatten()
+        mask = jm.flatten(order="F")
+
+    return mask
 
 
 # def calculate_sens(Jac=None, normalize=False, small=1.0e-15, blank=np.nan, log=False, out=True):
