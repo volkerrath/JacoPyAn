@@ -30,11 +30,18 @@ def decode_h2(strng):
         frequency, dattype, site numbers
 
     """
+    # old format
+    # s = strng.replace(";","").split()
+    # i1 = int(s[3])
+    # i2 = int(s[5])
+    # i3 = int(s[7])
+    
+    s = strng.split()
 
-    s = strng.replace(";","").split()
-    i1 = int(s[3])
-    i2 = int(s[5])
-    i3 = int(s[7])
+
+    i1 = int(s[0])
+    i2 = int(s[1])
+    i3 = int(s[2])
 
     ivals = [i1, i2, i3]
     return ivals

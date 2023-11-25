@@ -61,14 +61,14 @@ rng = np.random.default_rng()
 nan = np.nan
 
 
-SparseThresh = 1.e-8
+SparseThresh = 1.e-7
 Sparse = SparseThresh > 0
 
 ErrorScale = False
 Scale = 1.
 
 
-WorkDir = JACOPYAN_ROOT+"/work/SABA/"
+WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya/SABA8_Jac/"
 if not WorkDir.endswith("/"):
     WorkDir = WorkDir+"/"
 MFile = WorkDir + "SABA8_best.rho"
@@ -78,8 +78,8 @@ MPad=[0, 0 , 0, 0, 0, 0]
 # DFiles = [WorkDir+"SABA8_Z_jac.dat", WorkDir +
 #           "SABA8_P_jac.dat", WorkDir+"SABA8_T_jac.dat",]
 
-JFiles = [WorkDir+"SABA8_Z.jac",]
-DFiles = [WorkDir+"SABA8_Z_jac.dat",]
+JFiles = [WorkDir+"SABA8_Pi.jac",]
+DFiles = [WorkDir+"SABA8_Pi_jac.dat",]
 
 # WorkDir = JACOPYAN_ROOT+"/work/TestJac/"
 # if not WorkDir.endswith("/"):

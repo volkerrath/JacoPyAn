@@ -300,6 +300,7 @@ Contains
     character(*), intent(in)				:: jfile, cfile
     ! local
     integer  iTx,iDt,iRx,nTx,nDt,nSite,nComp,icomp,i,j,k,l,istat,ios,nAll,iTxt,dotpos
+    integer  ii,jj,kk
 
     real(8), allocatable            :: val(:) ! (ncomp)
     real(8), allocatable            :: err(:) ! (ncomp)
@@ -353,31 +354,31 @@ Contains
     nTx = size(sens)
     write(ioSens) nTx
 
-    do i = 1,nTx
-      nDt = sens(i)%nDt
-      iTx = sens(i)%tx
+    do ii = 1,nTx
+      nDt = sens(ii)%nDt
+      iTx = sens(ii)%tx
       pTx= txDict(iTx)%period
 
       write(ioSens) nDt
       
-      do j = 1,nDt
-      
-        nComp = sens(i)%v(j)%nComp
-        nSite = sens(i)%v(j)%nSite
-        iDt   = sens(i)%v(j)%dataType
+      do jj = 1,nDt
+        nComp = sens(ii)%v(jj)%nComp
+        nSite = sens(ii)%v(jj)%nSite
+        iDt   = sens(ii)%v(jj)%dataType
 
         
         SI_factor = ImpUnits(typeDict(iDt)%units,fileInfo(iTxt,iDt)%units_in_file)
+!         write(*,*) 'Factor: ',SI_factor, typeDict(iDt)%units, fileInfo(iTxt,iDt)%units_in_file
 
         allocate(val(nComp),err(nComp),STAT=istat)
 
         write(ioSens) nSite
 
-        do k = 1,nSite
-            iRx = sens(i)%v(j)%rx(k)
+        do kk = 1,nSite
+
+            iRx = sens(ii)%v(jj)%rx(kk)
             sRx = rxDict(iRx)%id
             xRx = rxDict(iRx)%x
-
             !write(*,*) 'Data Type: ', iDt, nComp,
             select case (iDt)
 
@@ -391,10 +392,10 @@ Contains
 
                 case(1, 2, 3)
 
-                    fmtstring = '(g12.5,3x,a20,3f16.3,a8,i8,3g16.6)'
+                    fmtstring = '(g12.5,3x,a20,3f16.3,a8,i8,3g18.9)'
 
-                    val = allData%d(i)%data(j)%value(:,k)
-                    err = allData%d(i)%data(j)%error(:,k)
+                    val = allData%d(ii)%data(jj)%value(:,kk)*SI_factor
+                    err = allData%d(ii)%data(jj)%error(:,kk)*SI_factor
 
 
 
@@ -404,28 +405,32 @@ Contains
                             pTx,trim(sRx),xRx,trim(compid),iDt,&
                             val(2*icomp-1), val(2*icomp), err(2*icomp)
 
-                        tmp =sens(i)%v(j)%dm(icomp,k)
+                        tmp =sens(ii)%v(jj)%dm(icomp,kk)
                         tmp = multBy_CmSqrt(tmp)
                         tmp%cellCond%v = tmp%cellCond%v*SI_factor
-                        sens(i)%v(j)%dm(icomp,k) = tmp
+                        sens(ii)%v(jj)%dm(icomp,kk) = tmp
 
 !                         tmp = sens(i)%v(j)%dm(icomp,k)
 !                         call RecursiveAR(tmp%cellCond%v,tmp%cellCond%v,CmSqrt%N)
 !                         sens(i)%v(j)%dm(icomp,k) = tmp
 
                     end do
+                    write(*,'(3i7,g12.4,a,a)') &
+                        iTx, iDt, iRx, pTx, ' ',trim(sRx)
+                    write(header,'(3i7,g12.4,a,a)') &
+                        iTx, iDt, iRx, pTx, ' ',trim(sRx)
 
-                    write(header,'(a,i10,a,i10,a,i10)') &
-                        'Sensitivity for freq=',iTx,'; dataType=',iDt,'; site=',iRx
+!                     write(header,'(a,i10,a,i10,a,i10)') &
+!                         'Sensitivity for freq=',iTx,'; dataType=',iDt,'; site=',iRx
 
-                    call writeVec_modelParam(nComp,sens(i)%v(j)%dm(:,k),header,jfile)
+                    call writeVec_modelParam(nComp,sens(ii)%v(jj)%dm(:,kk),header,jfile)
 
 
                 case(5, 6)
 
-                    fmtstring = '(g12.5,3x,a20,3f16.3,a8,i8,2g16.6)'
-                    val = allData%d(i)%data(j)%value(:,k)
-                    err = allData%d(i)%data(j)%error(:,k)
+                    fmtstring = '(g12.5,3x,a20,3f16.3,a8,i8,2g18.9)'
+                    val = allData%d(ii)%data(jj)%value(:,kk)*SI_factor
+                    err = allData%d(ii)%data(jj)%error(:,kk)*SI_factor
 
                     do icomp = 1,nComp
                         compid = typeDict(iDt)%id(icomp)
@@ -433,21 +438,24 @@ Contains
                           pTx,trim(sRx),xRx,trim(compid),iDt, &
                           val(icomp),err(icomp)
 
-                        tmp =sens(i)%v(j)%dm(icomp,k)
+                        tmp =sens(ii)%v(jj)%dm(icomp,kk)
                         tmp = multBy_CmSqrt(tmp)
                         tmp%cellCond%v = tmp%cellCond%v*SI_factor
-                        sens(i)%v(j)%dm(icomp,k) = tmp
+                        sens(ii)%v(jj)%dm(icomp,kk) = tmp
 
 !                         tmp = sens(i)%v(j)%dm(icomp,k)
 !                         call RecursiveAR(tmp%cellCond%v,tmp%cellCond%v,CmSqrt%N)
 !                         sens(i)%v(j)%dm(icomp,k) = tmp
 
                     end do
+                    write(*,'(3i7,g12.4,a,a)') &
+                        iTx, iDt, iRx, pTx, ' ',trim(sRx)
+                    write(header,'(3i7,g12.4,a,a)') &
+                        iTx, iDt, iRx, pTx, ' ',trim(sRx)
+!                     write(header,'(a,i10,a,i10,a,i10)') &
+!                         'Sensitivity for freq=',iTx,'; dataType=',iDt,'; site=',iRx
 
-                    write(header,'(a,i10,a,i10,a,i10)') &
-                        'Sensitivity for freq=',iTx,'; dataType=',iDt,'; site=',iRx
-
-                    call writeVec_modelParam(nComp,sens(i)%v(j)%dm(:,k),header,jfile)
+                    call writeVec_modelParam(nComp,sens(ii)%v(jj)%dm(:,kk),header,jfile)
 
                 end select
 

@@ -1,5 +1,5 @@
 ! *****************************************************************************
-program Mod3DMTS
+program Mod3DMT
 ! Program for running 3D MT forward, sensitivity and inverse modelling
 ! Copyright (c) 2004-2014 Oregon State University
 !              AUTHORS  Gary Egbert, Anna Kelbert & Naser Meqbel
@@ -35,7 +35,7 @@ program Mod3DMTS
               call  MPI_constructor
 			  if (taskid==0) then
 #ifdef JAC
-			      call parseArgs('Mod3DMTS',cUserDef) ! OR readStartup(rFile_Startup,cUserDef)
+			      call parseArgs('Mod3DMTJ',cUserDef) ! OR readStartup(rFile_Startup,cUserDef)
 #else
 			      call parseArgs('Mod3DMT',cUserDef) ! OR readStartup(rFile_Startup,cUserDef)
 #endif
@@ -48,7 +48,7 @@ program Mod3DMTS
 			 end if
 
 #else
-             call parseArgs('Mod3DMTS',cUserDef) ! OR readStartup(rFile_Startup,cUserDef)
+             call parseArgs('Mod3DMT',cUserDef) ! OR readStartup(rFile_Startup,cUserDef)
 			 write(6,*)'I am a SERIAL version'
 #endif
 
@@ -135,9 +135,8 @@ program Mod3DMTS
 #endif
 
 #ifdef JAC
-        ! create square root of Cm
-    	call create_CmSqrt(sigma0, cUserDef%rFile_Cov)
-        call write_sensMatrixMTX(sens,sigma0,Cmsqrt, allData,cUserDef%wFile_Sens)
+        !call write_dataVectorMTX(allData,cUserDef%wFile_Data)
+        call write_sensMatrixMTX(sens,sigma0,allData,cUserDef%wFile_Sens, cUserDef%rFile_Cov)
 #else
         call write_sensMatrixMTX(sens,allData,cUserDef%wFile_Sens)
 #endif
