@@ -61,10 +61,10 @@ rng = np.random.default_rng()
 nan = np.nan
 
 
-SparseThresh = 1.e-7
+SparseThresh = 1.e-8
 Sparse = SparseThresh > 0
 
-ErrorScale = False
+ErrorScale = True
 VolumeScale= False
 
 Scale = 1.
@@ -81,22 +81,10 @@ MFile = WorkDir + "SABA8_best.rho"
 # DFiles = [WorkDir+"SABA8_Z_jac.dat", WorkDir +
 #           "SABA8_P_jac.dat", WorkDir+"SABA8_T_jac.dat",]
 
-JFiles = [WorkDir+"SABA8_Pi.jac",]
-DFiles = [WorkDir+"SABA8_Pi_jac.dat",]
+JFiles = [WorkDir+"SABA8_Ti.jac", WorkDir+"SABA8_Pi.jac", WorkDir+"SABA8_Zi.jac",] 
 
-# WorkDir = JACOPYAN_ROOT+"/work/TestJac/"
-# if not WorkDir.endswith("/"):
-#     WorkDir = WorkDir+"/"
-# MFile = WorkDir + "TestJac.rho"
-# MPad = [0, 0,    0,  0,    0, 0]
-# JFiles = [WorkDir+"TestJac_Z.jac", WorkDir+"TestJac_P.jac", WorkDir+"TestJac_T.jac",]
-# DFiles = [WorkDir+"TestJac_Z_jac.dat", WorkDir +
-#           "TestJac_P_jac.dat", WorkDir+"TestJac_T_jac.dat",]
 
-if np.size(DFiles) != np.size(JFiles):
-    error("Data file number not equal Jac file number! Exit.")
-nF = np.size(DFiles)
-
+nF = len(JFiles)
 
 total = 0.0
 start = time.perf_counter()
@@ -109,41 +97,35 @@ rhoair = 1.e17
 aircells = np.where(rho > rhoair/10)
 blank = 1.e-30 #np.nan
 
+airmask = jac.set_airmask(rho=rho, aircells=aircells, flat = False, out=True)
+
 elapsed = time.perf_counter() - start
 total = total + elapsed
 print(" Used %7.4f s for reading model from %s " % (elapsed, MFile))
 
 
-name, ext = os.path.splitext(MFile)
-
-
-TSTFile = name 
-Head = "#  original model"
-mod.write_mod(TSTFile, ModExt="_0_MaskTest.rho", trans="LOGE",
-                  dx=dx, dy=dy, dz=dz, mval=rho,
-                  reference=reference, mvalair=rhoair, aircells=aircells, header=Head)
-
-airmask = jac.set_airmask(rho=rho, aircells=aircells, flat = False, out=True)
-
-rhotest = airmask.reshape(dims)*rho
-mod.write_mod(TSTFile, ModExt="_1_MaskTest.rho", trans="LOGE",
-                  dx=dx, dy=dy, dz=dz, mval=rhotest,
-                  reference=reference, mvalair=rhoair, aircells=aircells, header=Head)
-
-
-if np.size(DFiles) != np.size(JFiles):
-    error("Data file number not equal Jac file number! Exit.")
-nF = np.size(DFiles)
+# only testing 
+# name, ext = os.path.splitext(MFile)
+# TSTFile = name 
+# Head = "#  original model"
+# mod.write_mod(TSTFile, ModExt="_0_MaskTest.rho", trans="LOGE",
+#                   dx=dx, dy=dy, dz=dz, mval=rho,
+#                   reference=reference, mvalair=rhoair, aircells=aircells, header=Head)
+# rhotest = airmask.reshape(dims)*rho
+# mod.write_mod(TSTFile, ModExt="_1_MaskTest.rho", trans="LOGE",
+#                   dx=dx, dy=dy, dz=dz, mval=rhotest,
+#                   reference=reference, mvalair=rhoair, aircells=aircells, header=Head)
 
 
 for f in np.arange(nF):
     nstr = ""
     name, ext = os.path.splitext(JFiles[f])
     start = time.perf_counter()
-    print("\nReading Data from "+DFiles[f])
-    Data, Site, Freq, Comp, DTyp, Head = mod.read_data_jac(DFiles[f])
+    DFile = JFiles[f].replace(".jac", "_jac.dat")
+    print("\nReading Data from "+DFile)
+    Data, Site, Freq, Comp, DTyp, Head = mod.read_data_jac(DFile)
     elapsed = time.perf_counter() - start
-    print(" Used %7.4f s for reading Data from %s " % (elapsed, DFiles[f]))
+    print(" Used %7.4f s for reading Data from %s " % (elapsed, DFile))
     total = total + elapsed
     print(np.unique(DTyp))
     start = time.perf_counter()
@@ -154,39 +136,25 @@ for f in np.arange(nF):
     total = total + elapsed
     
 
-    # mx = np.max(Jac)
-    # mn = np.amin(Jac)
-    # print(JFiles[f]+" minimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))
-    # airmask = airmask.flatten(order="F")
-    wcell   = 1. /vcell.flatten(order="F")
-
-    
-    # GG = Jac[1000,:]
-    # OO = np.ones_like(GG)
-    # snstest = airmask.reshape(dims, order = "F")*GG.reshape(dims, order = "F")
-    # mod.write_mod(TSTFile, ModExt="_1_MaskTest.sns", trans="LINEAR",
-    #               dx=dx, dy=dy, dz=dz, mval=snstest,
-    #               reference=reference, mvalair=rhoair, aircells=aircells, header=Head)
-    
-    
     if np.shape(Jac)[0]!=np.shape(Data)[0]:
         print(np.shape(Jac),np.shape(Data))
         error(" Dimensions of Jacobian and data do not match! Exit.")
+    
+    
+    # No longer used here 
+    if ErrorScale:
+        nstr = nstr+"_nerr"
+        start = time.perf_counter()
+        dsh = np.shape(Data)
+        err = np.reshape(Data[:, 5], (dsh[0], 1))
+        print(np.amin(err), np.amax(err))
+        Jac = jac.normalize_jac(Jac, err)
+        elapsed = time.perf_counter() - start
+        print(" Used %7.4f s for normalizing Jacobian with data error from %s " %
+              (elapsed, DFile))
+        start = time.perf_counter()
 
-    # if ErrorScale:
-    #     nstr = nstr+"_nerr"
-    #     start = time.perf_counter()
-    #     dsh = np.shape(Data)
-    #     err = np.reshape(Data[:, 5], (dsh[0], 1))
-    #     print(np.amin(err), np.amax(err))
-    #     Jac, _ = jac.normalize_jac(Jac, err)
-    #     elapsed = time.perf_counter() - start
-    #     print(" Used %7.4f s for normalizing Jacobian with data error from %s " %
-    #           (elapsed, DFiles[f]))
-    #     start = time.perf_counter()
-
-    # if VolumeScale:
-        
+    # if VolumeScale:     
     #     nstr = nstr+"_vcell"
     #     start = time.perf_counter()
     #     wcell   = 1. /vcell.flatten(order="F")
@@ -205,7 +173,7 @@ for f in np.arange(nF):
         for idt in np.arange(np.shape(Jac)[0]):
             JJ = Jac[idt,:].reshape(dims,order="F")
             Jac[idt,:] = (airmask*JJ).flatten(order="F")
-        
+                  
         mx = np.nanmax(Jac)
         mn = np.nanmin(Jac)
         print(JFiles[f]+" minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx)) 
@@ -231,3 +199,5 @@ for f in np.arange(nF):
     elapsed = time.perf_counter() - start
     total = total + elapsed
     print(" Used %7.4f s for writing Jacobian and infp to %s " % (elapsed, name))
+    Jac = None
+    #del Jac

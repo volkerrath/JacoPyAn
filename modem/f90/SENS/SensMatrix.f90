@@ -301,6 +301,7 @@ Contains
     ! local
     integer  iTx,iDt,iRx,nTx,nDt,nSite,nComp,icomp,i,j,k,l,istat,ios,nAll,iTxt,dotpos
     integer  ii,jj,kk
+    logical :: use_err=.TRUE.
 
     real(8), allocatable            :: val(:) ! (ncomp)
     real(8), allocatable            :: err(:) ! (ncomp)
@@ -398,7 +399,6 @@ Contains
                     err = allData%d(ii)%data(jj)%error(:,kk)*SI_factor
 
 
-
                     do icomp = 1,nComp/2
                         compid = typeDict(iDt)%id(icomp)
                         write(ioJdt,fmt=fmtstring) &
@@ -407,7 +407,11 @@ Contains
 
                         tmp =sens(ii)%v(jj)%dm(icomp,kk)
                         tmp = multBy_CmSqrt(tmp)
-                        tmp%cellCond%v = tmp%cellCond%v*SI_factor
+                         if (use_err)
+                          tmp%cellCond%v = tmp%cellCond%v*SI_factor/err
+                        else
+                          tmp%cellCond%v = tmp%cellCond%v*SI_factor
+                        end if
                         sens(ii)%v(jj)%dm(icomp,kk) = tmp
 
 !                         tmp = sens(i)%v(j)%dm(icomp,k)
@@ -432,6 +436,7 @@ Contains
                     val = allData%d(ii)%data(jj)%value(:,kk)*SI_factor
                     err = allData%d(ii)%data(jj)%error(:,kk)*SI_factor
 
+
                     do icomp = 1,nComp
                         compid = typeDict(iDt)%id(icomp)
                         write(ioJdt,fmt=fmtstring) &
@@ -440,7 +445,12 @@ Contains
 
                         tmp =sens(ii)%v(jj)%dm(icomp,kk)
                         tmp = multBy_CmSqrt(tmp)
-                        tmp%cellCond%v = tmp%cellCond%v*SI_factor
+                        if (use_err)
+                          tmp%cellCond%v = tmp%cellCond%v*SI_factor/err
+                        else
+                          tmp%cellCond%v = tmp%cellCond%v*SI_factor
+                        end if
+
                         sens(ii)%v(jj)%dm(icomp,kk) = tmp
 
 !                         tmp = sens(i)%v(j)%dm(icomp,k)
@@ -484,6 +494,7 @@ Contains
     ! local
     integer  iTx,iDt,iRx,nTx,nDt,nSite,nComp,i,j,k,istat,ios,nAll
     character(80) header
+
 
     if(.not. associated(sens)) then
         call errStop('sensitivity matrix not allocated in write_sensMatrixMTX')

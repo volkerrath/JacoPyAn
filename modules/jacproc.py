@@ -433,7 +433,9 @@ def sparsify_jac(Jac=None,
             % (shj[0], shj[1], nel)
         )
         
+    
     Jf = Jac.copy()
+    print(np.shape(Jf))
     
     if scalval <0.:
         Scaleval = np.amax(np.abs(Jf))
@@ -441,11 +443,18 @@ def sparsify_jac(Jac=None,
     else: 
         Scaleval = abs(scalval)
         print("sparsify_jac: scaleval is  %g" % (Scaleval))  
+        
+    if normalized:        
+        print("sparsify_jac: output J is scaled by %g" % (Scaleval)) 
+        f = 1.0 / Scaleval
+        Jf = normalize_jac(Jac=Jf, fn=f)
     
     Jf[np.abs(Jf)/Scaleval < sparse_thresh] = 0.0
+    
+    print(np.shape(Jf))
 
     Js = scs.csr_matrix(Jf)
-    #Js = scs.lil_matrix(Jf)
+
 
     if out:
         ns = Js.count_nonzero()
@@ -462,17 +471,12 @@ def sparsify_jac(Jac=None,
         # print(norma)
         # print(normf)        
         print(" Sparsified J explains "
-              +str(round(100.-100.*normo/normx,2))+"% of full J (Spectral norm.)")
+              +str(round(100.-100.*normo/normx,2))+"% of full J (Spectral norm)")
         print(" Sparsified J explains "
-              +str(round(100.-100.*normd/normf,2))+"% of full J (Frobenius norm.)")
+              +str(round(100.-100.*normd/normf,2))+"% of full J (Frobenius norm)")
         # print("****", nel, ns, 100.0 * ns / nel, round(100.-100.*normd/normf,3) )
 
-    if normalized:        
-        print("sparsify_jac: output J is scaled by %g" % (Scaleval)) 
-        f = 1.0 / Scaleval
-        Js = normalize_jac(Jac=Js, fn=f)
-        
-    #Js = Js.tocsr()
+       
 
     return Js, Scaleval
 
