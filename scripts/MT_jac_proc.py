@@ -65,14 +65,17 @@ SparseThresh = 1.e-7
 Sparse = SparseThresh > 0
 
 ErrorScale = False
+VolumeScale= False
+
 Scale = 1.
 
 
-WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya/SABA8_Jac/"
+WorkDir = JACOPYAN_DATA+"/Sabancaya/"
+WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya//SABA8_Jac/"
+
 if not WorkDir.endswith("/"):
     WorkDir = WorkDir+"/"
 MFile = WorkDir + "SABA8_best.rho"
-MPad=[0, 0 , 0, 0, 0, 0]
 
 # JFiles = [WorkDir+"SABA8_Z.jac", WorkDir+"SABA8_P.jac", WorkDir+"SABA8_T.jac",]
 # DFiles = [WorkDir+"SABA8_Z_jac.dat", WorkDir +
@@ -120,13 +123,9 @@ mod.write_mod(TSTFile, ModExt="_0_MaskTest.rho", trans="LOGE",
                   dx=dx, dy=dy, dz=dz, mval=rho,
                   reference=reference, mvalair=rhoair, aircells=aircells, header=Head)
 
-jacmask = jac.set_mask(rho=rho, pad=MPad, blank= blank, flat = False, out=True)
-jdims= np.shape(jacmask)
-j0 = jacmask.reshape(dims)
-j0[aircells] = blank
-jacmask = j0.reshape(jdims)
+airmask = jac.set_airmask(rho=rho, aircells=aircells, flat = False, out=True)
 
-rhotest = jacmask.reshape(dims)*rho
+rhotest = airmask.reshape(dims)*rho
 mod.write_mod(TSTFile, ModExt="_1_MaskTest.rho", trans="LOGE",
                   dx=dx, dy=dy, dz=dz, mval=rhotest,
                   reference=reference, mvalair=rhoair, aircells=aircells, header=Head)
@@ -154,43 +153,71 @@ for f in np.arange(nF):
     print(" Used %7.4f s for reading Jacobian from %s " % (elapsed, JFiles[f]))
     total = total + elapsed
     
-    mx = np.max(Jac)
-    mn = np.amin(Jac)
-    print(JFiles[f]+" minimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))
-    jm = jacmask.flatten(order="F")
-    mx = np.nanmax(Jac*jm)
-    mn = np.nanmin(Jac*jm)
-    print(JFiles[f]+" minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx))
+
+    # mx = np.max(Jac)
+    # mn = np.amin(Jac)
+    # print(JFiles[f]+" minimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))
+    # airmask = airmask.flatten(order="F")
+    wcell   = 1. /vcell.flatten(order="F")
+
+    
+    # GG = Jac[1000,:]
+    # OO = np.ones_like(GG)
+    # snstest = airmask.reshape(dims, order = "F")*GG.reshape(dims, order = "F")
+    # mod.write_mod(TSTFile, ModExt="_1_MaskTest.sns", trans="LINEAR",
+    #               dx=dx, dy=dy, dz=dz, mval=snstest,
+    #               reference=reference, mvalair=rhoair, aircells=aircells, header=Head)
     
     
     if np.shape(Jac)[0]!=np.shape(Data)[0]:
         print(np.shape(Jac),np.shape(Data))
         error(" Dimensions of Jacobian and data do not match! Exit.")
 
-    if ErrorScale:
-        nstr = nstr+"_nerr"
-        start = time.perf_counter()
-        dsh = np.shape(Data)
-        err = np.reshape(Data[:, 5], (dsh[0], 1))
-        print(np.amin(err), np.amax(err))
-        Jac = jac.normalize_jac(Jac, err)
-        elapsed = time.perf_counter() - start
-        print(" Used %7.4f s for normalizing Jacobian with data error from %s " %
-              (elapsed, DFiles[f]))
-        start = time.perf_counter()
+    # if ErrorScale:
+    #     nstr = nstr+"_nerr"
+    #     start = time.perf_counter()
+    #     dsh = np.shape(Data)
+    #     err = np.reshape(Data[:, 5], (dsh[0], 1))
+    #     print(np.amin(err), np.amax(err))
+    #     Jac, _ = jac.normalize_jac(Jac, err)
+    #     elapsed = time.perf_counter() - start
+    #     print(" Used %7.4f s for normalizing Jacobian with data error from %s " %
+    #           (elapsed, DFiles[f]))
+    #     start = time.perf_counter()
+
+    # if VolumeScale:
+        
+    #     nstr = nstr+"_vcell"
+    #     start = time.perf_counter()
+    #     wcell   = 1. /vcell.flatten(order="F")
+    #     print(np.amin(err), np.amax(err))
+    #     Jac = Jac*wcell
+    #     elapsed = time.perf_counter() - start
+    #     print(" Used %7.4f s for normalizing Jacobian with inverse cell volumes " %
+    #           (elapsed))
+    #     start = time.perf_counter()
 
     sstr = "_full"
     if SparseThresh > 0.:
-
+        # airmask = airmask.flatten(order="F")
         sstr = "_sp"+str(round(np.log10(SparseThresh)))
         start = time.perf_counter()
-        Jac, Scale = jac.sparsify_jac(Jac, sparse_thresh=SparseThresh)
+        for idt in np.arange(np.shape(Jac)[0]):
+            JJ = Jac[idt,:].reshape(dims,order="F")
+            Jac[idt,:] = (airmask*JJ).flatten(order="F")
+        
+        mx = np.nanmax(Jac)
+        mn = np.nanmin(Jac)
+        print(JFiles[f]+" minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx)) 
+        
+        Scale = np.nanmax(np.abs(Jac))
+        Jac, Scale = jac.sparsify_jac(Jac, scalval=Scale, sparse_thresh=SparseThresh)
         elapsed = time.perf_counter() - start
         total = total + elapsed
         print(" Used %7.4f s for sparsifying Jacobian %s " %
               (elapsed, JFiles[f]))
 
-    
+
 
     name = name+nstr+sstr
     start = time.perf_counter()

@@ -437,11 +437,10 @@ def sparsify_jac(Jac=None,
     
     if scalval <0.:
         Scaleval = np.amax(np.abs(Jf))
-        print("sparsify_jac: output J is scaled by %g (max Jacobian)"
-            % (Scaleval))  
+        print("sparsify_jac: scaleval is %g (max Jacobian)" % (Scaleval))  
     else: 
         Scaleval = abs(scalval)
-        print("sparsify_jac: output J is scaled by %g" % (Scaleval))  
+        print("sparsify_jac: scaleval is  %g" % (Scaleval))  
     
     Jf[np.abs(Jf)/Scaleval < sparse_thresh] = 0.0
 
@@ -468,7 +467,8 @@ def sparsify_jac(Jac=None,
               +str(round(100.-100.*normd/normf,2))+"% of full J (Frobenius norm.)")
         # print("****", nel, ns, 100.0 * ns / nel, round(100.-100.*normd/normf,3) )
 
-    if normalized:
+    if normalized:        
+        print("sparsify_jac: output J is scaled by %g" % (Scaleval)) 
         f = 1.0 / Scaleval
         Js = normalize_jac(Jac=Js, fn=f)
         

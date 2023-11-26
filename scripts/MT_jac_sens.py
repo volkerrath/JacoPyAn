@@ -53,17 +53,15 @@ rhoair = 1.e17
 InpFormat = "sparse"
 OutFormat = "mod ubc" 
 
-WorkDir = JACOPYAN_ROOT+"/work/Sabancaya/"
+WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya/SABA8_Jac/"
 
 
 MFile   = WorkDir + "SABA8_best.rho"
-MPad=[10, 10 , 10, 10, 0, 20]
-# MPad=[0, 0, 0, 0, 0, 0]
 
 # 
 MOrig = [-15.767401, -71.854095]
 
-WorkName = "SABA8_Z_sp-8" #
+WorkName = "SABA8_Zi_sp-7" #
 # WorkName = "SABA8_T_sp-8"
 # WorkName = "SABA8_P_sp-8"
 
@@ -92,7 +90,11 @@ Usesigma:
 
 
 # Transform = [ "max", "sqr"]
+#Transform = [ "siz"]
 Transform = [ "max"]
+
+Transform = [ "siz", "max"]
+
 """
 Transform sensitivities. 
 Options:
@@ -124,30 +126,31 @@ name, ext = os.path.splitext(MFile)
 OFile = name
 Head = WorkName
 
-mod.write_mod(OFile, ModExt="_mod.rho", trans = "LOGE",
-                  dx=dx, dy=dy, dz=dz, mval=rho,
-                  reference=refmod, mvalair=blank, aircells=aircells, header=Head)
-print(" Model (ModEM format) written to "+OFile)
+#mod.write_mod(OFile, ModExt="_mod.rho", trans = "LOGE",
+                  #dx=dx, dy=dy, dz=dz, mval=rho,
+                  #reference=refmod, mvalair=blank, aircells=aircells, header=Head)
+#print(" Model (ModEM format) written to "+OFile)
     
-elev = -refmod[2]
-refubc =  [MOrig[0], MOrig[1], elev]
-mod.write_ubc(OFile, ModExt="_rho_ubc.mod", MshExt="_rho_ubc.msh",
-                  dx=dx, dy=dy, dz=dz, mval=rho, reference=refubc, mvalair=blank, aircells=aircells, header=Head)
-print(" Model (UBC format) written to "+OFile)
+#elev = -refmod[2]
+#refubc =  [MOrig[0], MOrig[1], elev]
+#mod.write_ubc(OFile, ModExt="_rho_ubc.mod", MshExt="_rho_ubc.msh",
+                  #dx=dx, dy=dy, dz=dz, mval=rho, reference=refubc, mvalair=blank, aircells=aircells, header=Head)
+#print(" Model (UBC format) written to "+OFile)
     
-TSTFile = WorkDir+WorkName+"0_MaskTest.rho"
-mod.write_mod(TSTFile, dx, dy, dz, rho, refmod, trans="LOGE", mvalair=blank, aircells=aircells)
+#TSTFile = WorkDir+WorkName+"0_MaskTest.rho"
+#mod.write_mod(TSTFile, dx, dy, dz, rho, refmod, trans="LOGE", mvalair=blank, aircells=aircells)
 
 
-jacmask = jac.set_mask(rho=rho, pad=MPad, blank= blank, flat = False, out=True)
+jacmask = jac.set_airmask(rho=rho, pad=MPad, blank= blank, flat = False, out=True)
 jdims= np.shape(jacmask)
 j0 = jacmask.reshape(dims)
 j0[aircells] = blank
 jacmask = j0.reshape(jdims)
 
-rhotest = jacmask.reshape(dims)*rho
-TSTFile = WorkDir+WorkName+"1_MaskTest.rho"
-mod.write_mod(TSTFile, dx, dy, dz, rhotest, refmod, trans="LOGE", mvalair=blank, aircells=aircells)
+
+#rhotest = jacmask.reshape(dims)*rho
+#TSTFile = WorkDir+WorkName+"1_MaskTest.rho"
+#mod.write_mod(TSTFile, dx, dy, dz, rhotest, refmod, trans="LOGE", mvalair=blank, aircells=aircells)
 
 
 name, ext = os.path.splitext(JFile)
@@ -194,9 +197,11 @@ print(JFile+" minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx))
 
 start = time.perf_counter()
 
+
+
 SensTmp = jac.calc_sensitivity(Jac,
                      Type = Type, OutInfo=False)
-SensTot = jac.transform_sensitivity(S=SensTmp, V=V,
+SensTot = jac.transform_sensitivity(S=SensTmp, V=V, 
                           Transform=Transform, OutInfo=False)
 
 SensFile = WorkDir+WorkName+"_total_"+Type+"_"+"_".join(Transform)
