@@ -527,8 +527,7 @@ def set_padmask(rho=None, pad=[0, 0 , 0, 0, 0, 0], blank= np.nan, flat=True, out
     return mask
 
 
-
-def set_airmask(rho=None, aircells=np.array([]), blank= np.nan, flat=True, out=True):
+def set_airmask(rho=None, aircells=np.array([]), blank= 1.e-30, flat=True, out=True):
     """
     Set aircell masc for Jacobian calculations.
 
@@ -539,7 +538,8 @@ def set_airmask(rho=None, aircells=np.array([]), blank= np.nan, flat=True, out=T
     shr = np.shape(rho)
     # jm = np.full(shr, np.nan)
     jm = np.full(shr, 1.)
-    print(np.shape(jm))
+    print(np.shape(jm), shr)
+    
     jm[aircells] = blank
     mask = jm
     if flat:
@@ -547,6 +547,7 @@ def set_airmask(rho=None, aircells=np.array([]), blank= np.nan, flat=True, out=T
         mask = jm.flatten(order="F")
 
     return mask
+
 
 
 
@@ -578,5 +579,5 @@ def transfrom_model(m=None, M=None, small=1.0e-14, out=True):
     last changed:  Oct 12, 2020
     """
     transm = np.dot(M, m)
-
+    error("transform_model not implemented! Exit.")
     return transm

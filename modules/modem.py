@@ -590,7 +590,7 @@ def write_model_ncd(
 
 def write_mod(ModFile=None, ModExt=".rho",
                     dx=None, dy=None, dz=None, mval=None, reference=None,
-                    trans="LINEAR", aircells = None, mvalair = 1.e17, blank = 1.e17, header="", out=True):
+                    trans="LINEAR", aircells = None, mvalair = 1.e17, blank = 1.e-30, header="", out=True):
     """
     Write ModEM model input.
 
@@ -624,11 +624,11 @@ def write_mod(ModFile=None, ModExt=".rho",
 
 
     if not aircells == None:
-        mval.reshape(dims)[aircells] = mvalair
+        mval[aircells] = mvalair
 
     if not blank == None:
         blanks = np.where(~np.isfinite(mval))
-        mval.reshape(dims)[blanks] = mvalair
+        mval[blanks] = mvalair
 
     if len(header)==0:
         header ="# 3D MT model written by ModEM in WS format"
