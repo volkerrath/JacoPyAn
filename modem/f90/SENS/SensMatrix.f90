@@ -301,7 +301,7 @@ Contains
     ! local
     integer  iTx,iDt,iRx,nTx,nDt,nSite,nComp,icomp,i,j,k,l,istat,ios,nAll,iTxt,dotpos
     integer  ii,jj,kk
-    logical :: use_err=.TRUE.
+
 
     real(8), allocatable            :: val(:) ! (ncomp)
     real(8), allocatable            :: err(:) ! (ncomp)
@@ -369,7 +369,7 @@ Contains
 
         
         SI_factor = ImpUnits(typeDict(iDt)%units,fileInfo(iTxt,iDt)%units_in_file)
-!         write(*,*) 'Factor: ',SI_factor, typeDict(iDt)%units, fileInfo(iTxt,iDt)%units_in_file
+        write(*,*) 'Factor: ',SI_factor, typeDict(iDt)%units, fileInfo(iTxt,iDt)%units_in_file
 
         allocate(val(nComp),err(nComp),STAT=istat)
 
@@ -397,7 +397,9 @@ Contains
 
                     val = allData%d(ii)%data(jj)%value(:,kk)*SI_factor
                     err = allData%d(ii)%data(jj)%error(:,kk)*SI_factor
-
+                    if (kk.eq.1) then
+                      write (*,*) '@@@@@@   ',err
+                    end if
 
                     do icomp = 1,nComp/2
                         compid = typeDict(iDt)%id(icomp)
@@ -407,11 +409,11 @@ Contains
 
                         tmp =sens(ii)%v(jj)%dm(icomp,kk)
                         tmp = multBy_CmSqrt(tmp)
-                         if (use_err)
-                          tmp%cellCond%v = tmp%cellCond%v*SI_factor/err
-                        else
+#ifdef NERR
+                          tmp%cellCond%v = tmp%cellCond%v*SI_factor/err(icomp)
+#else
                           tmp%cellCond%v = tmp%cellCond%v*SI_factor
-                        end if
+#endif
                         sens(ii)%v(jj)%dm(icomp,kk) = tmp
 
 !                         tmp = sens(i)%v(j)%dm(icomp,k)
@@ -445,11 +447,11 @@ Contains
 
                         tmp =sens(ii)%v(jj)%dm(icomp,kk)
                         tmp = multBy_CmSqrt(tmp)
-                        if (use_err)
-                          tmp%cellCond%v = tmp%cellCond%v*SI_factor/err
-                        else
+#ifdef NERR
+                          tmp%cellCond%v = tmp%cellCond%v*SI_factor/err(icomp)
+#else
                           tmp%cellCond%v = tmp%cellCond%v*SI_factor
-                        end if
+#endif
 
                         sens(ii)%v(jj)%dm(icomp,kk) = tmp
 
