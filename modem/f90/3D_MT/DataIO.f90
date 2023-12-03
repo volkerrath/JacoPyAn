@@ -294,7 +294,7 @@ Contains
                         write(ioDat, '(a4)', iostat=ios,advance='no') '    '
                         write(ioDat,'(4x,a40,3f15.3)',iostat=ios,advance='no') trim(siteid),x(:)
 #else
-                        write(ioDat,'(es12.6)',    iostat=ios,advance='no') Period
+                        write(ioDat,'(es13.6)',    iostat=ios,advance='no') Period
                         write(ioDat, '(a1)', iostat=ios,advance='no') ' '
                         write(ioDat,'(a40,3f15.3)',iostat=ios,advance='no') trim(siteid),x(:)
 #endif
@@ -321,7 +321,7 @@ Contains
                         write(ioDat,'(4x,a40,3f15.3)',iostat=ios,advance='no') trim(siteid),x(:)
                         write(ioDat,'(4x,a40,3f15.3)',iostat=ios,advance='no') trim(ref_siteid),ref_x(:)
 #else
-                        write(ioDat,'(es12.6)',    iostat=ios,advance='no') Period
+                        write(ioDat,'(es13.6)',    iostat=ios,advance='no') Period
                         write(ioDat, '(a1)', iostat=ios,advance='no') ' '
                         write(ioDat,'(a40,3f15.3)',iostat=ios,advance='no') trim(siteid),x(:)
                         write(ioDat,'(a40,3f15.3)',iostat=ios,advance='no') trim(ref_siteid),ref_x(:)
@@ -359,7 +359,7 @@ Contains
                         write(ioDat,'(4x,a40,3f15.3)',iostat=ios,advance='no') trim(siteid),x(:)
                         write(ioDat,'(a8,3es15.6)',iostat=ios) trim(compid),value(icomp),error(icomp)
 #else
-                        write(ioDat,'(es12.6)',    iostat=ios,advance='no') Period
+                        write(ioDat,'(es13.6)',    iostat=ios,advance='no') Period
                         write(ioDat, '(a1)', iostat=ios,advance='no') ' '
                         write(ioDat,'(a40,3f15.3)',iostat=ios,advance='no') trim(siteid),x(:)
                         write(ioDat,'(a8,3es15.6)',iostat=ios) trim(compid),value(icomp),error(icomp)

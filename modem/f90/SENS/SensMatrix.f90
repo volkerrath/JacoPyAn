@@ -300,7 +300,7 @@ Contains
     character(*), intent(in)				:: jfile, cfile
     ! local
     integer  iTx,iDt,iRx,nTx,nDt,nSite,nComp,icomp,i,j,k,l,istat,ios,nAll,iTxt,dotpos
-    integer  ii,jj,kk
+    integer  ii,jj,kk, exist
 
 
     real(8), allocatable            :: val(:) ! (ncomp)
@@ -369,7 +369,7 @@ Contains
 
         
         SI_factor = ImpUnits(typeDict(iDt)%units,fileInfo(iTxt,iDt)%units_in_file)
-        write(*,*) 'Factor: ',SI_factor, typeDict(iDt)%units, fileInfo(iTxt,iDt)%units_in_file
+!         write(*,*) 'Factor: ',SI_factor
 
         allocate(val(nComp),err(nComp),STAT=istat)
 
@@ -397,11 +397,18 @@ Contains
 
                     val = allData%d(ii)%data(jj)%value(:,kk)*SI_factor
                     err = allData%d(ii)%data(jj)%error(:,kk)*SI_factor
-                    if (kk.eq.1) then
-                      write (*,*) '@@@@@@   ',err
-                    end if
+
 
                     do icomp = 1,nComp/2
+
+                        write(*,*) "error   ", err(2*icomp)
+
+                        exist = 1
+                        if (abs(err(2*icomp))<1.e-30) then
+                          exist = 0
+                          exit
+                        end if
+
                         compid = typeDict(iDt)%id(icomp)
                         write(ioJdt,fmt=fmtstring) &
                             pTx,trim(sRx),xRx,trim(compid),iDt,&
@@ -416,20 +423,14 @@ Contains
 #endif
                         sens(ii)%v(jj)%dm(icomp,kk) = tmp
 
-!                         tmp = sens(i)%v(j)%dm(icomp,k)
-!                         call RecursiveAR(tmp%cellCond%v,tmp%cellCond%v,CmSqrt%N)
-!                         sens(i)%v(j)%dm(icomp,k) = tmp
-
                     end do
-                    write(*,'(3i7,g12.4,a,a)') &
-                        iTx, iDt, iRx, pTx, ' ',trim(sRx)
-                    write(header,'(3i7,g12.4,a,a)') &
-                        iTx, iDt, iRx, pTx, ' ',trim(sRx)
 
-!                     write(header,'(a,i10,a,i10,a,i10)') &
-!                         'Sensitivity for freq=',iTx,'; dataType=',iDt,'; site=',iRx
+                    write(*,'(3i7,g12.4,a,a)') iTx, iDt, iRx, pTx, ' ',trim(sRx), exist
+                    if (exist.eq.1) then
 
-                    call writeVec_modelParam(nComp,sens(ii)%v(jj)%dm(:,kk),header,jfile)
+                      write(header,'(3i7,g12.4,a,a)') iTx, iDt, iRx, pTx, ' ',trim(sRx)
+                      call writeVec_modelParam(nComp,sens(ii)%v(jj)%dm(:,kk),header,jfile)
+                    end if
 
 
                 case(5, 6)
@@ -438,8 +439,16 @@ Contains
                     val = allData%d(ii)%data(jj)%value(:,kk)*SI_factor
                     err = allData%d(ii)%data(jj)%error(:,kk)*SI_factor
 
-
                     do icomp = 1,nComp
+
+                        write(*,*) "error   ", err(icomp)
+
+                        exist = 1
+                        if (abs(err(icomp))<1.e-30) then
+                          exist = 0
+                          exit
+                        end if
+
                         compid = typeDict(iDt)%id(icomp)
                         write(ioJdt,fmt=fmtstring) &
                           pTx,trim(sRx),xRx,trim(compid),iDt, &
@@ -455,19 +464,17 @@ Contains
 
                         sens(ii)%v(jj)%dm(icomp,kk) = tmp
 
-!                         tmp = sens(i)%v(j)%dm(icomp,k)
-!                         call RecursiveAR(tmp%cellCond%v,tmp%cellCond%v,CmSqrt%N)
-!                         sens(i)%v(j)%dm(icomp,k) = tmp
-
                     end do
-                    write(*,'(3i7,g12.4,a,a)') &
-                        iTx, iDt, iRx, pTx, ' ',trim(sRx)
-                    write(header,'(3i7,g12.4,a,a)') &
-                        iTx, iDt, iRx, pTx, ' ',trim(sRx)
+
+                    write(*,*) iTx, iDt, iRx, pTx, ' ',trim(sRx), exist, err
+
+                    if (exist.eq.1) then
+                    write(header,'(3i7,g12.4,a,a)') iTx, iDt, iRx, pTx, ' ',trim(sRx)
 !                     write(header,'(a,i10,a,i10,a,i10)') &
 !                         'Sensitivity for freq=',iTx,'; dataType=',iDt,'; site=',iRx
 
-                    call writeVec_modelParam(nComp,sens(ii)%v(jj)%dm(:,kk),header,jfile)
+                      call writeVec_modelParam(nComp,sens(ii)%v(jj)%dm(:,kk),header,jfile)
+                    end if
 
                 end select
 
