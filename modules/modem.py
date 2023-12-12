@@ -2,6 +2,8 @@
 import os
 import sys
 from sys import exit as error
+import string
+
 import numpy as np
 from numpy.linalg import norm
 from scipy.io import FortranFile
@@ -37,7 +39,8 @@ def decode_h2(strng):
     # i3 = int(s[7])
     
     s = strng.split()
-
+    
+    print(" in s[0]:  ", s[0] )
 
     i1 = int(s[0])
     i2 = int(s[1])
@@ -45,6 +48,72 @@ def decode_h2(strng):
 
     ivals = [i1, i2, i3]
     return ivals
+
+
+def read_jac_new(JacFile=None, out=False):
+    """
+    Read Jacobian from ModEM output.
+
+    author: vrath
+    last changed: Feb 10, 2021
+    """
+    if out:
+        print("Opening and reading " + JacFile)
+
+    eof = False
+    fjac = FortranFile(JacFile, "r")
+    tmp1 = []
+    tmp2 = []
+
+    header1 = fjac.read_record(np.byte)
+    h1 = ''.join([chr(item) for item in header1])
+    print(h1)
+    nAll= fjac.read_ints(np.int32)
+    print("nAll"+str(nAll))
+
+    for irec in range(nAll):
+        # header2
+        header2 = fjac.read_record(np.byte)
+        h2 = ''.join([chr(item) for item in header2])
+        tmp2.append(decode_h2(h2))
+
+
+        # paramType
+        _ = fjac.read_ints(np.byte)
+        # p = ''.join([chr(item) for item in paramType])
+        # print(p)
+        # dims
+        _ = fjac.read_ints(np.int32)
+        # print(dims)
+        # dx
+        _ = fjac.read_reals(np.float64)
+        # dy
+        _ = fjac.read_reals(np.float64)
+        # dz
+        _ = fjac.read_reals(np.float64)
+        # AirCond
+        _ = fjac.read_reals(np.float64)
+        ColJac = fjac.read_reals(np.float64)
+        #ColJac = fjac.read_reals(np.float64).flatten()
+        # print(np.shape(CellSens))
+        # ColJac =  CellSens.flatten(order='F')
+        # Coljac = np.fromfile(file, dtype=np.float6)
+        tmp1.append(ColJac)
+        # print(np.shape(tmp1))
+        # tmp2.append()
+
+                    
+    Jac = np.asarray(tmp1)
+    Inf = np.asarray(tmp2)
+#    Inf = np.asarray(tmp2,dtype=object)
+
+    fjac.close()
+
+    if out:
+        print("...done reading " + JacFile)
+
+    return Jac, Inf  #, Site, Freq, Comp
+
 
 def read_jac(JacFile=None, out=False):
     """
@@ -56,6 +125,7 @@ def read_jac(JacFile=None, out=False):
     if out:
         print("Opening and reading " + JacFile)
 
+    eof = False
     fjac = FortranFile(JacFile, "r")
     tmp1 = []
     tmp2 = []
@@ -77,10 +147,23 @@ def read_jac(JacFile=None, out=False):
             for i3 in range(nSite[0]):
                 # header2
                 header2 = fjac.read_record(np.byte)
+                
+                if int(header2[0])==1 or int(header2[0])==0:
+                    eof = True
+                    break
+         
                 h2 = ''.join([chr(item) for item in header2])
+                
+                # print("\n\n\n",type(header2))
+                # print(header2[0])
+                # print(isinstance(header2[0], int))
+                # print(isinstance(header2[0], str))
+                # print(int(header2[0]))
+                # # print("this is header2 ",header2)
+                # # print("this is H2 ",h2)
+                # print(decode_h2(h2))
                 tmp2.append(decode_h2(h2))
-                # print(h2)
-                # print(i1,i2,i3)
+
                 nSigma = fjac.read_ints(np.int32)
                 # print("nSigma"+str(nSigma))
                 for i4 in range(nSigma[0]):
@@ -107,6 +190,10 @@ def read_jac(JacFile=None, out=False):
                     tmp1.append(ColJac)
                     # print(np.shape(tmp1))
                     # tmp2.append()
+        #     if eof: break
+        # if eof: break
+                    
+                    
     Jac = np.asarray(tmp1)
     Inf = np.asarray(tmp2)
 #    Inf = np.asarray(tmp2,dtype=object)
@@ -119,7 +206,7 @@ def read_jac(JacFile=None, out=False):
     return Jac, Inf  #, Site, Freq, Comp
 
 
-def read_data_jac(DatFile=None, out=True):
+def read_data_jac_new(DatFile=None, out=True):
     """
     Read ModEM input data.
 
@@ -149,6 +236,70 @@ def read_data_jac(DatFile=None, out=True):
             t = line.split()
             # print(t)
             if t:
+                    #print(" 1: ", t[5], t[6], len(t))
+                tmp1 = [
+                    float(t[0]),
+                    float(t[2]),
+                    float(t[3]),
+                    float(t[4]),
+                    float(t[7]),
+                    float(t[8]),
+                ]
+                Data.append(tmp1)
+                Site.append([t[1]])
+                Comp.append([t[5]])
+                Dtyp.append([int(t[6])])
+            else:      
+                break
+
+    Site = [item for sublist in Site for item in sublist]
+    Site = np.asarray(Site, dtype=object)
+    Comp = [item for sublist in Comp for item in sublist]
+    Comp = np.asarray(Comp, dtype=object)
+
+    Dtyp =  [item for sublist in Dtyp for item in sublist]
+    Dtyp =  np.asarray(Dtyp, dtype=object)
+
+    Data = np.asarray(Data)
+    Freq = Data[:,0]
+
+    nD = np.shape(Data)
+    if out:
+        print("readDat: %i data read from %s" % (nD[0], DatFile))
+
+    return Data, Site, Freq, Comp, Dtyp, Head
+
+def read_data_jac(DatFile=None, out=True):
+    """
+    Read ModEM input data.
+
+    author: vrath
+    last changed: Feb 10, 2021
+    """
+    Data = []
+    Site = []
+    Comp = []
+    Head = []
+    Dtyp = []
+    """
+    !    Full_Impedance              = 1
+    !    Off_Diagonal_Impedance      = 2 
+    !    Full_Vertical_Components    = 3
+    !    Full_Interstation_TF        = 4
+    !    Off_Diagonal_Rho_Phase      = 5
+    !    Phase_Tensor                = 6
+    """
+# 0             1       2           3        4          5            6           7          8    9                10
+# 0.22700E-03   ACCO  -15.7940   -71.9960  -2853.721   -15220.710    -4500.000    PTXX       6   0.869975130   0.250000000 
+    with open(DatFile) as fd:
+        for line in fd:
+            if line.startswith("#") or line.startswith(">"):
+                Head.append(line)
+                continue
+
+            t = line.split()
+            # print(t)
+            if t:
                 if int(t[6]) in [6, 5]:
 
                     #print(" 1: ", t[5], t[6], len(t))
@@ -157,13 +308,15 @@ def read_data_jac(DatFile=None, out=True):
                         float(t[2]),
                         float(t[3]),
                         float(t[4]),
-                        float(t[7]),
-                        float(t[8]),
+                        float(t[5]),
+                        float(t[6]),
+                        float(t[9]),
+                        float(t[10]),
                     ]
                     Data.append(tmp1)
                     Site.append([t[1]])
-                    Comp.append([t[5]])
-                    Dtyp.append([int(t[6])])
+                    Comp.append([t[7]])
+                    Dtyp.append([int(t[8])])
                     
                 else:
                     
@@ -173,23 +326,28 @@ def read_data_jac(DatFile=None, out=True):
                         float(t[2]),
                         float(t[3]),
                         float(t[4]),
-                        float(t[7]),
+                        float(t[5]),
+                        float(t[6]),
                         float(t[9]),
-                    ]
+                        float(t[11]),
+                   ]
                     Data.append(tmp1)
-                    Dtyp.append([int(t[6])])
-
+                    Dtyp.append([int(t[8])])
+                    Comp.append([t[7] + "R"])
+                    Site.append([t[1], t[1]])
                     tmp2 = [
                         float(t[0]),
                         float(t[2]),
                         float(t[3]),
                         float(t[4]),
-                        float(t[8]),
-                        float(t[9]),
-                    ]
+                        float(t[5]),
+                        float(t[6]),                        
+                        float(t[10]),
+                        float(t[11]),
+                        ]
                     Data.append(tmp2)
-                    Dtyp.append([int(t[6])])
-                    Comp.append([t[5] + "R", t[5] + "I"])
+                    Dtyp.append([int(t[8])])
+                    Comp.append([t[7] + "I"])
                     Site.append([t[1], t[1]])
             else:
                 break
