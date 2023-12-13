@@ -40,7 +40,7 @@ def decode_h2(strng):
     
     s = strng.split()
     
-    print(" in s[0]:  ", s[0] )
+    # print(" in s[0]:  ", s[0] )
 
     i1 = int(s[0])
     i2 = int(s[1])
@@ -300,7 +300,7 @@ def read_data_jac(DatFile=None, out=True):
             t = line.split()
             # print(t)
             if t:
-                if int(t[6]) in [6, 5]:
+                if int(t[8]) in [6, 5]:
 
                     #print(" 1: ", t[5], t[6], len(t))
                     tmp1 = [
