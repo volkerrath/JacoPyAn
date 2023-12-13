@@ -64,7 +64,7 @@ nan = np.nan
 SparseThresh = 1.e-8
 Sparse = SparseThresh > 0
 
-ErrorScale = True
+ErrorScale = False
 VolumeScale= False
 
 Scale = 1.
@@ -81,8 +81,8 @@ MFile = WorkDir + "SABA8_best.rho"
 # DFiles = [WorkDir+"SABA8_Z_jac.dat", WorkDir +
 #           "SABA8_P_jac.dat", WorkDir+"SABA8_T_jac.dat",]
 
-JFiles = [WorkDir+"SABA8_Ti.jac", WorkDir+"SABA8_Pi.jac", WorkDir+"SABA8_Zi.jac",] 
-
+# JFiles = [WorkDir+"SABA8_Ti.jac", WorkDir+"SABA8_Pi.jac", WorkDir+"SABA8_Zi.jac",] 
+JFiles = [WorkDir+"SABA8_TiNE.jac"] 
 
 nF = len(JFiles)
 
@@ -101,6 +101,7 @@ airmask = jac.set_airmask(rho=rho, aircells=aircells, flat = False, out=True)
 
 elapsed = time.perf_counter() - start
 total = total + elapsed
+
 print(" Used %7.4f s for reading model from %s " % (elapsed, MFile))
 
 
@@ -198,6 +199,7 @@ for f in np.arange(nF):
         np.savez_compressed(name +"_jac.npz", Jac)
     elapsed = time.perf_counter() - start
     total = total + elapsed
-    print(" Used %7.4f s for writing Jacobian and infp to %s " % (elapsed, name))
+    print(" Used %7.4f s for writing Jacobian and info to %s " % (elapsed, name))
     Jac = None
+    JJ = None
     #del Jac
