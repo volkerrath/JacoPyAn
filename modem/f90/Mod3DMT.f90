@@ -25,7 +25,7 @@ program Mod3DMT
      type (timer_t)         :: timer
 
      ! Output variable
-     character(128)          :: header
+     character(80)          :: header
      character(128)          :: tmp
      integer                :: ios
 
@@ -39,7 +39,7 @@ program Mod3DMT
 #else
 			      call parseArgs('Mod3DMT',cUserDef) ! OR readStartup(rFile_Startup,cUserDef)
 #endif
-			      write(6,*)'I am a PARALLEL version'
+			      write(6,*)'I am a proud PARALLEL version'
 			      call Master_job_Distribute_userdef_control(cUserDef)
 	              open(ioMPI,file=cUserDef%wFile_MPI)
 	              write(ioMPI,*) 'Total Number of nodes= ', number_of_workers
@@ -49,7 +49,7 @@ program Mod3DMT
 
 #else
              call parseArgs('Mod3DMT',cUserDef) ! OR readStartup(rFile_Startup,cUserDef)
-			 write(6,*)'I am a SERIAL version'
+			 write(6,*)'I am a silly SERIAL version'
 #endif
 
 
@@ -135,7 +135,6 @@ program Mod3DMT
 #endif
 
 #ifdef JAC
-        !call write_dataVectorMTX(allData,cUserDef%wFile_Data)
         call write_sensMatrixMTX(sens,sigma0,allData,cUserDef%wFile_Sens, cUserDef%rFile_Cov)
 #else
         call write_sensMatrixMTX(sens,allData,cUserDef%wFile_Sens)

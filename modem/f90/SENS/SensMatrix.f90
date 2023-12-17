@@ -296,21 +296,24 @@ Contains
   subroutine write_sensMatrixMTX(sens, sigma, allData, jfile, cfile)
     type(dataVectorMTX_t), intent(in)         :: allData
     type(sensMatrix_t), pointer	:: sens(:)
-    type(modelParam_t)            :: sigma, tmp, sns
+    type(modelParam_t)            :: sigma, tmp1, tmp2
     character(*), intent(in)				:: jfile, cfile
     ! local
     integer  iTx,iDt,iRx,nTx,nDt,nSite,nComp,icomp,i,j,k,l,istat,ios,nAll,iTxt,dotpos
-    integer  ii,jj,kk, exist
+    integer  ii,jj,kk
 
 
     real(8), allocatable            :: val(:) ! (ncomp)
     real(8), allocatable            :: err(:) ! (ncomp)
-    real(8) :: pTx, xRx(3), SI_factor
+    real(8) :: pTx, xRx(3), SI_factor,  smallval, largeval, lat, lon
 
     character(80) header, fmtstring
     character(40) sRx, cRx
-    character(20) compid
+    character(20) compid, sit
     character(200) tmpstr
+    
+    smallval = 1.e-32
+    largeval = 1.e+32
 
     iTxt = 1
 
@@ -318,8 +321,9 @@ Contains
         call errStop('sensitivity matrix not allocated in write_sensMatrixMTX')
     end if
 
-    tmp = Sigma
-    sns = Sigma
+    tmp1 = Sigma
+    tmp2 = Sigma
+
 
     ! create square root of Cm
     write(*,*) 'Generate covariance matrix from ',cfile
@@ -381,6 +385,9 @@ Contains
             sRx = rxDict(iRx)%id
             xRx = rxDict(iRx)%x
             !write(*,*) 'Data Type: ', iDt, nComp,
+
+            read(sRx,*) sit, lat, lon
+
             select case (iDt)
 
                 !    Full_Impedance              = 1
@@ -393,88 +400,94 @@ Contains
 
                 case(1, 2, 3)
 
-                    fmtstring = '(g12.5,3x,a20,3f16.3,a8,i8,3g18.9)'
+                    fmtstring = '(g12.5,a20,2g14.6,3f16.3,a8,i8,2g18.9)'
 
                     val = allData%d(ii)%data(jj)%value(:,kk)*SI_factor
                     err = allData%d(ii)%data(jj)%error(:,kk)*SI_factor
 
+                      do icomp = 1,nComp/2
 
-                    do icomp = 1,nComp/2
+                        
+                          compid = typeDict(iDt)%id(icomp)
+                          
+                          if (abs(err(2*icomp-1))< smallval) then
+                            err(2*icomp-1) = largeval
+                          end if 
+                          
+                          if (abs(err(2*icomp))< smallval) then
+                            err(2*icomp) = largeval
+                          end if         
 
-                        write(*,*) "error   ", err(2*icomp)
 
-                        exist = 1
-                        if (abs(err(2*icomp))<1.e-30) then
-                          exist = 0
-                          exit
-                        end if
 
-                        compid = typeDict(iDt)%id(icomp)
-                        write(ioJdt,fmt=fmtstring) &
-                            pTx,trim(sRx),xRx,trim(compid),iDt,&
-                            val(2*icomp-1), val(2*icomp), err(2*icomp)
+                          write(ioJdt,fmt=fmtstring) &
+                              pTx,trim(sit), lat, lon,xRx,trim(compid)//'R',iDt,&
+                              val(2*icomp-1), err(2*icomp-1)
 
-                        tmp =sens(ii)%v(jj)%dm(icomp,kk)
-                        tmp = multBy_CmSqrt(tmp)
+                          write(ioJdt,fmt=fmtstring) &
+                              pTx,trim(sit), lat, lon,xRx,trim(compid)//'I',iDt,&
+                              val(2*icomp ), err(2*icomp )
+
+                          tmp1 =sens(ii)%v(jj)%dm(2*icomp-1,kk)
+                          tmp1 = multBy_CmSqrt(tmp1)                         
+                          tmp2 =sens(ii)%v(jj)%dm(2*icomp  ,kk)
+                          tmp2 = multBy_CmSqrt(tmp2)
 #ifdef NERR
-                          tmp%cellCond%v = tmp%cellCond%v*SI_factor/err(icomp)
+                          tmp1%cellCond%v = tmp1%cellCond%v*SI_factor/err(2*icomp-1)                          
+                          tmp2%cellCond%v = tmp2%cellCond%v*SI_factor/err(2*icomp  )
+
 #else
-                          tmp%cellCond%v = tmp%cellCond%v*SI_factor
+                          tmp1%cellCond%v = tmp1%cellCond%v*SI_factor                          
+                          tmp2%cellCond%v = tmp2%cellCond%v*SI_factor
+
 #endif
-                        sens(ii)%v(jj)%dm(icomp,kk) = tmp
+                          sens(ii)%v(jj)%dm(2*icomp-1,kk) = tmp1
+                          sens(ii)%v(jj)%dm(2*icomp  ,kk) = tmp2
+                      end do
 
-                    end do
-
-                    write(*,'(3i7,g12.4,a,a)') iTx, iDt, iRx, pTx, ' ',trim(sRx), exist
-                    if (exist.eq.1) then
-
-                      write(header,'(3i7,g12.4,a,a)') iTx, iDt, iRx, pTx, ' ',trim(sRx)
+!                      write(*,'(3i6,g12.4,a20, 2g14.6)') iTx, iDt, iRx, pTx, trim(sit), lat, lon
+                      write(header,'(3i6,g12.4,a20, 2g14.6)') iTx, iDt, iRx, pTx, trim(sit), lat, lon
+!                       write(*,*) " length of header ", len(header)
                       call writeVec_modelParam(nComp,sens(ii)%v(jj)%dm(:,kk),header,jfile)
-                    end if
 
+                    !end if
 
                 case(5, 6)
 
-                    fmtstring = '(g12.5,3x,a20,3f16.3,a8,i8,2g18.9)'
+                    fmtstring = '(g12.5,a20,2g14.6,3f16.3,a8,i8,2g18.9)'
+
                     val = allData%d(ii)%data(jj)%value(:,kk)*SI_factor
                     err = allData%d(ii)%data(jj)%error(:,kk)*SI_factor
 
-                    do icomp = 1,nComp
 
-                        write(*,*) "error   ", err(icomp)
+                    compid = typeDict(iDt)%id(icomp)
+                      do icomp = 1,nComp
+                      
+                          if (abs(err(icomp))< smallval) then
+                            err(icomp) = largeval
+                          end if 
 
-                        exist = 1
-                        if (abs(err(icomp))<1.e-30) then
-                          exist = 0
-                          exit
-                        end if
+                          write(ioJdt,fmt=fmtstring) &
+                            pTx,trim(sit), lat, lon,xRx,trim(compid),iDt, &
+                            val(icomp),err(icomp)
 
-                        compid = typeDict(iDt)%id(icomp)
-                        write(ioJdt,fmt=fmtstring) &
-                          pTx,trim(sRx),xRx,trim(compid),iDt, &
-                          val(icomp),err(icomp)
-
-                        tmp =sens(ii)%v(jj)%dm(icomp,kk)
-                        tmp = multBy_CmSqrt(tmp)
+                          tmp1 =sens(ii)%v(jj)%dm(icomp,kk)
+                          tmp1 = multBy_CmSqrt(tmp1)
 #ifdef NERR
-                          tmp%cellCond%v = tmp%cellCond%v*SI_factor/err(icomp)
+                            tmp1%cellCond%v = tmp1%cellCond%v*SI_factor/err(icomp)
 #else
-                          tmp%cellCond%v = tmp%cellCond%v*SI_factor
+                            tmp1%cellCond%v = tmp1%cellCond%v*SI_factor
 #endif
 
-                        sens(ii)%v(jj)%dm(icomp,kk) = tmp
+                          sens(ii)%v(jj)%dm(icomp,kk) = tmp1
 
-                    end do
+                     end do
 
-                    write(*,*) iTx, iDt, iRx, pTx, ' ',trim(sRx), exist, err
-
-                    if (exist.eq.1) then
-                    write(header,'(3i7,g12.4,a,a)') iTx, iDt, iRx, pTx, ' ',trim(sRx)
-!                     write(header,'(a,i10,a,i10,a,i10)') &
-!                         'Sensitivity for freq=',iTx,'; dataType=',iDt,'; site=',iRx
-
-                      call writeVec_modelParam(nComp,sens(ii)%v(jj)%dm(:,kk),header,jfile)
-                    end if
+!                      write(*,'(3i6,g12.4,a20,2g14.6)') iTx, iDt, iRx, pTx, trim(sit), lat, lon
+!                      write(*,*) err
+                     write(header,'(3i6,g12.4,a20, 2g14.6)') iTx, iDt, iRx, pTx, trim(sit), lat, lon
+!                      write(*,*) " length of header ", len(header)
+                     call writeVec_modelParam(nComp,sens(ii)%v(jj)%dm(:,kk),header,jfile)
 
                 end select
 

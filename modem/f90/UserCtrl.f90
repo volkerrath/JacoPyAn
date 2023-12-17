@@ -39,7 +39,7 @@ module UserCtrl
 	! Input files
 	character(80)       :: rFile_Grid, rFile_Model, rFile_Data
 	character(80)       :: rFile_dModel
-  character(80)       :: rFile_EMsoln, rFile_EMrhs, rFile_Prior
+    character(80)       :: rFile_EMsoln, rFile_EMrhs, rFile_Prior
 
 	! Output files
 	character(80)       :: wFile_Grid, wFile_Model, wFile_Data
