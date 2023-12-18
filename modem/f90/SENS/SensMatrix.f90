@@ -429,9 +429,13 @@ Contains
                               val(2*icomp ), err(2*icomp )
 
                           tmp1 =sens(ii)%v(jj)%dm(2*icomp-1,kk)
-                          tmp1 = multBy_CmSqrt(tmp1)                         
                           tmp2 =sens(ii)%v(jj)%dm(2*icomp  ,kk)
+
+#ifndef ROUGH
+                          tmp1 = multBy_CmSqrt(tmp1)
                           tmp2 = multBy_CmSqrt(tmp2)
+#endif
+
 #ifdef NERR
                           tmp1%cellCond%v = tmp1%cellCond%v*SI_factor/err(2*icomp-1)                          
                           tmp2%cellCond%v = tmp2%cellCond%v*SI_factor/err(2*icomp  )
