@@ -64,25 +64,22 @@ nan = np.nan
 SparseThresh = 1.e-8
 Sparse = SparseThresh > 0
 
-ErrorScale = False
+ErrorScale =  True
 VolumeScale= False
 
 Scale = 1.
 
 
-WorkDir = JACOPYAN_DATA+"/Sabancaya/"
-WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya//SABA8_Jac/"
-
+WorkDir = JACOPYAN_DATA+"/NewJacTest/"
+# WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya//SABA8_Jac/"
 if not WorkDir.endswith("/"):
     WorkDir = WorkDir+"/"
-MFile = WorkDir + "SABA8_best.rho"
-
-# JFiles = [WorkDir+"SABA8_Z.jac", WorkDir+"SABA8_P.jac", WorkDir+"SABA8_T.jac",]
-# DFiles = [WorkDir+"SABA8_Z_jac.dat", WorkDir +
-#           "SABA8_P_jac.dat", WorkDir+"SABA8_T_jac.dat",]
+    
+# MFile = WorkDir + "SABA8_best.rho"
+MFile = WorkDir + "JacTest.rho"
 
 # JFiles = [WorkDir+"SABA8_Ti.jac", WorkDir+"SABA8_Pi.jac", WorkDir+"SABA8_Zi.jac",] 
-JFiles = [WorkDir+"SABA8_TiNE.jac"] 
+JFiles = [WorkDir+"NewJacTest_P.jac",WorkDir+"NewJacTest_T.jac",WorkDir+"NewJacTest_Z.jac"]
 
 nF = len(JFiles)
 
@@ -140,16 +137,25 @@ for f in np.arange(nF):
     if np.shape(Jac)[0]!=np.shape(Data)[0]:
         print(np.shape(Jac),np.shape(Data))
         error(" Dimensions of Jacobian and data do not match! Exit.")
-    
+        
+    mx = np.nanmax(Jac)
+    mn = np.nanmin(Jac)
+    print(JFiles[f]+" raw minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx)) 
+   
     
     # No longer used here 
     if ErrorScale:
         nstr = nstr+"_nerr"
         start = time.perf_counter()
         dsh = np.shape(Data)
-        err = np.reshape(Data[:, 5], (dsh[0], 1))
-        print(np.amin(err), np.amax(err))
+        err = np.reshape(Data[:, 7], (dsh[0], 1))
         Jac = jac.normalize_jac(Jac, err)
+        
+        mx = np.nanmax(Jac)
+        mn = np.nanmin(Jac)
+        print(JFiles[f]+" scaled minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx)) 
+        
+        
         elapsed = time.perf_counter() - start
         print(" Used %7.4f s for normalizing Jacobian with data error from %s " %
               (elapsed, DFile))
@@ -166,8 +172,12 @@ for f in np.arange(nF):
     #           (elapsed))
     #     start = time.perf_counter()
 
+
+
+
     sstr = "_full"
     if SparseThresh > 0.:
+        
         # airmask = airmask.flatten(order="F")
         sstr = "_sp"+str(round(np.log10(SparseThresh)))
         start = time.perf_counter()
@@ -175,12 +185,13 @@ for f in np.arange(nF):
             JJ = Jac[idt,:].reshape(dims,order="F")
             Jac[idt,:] = (airmask*JJ).flatten(order="F")
                   
-        mx = np.nanmax(Jac)
-        mn = np.nanmin(Jac)
-        print(JFiles[f]+" minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx)) 
-        
+         
         Scale = np.nanmax(np.abs(Jac))
         Jac, Scale = jac.sparsify_jac(Jac, scalval=Scale, sparse_thresh=SparseThresh)
+        mx = np.nanmax(np.abs(Jac.todense()))
+        mn = np.nanmin(np.abs(Jac.todense()))
+        print(JFiles[f]+" sparse minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx)) 
+
         elapsed = time.perf_counter() - start
         total = total + elapsed
         print(" Used %7.4f s for sparsifying Jacobian %s " %

@@ -435,7 +435,7 @@ def sparsify_jac(Jac=None,
         
     
     Jf = Jac.copy()
-    print(np.shape(Jf))
+    # print(np.shape(Jf))
     
     if scalval <0.:
         Scaleval = np.amax(np.abs(Jf))
@@ -451,7 +451,7 @@ def sparsify_jac(Jac=None,
     
     Jf[np.abs(Jf)/Scaleval < sparse_thresh] = 0.0
     
-    print(np.shape(Jf))
+    # print(np.shape(Jf))
 
     Js = scs.csr_matrix(Jf)
 
