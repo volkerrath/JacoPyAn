@@ -53,18 +53,25 @@ rhoair = 1.e17
 InpFormat = "sparse"
 OutFormat = "mod ubc" 
 
-WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya/SABA8_Jac/"
 
+WorkDir = JACOPYAN_DATA+"/NewJacTest/"
+# WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya//SABA8_Jac/"
+if not WorkDir.endswith("/"):
+    WorkDir = WorkDir+"/"
+    
+# MFile = WorkDir + "SABA8_best.rho"
+MFile = WorkDir + "JacTest.rho"
 
-MFile   = WorkDir + "SABA8_best.rho"
+# JFiles = [WorkDir+"NewJacTest_P.jac",WorkDir+"NewJacTest_T.jac",WorkDir+"NewJacTest_Z.jac"]
 
-# 
+SensDir = WorkDir+"/Sens/"
+if not os.path.isdir(SensDir):
+    print("File: %s does not exist, but will be created" % SensDir)
+    os.mkdir(SensDir)
+
 MOrig = [-15.767401, -71.854095]
 
-WorkName = "SABA8_Zi_sp-7" #
-# WorkName = "SABA8_T_sp-8"
-# WorkName = "SABA8_P_sp-8"
-
+WorkName = "NewJacTest_P_nerr_sp-8"
 JFile = WorkDir + WorkName
 
 
@@ -74,7 +81,7 @@ FreqBands = [ [0.0001, 0.01], [0.01, 0.1], [0.1, 1.], [1., 100.], [100., 1000.],
 
 
 
-Type = "raw"
+Type = "euc"
 """
 Calculate sensitivities.
 Expects that Jacobian is already error-scaled, i.e Jac = C^(-1/2)*J.
@@ -91,9 +98,8 @@ Usesigma:
 
 # Transform = [ "max", "sqr"]
 #Transform = [ "siz"]
-Transform = [ "max"]
-
-Transform = [ "siz", "max"]
+Transform = [ "max", "sqr", "log"]
+# Transform = [ "siz", "max"]
 
 """
 Transform sensitivities. 
@@ -140,8 +146,7 @@ Head = WorkName
 #TSTFile = WorkDir+WorkName+"0_MaskTest.rho"
 #mod.write_mod(TSTFile, dx, dy, dz, rho, refmod, trans="LOGE", mvalair=blank, aircells=aircells)
 
-
-jacmask = jac.set_airmask(rho=rho, pad=MPad, blank= blank, flat = False, out=True)
+jacmask = jac.set_airmask(rho=rho, aircells=aircells, blank= blank, flat = False, out=True)
 jdims= np.shape(jacmask)
 j0 = jacmask.reshape(dims)
 j0[aircells] = blank
@@ -204,7 +209,7 @@ SensTmp = jac.calc_sensitivity(Jac,
 SensTot = jac.transform_sensitivity(S=SensTmp, V=V, 
                           Transform=Transform, OutInfo=False)
 
-SensFile = WorkDir+WorkName+"_total_"+Type+"_"+"_".join(Transform)
+SensFile = SensDir+WorkName+"_total_"+Type+"_"+"_".join(Transform)
 Head = (WorkName+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
 S = SensTot.reshape(dims, order="F")
 
@@ -266,7 +271,7 @@ for Split in Splits:
                          Type = Type, OutInfo=False)
             SensTmp = jac.transform_sensitivity(S=SensTmp, V=V,
                               Transform=Transform, OutInfo=False)
-            SensFile = WorkDir+WorkName+"_"+compstr[icmp-1]+"_"+Type+"_"+"_".join(Transform)
+            SensFile = SensDir+WorkName+"_"+compstr[icmp-1]+"_"+Type+"_"+"_".join(Transform)
             Head = (WorkName+"_"+compstr[icmp-1]+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
             S = np.reshape(SensTmp, dims, order="F")
             if "mod" in OutFormat.lower():
@@ -300,7 +305,7 @@ for Split in Splits:
                         Type = Type, OutInfo=False)
            SensTmp = jac.transform_sensitivity(S=SensTmp, V=V,
                              Transform=Transform, OutInfo=False)
-           SensFile = WorkDir+WorkName+"_"+sit.lower()+"_"+Type+"_"+"_".join(Transform)
+           SensFile = SensDir+WorkName+"_"+sit.lower()+"_"+Type+"_"+"_".join(Transform)
            Head = (WorkName+"_"+sit.lower()+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
            S = np.reshape(SensTmp, dims, order="F") 
            if "mod" in OutFormat.lower():
@@ -343,27 +348,29 @@ for Split in Splits:
 
         
            JacTmp = Jac[FreqList]
-           SensTmp = jac.calc_sensitivity(JacTmp,
-                        Type = Type, OutInfo=False)
-           SensTmp = jac.transform_sensitivity(S=SensTmp, V=V,
-                             Transform=Transform, OutInfo=False)
-           SensFile = WorkDir+WorkName+"_freqband"+lowstr+"_to_"+uppstr+"_"+Type+"_"+"_".join(Transform)
-           Head = (WorkName+"_freqband"+lowstr+"to"+uppstr+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
-           S = np.reshape(SensTmp, dims, order="F") 
-           if "mod" in OutFormat.lower():
-               mod.write_mod(SensFile, ModExt="_mod.sns",
-                             dx=dx, dy=dy, dz=dz, mval=S,
-                             reference=refmod, mvalair=blank, aircells=aircells, header=Head)
-               print(" Frequency band sensitivities (ModEM format) written to "+SensFile)
-     
-           if "ubc" in OutFormat.lower():
-               elev = -refmod[2]
-               refubc =  [MOrig[0], MOrig[1], elev]
-               mod.write_ubc(SensFile, ModExt="_ubc.sns", MshExt="_ubc.msh",
-                             dx=dx, dy=dy, dz=dz, mval=S,
-                             reference=refubc, mvalair=blank, aircells=aircells, header=Head)
-               print(" Frequency band sensitivities (UBC format) written to "+SensFile)   
-           
+           if np.shape(JacTmp)[0] > 0:
+               SensTmp = jac.calc_sensitivity(JacTmp,
+                            Type = Type, OutInfo=False)
+               SensTmp = jac.transform_sensitivity(S=SensTmp, V=V,
+                                 Transform=Transform, OutInfo=False)
+               SensFile = SensDir+WorkName+"_freqband"+lowstr+"_to_"+uppstr+"_"+Type+"_"+"_".join(Transform)
+               Head = (WorkName+"_freqband"+lowstr+"to"+uppstr+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
+               S = np.reshape(SensTmp, dims, order="F") 
+               if "mod" in OutFormat.lower():
+                   mod.write_mod(SensFile, ModExt="_mod.sns",
+                                 dx=dx, dy=dy, dz=dz, mval=S,
+                                 reference=refmod, mvalair=blank, aircells=aircells, header=Head)
+                   print(" Frequency band sensitivities (ModEM format) written to "+SensFile)
+         
+               if "ubc" in OutFormat.lower():
+                   elev = -refmod[2]
+                   refubc =  [MOrig[0], MOrig[1], elev]
+                   mod.write_ubc(SensFile, ModExt="_ubc.sns", MshExt="_ubc.msh",
+                                 dx=dx, dy=dy, dz=dz, mval=S,
+                                 reference=refubc, mvalair=blank, aircells=aircells, header=Head)
+                   print(" Frequency band sensitivities (UBC format) written to "+SensFile)   
+           else: 
+                print("Frequency band is empty! Continue.")
 
         
         elapsed = time.perf_counter() - start

@@ -451,7 +451,6 @@ Contains
 
 !                      write(*,'(3i6,g12.4,a20, 2g14.6)') iTx, iDt, iRx, pTx, trim(sit), lat, lon
                       write(header,'(3i6,g12.4,a20, 2g14.6)') iTx, iDt, iRx, pTx, trim(sit), lat, lon
-!                       write(*,*) " length of header ", len(header)
                       call writeVec_modelParam(nComp,sens(ii)%v(jj)%dm(:,kk),header,jfile)
 
                     !end if
@@ -488,9 +487,7 @@ Contains
                      end do
 
 !                      write(*,'(3i6,g12.4,a20,2g14.6)') iTx, iDt, iRx, pTx, trim(sit), lat, lon
-!                      write(*,*) err
                      write(header,'(3i6,g12.4,a20, 2g14.6)') iTx, iDt, iRx, pTx, trim(sit), lat, lon
-!                      write(*,*) " length of header ", len(header)
                      call writeVec_modelParam(nComp,sens(ii)%v(jj)%dm(:,kk),header,jfile)
 
                 end select

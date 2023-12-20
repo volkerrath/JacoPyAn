@@ -80,11 +80,10 @@ def read_jac(JacFile=None, out=False):
             # print("nSite"+str(nSite))
             for i3 in range(nSite[0]):
                 # header2
-                header2 = fjac.read_record(np.byte)
-                
-                if int(header2[0])==1 or int(header2[0])==0:
-                    eof = True
-                    break
+                header2 = fjac.read_record(np.byte)               
+                # if int(header2[0])==1 or int(header2[0])==0:
+                #     eof = True
+                #     break
          
                 h2 = ''.join([chr(item) for item in header2])
                 
