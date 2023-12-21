@@ -69,6 +69,7 @@ if not os.path.isdir(SensDir):
     print("File: %s does not exist, but will be created" % SensDir)
     os.mkdir(SensDir)
 
+# necessary, but not relevant  for synthetic model 
 MOrig = [-15.767401, -71.854095]
 
 WorkName = "NewJacTest_P_nerr_sp-8"
@@ -81,7 +82,7 @@ FreqBands = [ [0.0001, 0.01], [0.01, 0.1], [0.1, 1.], [1., 100.], [100., 1000.],
 
 
 
-Type = "euc"
+Type = "raw"
 """
 Calculate sensitivities.
 Expects that Jacobian is already error-scaled, i.e Jac = C^(-1/2)*J.
@@ -97,9 +98,9 @@ Usesigma:
 
 
 # Transform = [ "max", "sqr"]
-#Transform = [ "siz"]
-Transform = [ "max", "sqr", "log"]
-# Transform = [ "siz", "max"]
+# Transform = [ "siz"]
+# Transform = [ "max", "sqr", "log"]
+Transform = [ "max"]
 
 """
 Transform sensitivities. 

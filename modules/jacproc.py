@@ -577,11 +577,138 @@ def transfrom_model(m=None, M=None, small=1.0e-14, out=True):
     """
     Transform Model.
 
-    M should be something like C_m^-1/2
-    ( see eg Kelbert 2012, Egbert & kelbert 2014)
+    M should be something analog to C_m^1/2 or C_m^-1/2.
+
+    
     author: vrath
-    last changed:  Oct 12, 2020
+    last changed:  dec 20, 2023
     """
     transm = np.dot(M, m)
     error("transform_model not implemented! Exit.")
     return transm
+
+
+def mult_by_cmsqr(m_like_in=None, smooth=[None, None, None], small=1.0e-14, out=True):
+    """
+    Multyiply by sqrt of paramter prior covariance (aka "smoothing")
+    baed on the ModEM fortran code 
+    
+    Parameters
+    ----------
+    m_like_in : TYPE, optional
+        DESCRIPTION. The default is None.
+    smooth : TYPE, optional
+        DESCRIPTION. The default is None.
+    out : TYPE, optional
+        DESCRIPTION. The default is True.
+
+    Returns
+    -------
+    None.
+
+    =============================================================================
+    
+       subroutine RecursiveAR(w,v,n)
+    
+        ! Implements the recursive autoregression algorithm for a 3D real array.
+        ! In our case, the assumed-shape array would be e.g. conductivity
+        ! in each cell of the Nx x Ny x NzEarth grid.
+    
+        real (kind=prec), intent(in)     :: w(:,:,:)
+        real (kind=prec), intent(out)    :: v(:,:,:)
+        integer, intent(in)                      :: n
+        integer                                  :: Nx, Ny, NzEarth, i, j, k, iSmooth
+    
+        Nx      = size(w,1)
+     	Ny      = size(w,2)
+     	NzEarth = size(w,3)
+    
+     	if (maxval(abs(shape(w) - shape(v)))>0) then
+    		call errStop('The input arrays should be of the same shapes in RecursiveAR')
+     	end if
+    
+     	v = w
+    
+     	do iSmooth = 1,n
+    
+    		! smooth in the X-direction (Sx)
+     	    do k = 1,NzEarth
+    	    	do j = 1,Ny
+     	    		!v(1,j,k) = v(1,j,k)
+     	    		do i = 2,Nx
+     					v(i,j,k) = SmoothX(i-1,j,k) * v(i-1,j,k) + v(i,j,k)
+     	    		end do
+    	    	end do
+     	    end do
+    
+    		! smooth in the Y-direction (Sy)
+     	    do k = 1,NzEarth
+    	    	do i = 1,Nx
+     	    		! v(i,1,k) = v(i,1,k)
+     	    		do j = 2,Ny
+     					v(i,j,k) = SmoothY(i,j-1,k) * v(i,j-1,k) + v(i,j,k)
+     	    		end do
+    	    	end do
+     	    end do
+    
+    		! smooth in the Z-direction (Sz)
+     	    do j = 1,Ny
+    	    	do i = 1,Nx
+     	    		! v(i,j,1) = v(i,j,1)
+     	    		do k = 2,NzEarth
+     					v(i,j,k) = SmoothZ(i,j,k-1) * v(i,j,k-1) + v(i,j,k)
+     	    		end do
+    	    	end do
+     	    end do
+    !
+    		! smooth in the Z-direction (Sz^T)
+     	    do j = Ny,1,-1
+    	    	do i = Nx,1,-1
+     	    		! v(i,j,NzEarth) = v(i,j,NzEarth)
+     	    		do k = NzEarth,2,-1
+     					v(i,j,k-1) = v(i,j,k-1) + SmoothZ(i,j,k-1) * v(i,j,k)
+     	    		end do
+    	    	end do
+     	    end do
+    
+    		! smooth in the Y-direction (Sy^T)
+     	    do k = NzEarth,1,-1
+    	    	do i = Nx,1,-1
+     	    		! v(i,Ny,k) = v(i,Ny,k)
+     	    		do j = Ny,2,-1
+     					v(i,j-1,k) = v(i,j-1,k) + SmoothY(i,j-1,k) * v(i,j,k)
+     	    		end do
+    	    	end do
+     	    end do
+    
+     	    ! smooth in the X-direction (Sx^T)
+     	    do k = NzEarth,1,-1
+    	    	do j = Ny,1,-1
+     	    		! v(Nx,j,k) = v(Nx,j,k)
+     	    		do i = Nx,2,-1
+     					v(i-1,j,k) = v(i-1,j,k) + SmoothX(i-1,j,k) * v(i,j,k)
+     	    		end do
+    	    	end do
+     	    end do
+    
+        end do
+    
+     	! apply the scaling operator C
+        do k = 1,NzEarth
+         	do j = 1,Ny
+        		do i = 1,Nx
+    				v(i,j,k) = (Scaling(i,j,k)**n) * v(i,j,k)
+        		end do
+         	end do
+        end do
+    
+      end subroutine RecursiveAR
+    =============================================================================
+
+    """
+    
+    error("mult_by_cmsq: Not yet implemented. Exit")
+    
+    m_like_out =  m_like_in
+    return m_like_out    
+    

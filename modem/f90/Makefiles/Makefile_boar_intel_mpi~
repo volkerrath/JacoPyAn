@@ -6,18 +6,29 @@ LD = mpiifort
 #LDFLAGS = -L${MKLROOT}/lib/intel64 -lmkl_intel_ilp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm -ldl
 LDFLAGS = -L${MKLROOT}/lib/intel64 -lmkl_scalapack_lp64 -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -lmkl_blacs_intelmpi_lp64 -liomp5 -lpthread -lm -ldl
 #LDFLAGS = -L${MKLROOT}/lib/intel64 -lmkl_scalapack_ilp64 -lmkl_intel_ilp64 -lmkl_intel_thread -lmkl_core -lmkl_blacs_intelmpi_ilp64 -liomp5 -lpthread -lm -ldl
-F90 = mpiifort
-FFLAGS = -O3 -g -fPIC -fopenmp -fpp -DJAC -DNERR -I"${MKLROOT}/include"
-# FFLAGS = -O3 -fPIC -fopenmp -fpp -DJAC -I"${MKLROOT}/include"
-# -i8
+F90 = mpiifort  # -fc=ifx
 MPIFLAGS = -DMPI
+
+
+
+# # raw Jacobian
+# EXEFILE=iMod3DMTJ.x
+# FFLAGS = -O3 -fPIC -fopenmp -fpp -DJAC -I"${MKLROOT}/include"
+
+# error-scaled jacobian (multiplied by C_d^-1/2)
+EXEFILE=iMod3DMTJE.x
+FFLAGS = -O3 -g -fPIC -fopenmp -fpp -DJAC -DNERR -I"${MKLROOT}/include"
+
+# error-scaled transforme jacobian (multiplied bu C_m^-1/2)
+# EXEFILE=iMod3DMTJR.x
+# FFLAGS = -O3 -fPIC -fopenmp -fpp -DJAC -DROUGH -DNERR  -I"${MKLROOT}/include"
 
 LIBS          =
 MODULE = --sysroot=$(OBJDIR)
 
 
 OUTDIR=/home/vrath/bin/
-EXEFILE=iMod3DMTJE.x
+
 
 
 # -------------------End-macro-Defs---------------------------

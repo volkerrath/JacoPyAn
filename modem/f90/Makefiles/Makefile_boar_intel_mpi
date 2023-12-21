@@ -10,7 +10,6 @@ F90 = mpiifort  # -fc=ifx
 MPIFLAGS = -DMPI
 
 
-
 # # raw Jacobian
 # EXEFILE=iMod3DMTJ.x
 # FFLAGS = -O3 -fPIC -fopenmp -fpp -DJAC -I"${MKLROOT}/include"
