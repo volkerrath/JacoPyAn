@@ -168,12 +168,12 @@ def read_data_jac(DatFile=None, out=True):
                 continue
 
             t = line.split()
-            # print(t)
+            print(t)
             if t:
                 if int(t[8]) in [6, 5]:
 
                     #print(" 1: ", t[5], t[6], len(t))
-                    tmp1 = [
+                    tmp= [
                         float(t[0]),
                         float(t[2]),
                         float(t[3]),
@@ -183,31 +183,11 @@ def read_data_jac(DatFile=None, out=True):
                         float(t[9]),
                         float(t[10]),
                     ]
-                    Data.append(tmp1)
+                    Data.append(tmp)
                     Site.append([t[1]])
                     Comp.append([t[7]])
                     Dtyp.append([int(t[8])])
-                    
-                else:
-                    
-                    # print(" 2: ", t[5], t[6], len(t),)
-                    tmp1 = [
-                        float(t[0]),
-                        float(t[2]),
-                        float(t[3]),
-                        float(t[4]),
-                        float(t[5]),
-                        float(t[6]),
-                        float(t[9]),
-                        float(t[10]),
-                   ]
-                    Data.append(tmp1)
-                    Dtyp.append([int(t[8])])
-                    Comp.append([t[7]])
-                    Site.append([t[1]])
 
-            else:
-                break
 
     Site = [item for sublist in Site for item in sublist]
     Site = np.asarray(Site, dtype=object)

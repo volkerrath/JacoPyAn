@@ -421,7 +421,7 @@ Contains
 
 
                           write(ioJdt,fmt=fmtstring) &
-                              pTx,trim(sit), lat, lon,xRx,trim(compid)//'R',iDt,&
+                              pTx,trim(sit), lat, lon, xRx,trim(compid)//'R',iDt,&
                               val(2*icomp-1), err(2*icomp-1)
 
                           write(ioJdt,fmt=fmtstring) &
@@ -463,15 +463,17 @@ Contains
                     err = allData%d(ii)%data(jj)%error(:,kk)*SI_factor
 
 
-                    compid = typeDict(iDt)%id(icomp)
+         
                       do icomp = 1,nComp
+                          
+                          compid = typeDict(iDt)%id(icomp)
                       
                           if (abs(err(icomp))< smallval) then
                             err(icomp) = largeval
                           end if 
 
                           write(ioJdt,fmt=fmtstring) &
-                            pTx,trim(sit), lat, lon,xRx,trim(compid),iDt, &
+                            pTx,trim(sit), lat, lon,xRx, trim(compid),iDt, &
                             val(icomp),err(icomp)
 
                           tmp1 =sens(ii)%v(jj)%dm(icomp,kk)
