@@ -198,6 +198,8 @@ def read_data_jac(DatFile=None, out=True):
     Dtyp =  np.asarray(Dtyp, dtype=object)
 
     Data = np.asarray(Data)
+    print(np.shape(Data))
+    
     Freq = Data[:,0]
 
     nD = np.shape(Data)

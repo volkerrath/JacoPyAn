@@ -706,9 +706,54 @@ def mult_by_cmsqr(m_like_in=None, smooth=[None, None, None], small=1.0e-14, out=
     =============================================================================
 
     """
+    # nsmooth = 1
+    
     
     error("mult_by_cmsq: Not yet implemented. Exit")
     
+    tmp = m_like_in.copy()
+    
+    nx, ny,nz = np.shape(m_like_in)
+    
+    sm_x, sm_y, sm_z = smooth   
+    
+    """
+    		! smooth in the Z-direction (Sz)
+     	    for jj in  np.arange(0,ny)
+    	    	do i = 1,Nx
+     	    		! v(i,j,1) = v(i,j,1)
+     	    		do k = 2,NzEarth
+     					v(i,j,k) = SmoothZ(i,j,k-1) * v(i,j,k-1) + v(i,j,k)
+     	    		end do
+    	    	end do
+     	    end do
+    !
+    		! smooth in the Z-direction (Sz^T)
+     	    do j = Ny,1,-1
+    	    	do i = Nx,1,-1
+     	    		! v(i,j,NzEarth) = v(i,j,NzEarth)
+     	    		do k = NzEarth,2,-1
+     					v(i,j,k-1) = v(i,j,k-1) + SmoothZ(i,j,k-1) * v(i,j,k)
+     	    		end do
+    	    	end do
+     	    end do
+    """
+    for ii in  np.arange(0,nx):
+       i = ii
+       for jj in np.arange(0,ny):
+          j =jj
+          for kk in np.arange(2, nz): 
+              k = kk
+              tmp[i,j,k] = sm_z[i,j,k-1] * tmp[i,j,k-1] + tmp[i,j,k]
+               
+    for ii in  np.arange(nx,0,-1):
+       i = ii-1
+       for jj in np.arange(ny, 0, -1):
+          j =jj-1
+          for kk in np.arange(2, nz): 
+              k = kk-1
+              tmp[i,j,k-1] = tmp[i,j,k-1] * sm_z[i,j,k-1] + tmp[i,j,k]
+               
     m_like_out =  m_like_in
     return m_like_out    
     

@@ -71,6 +71,7 @@ Scale = 1.
 
 
 WorkDir = JACOPYAN_DATA+"/NewJacTest/"
+WorkDir = JACOPYAN_DATA+"/NewJacTest/"
 # WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya//SABA8_Jac/"
 if not WorkDir.endswith("/"):
     WorkDir = WorkDir+"/"
@@ -79,6 +80,7 @@ if not WorkDir.endswith("/"):
 MFile = WorkDir + "JacTest.rho"
 
 # JFiles = [WorkDir+"SABA8_Ti.jac", WorkDir+"SABA8_Pi.jac", WorkDir+"SABA8_Zi.jac",] 
+# JFiles = [WorkDir+"NewJacTest_P.jac",WorkDir+"NewJacTest_T.jac",WorkDir+"NewJacTest_Z.jac"]
 JFiles = [WorkDir+"NewJacTest_P.jac",WorkDir+"NewJacTest_T.jac",WorkDir+"NewJacTest_Z.jac"]
 
 nF = len(JFiles)
