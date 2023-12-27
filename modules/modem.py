@@ -168,9 +168,9 @@ def read_data_jac(DatFile=None, out=True):
                 continue
 
             t = line.split()
-            print(t)
+            
             if t:
-                if int(t[8]) in [6, 5]:
+                if int(t[8]) in [1,2,3,6,5]:
 
                     #print(" 1: ", t[5], t[6], len(t))
                     tmp= [
@@ -198,8 +198,10 @@ def read_data_jac(DatFile=None, out=True):
     Dtyp =  np.asarray(Dtyp, dtype=object)
 
     Data = np.asarray(Data)
-    print(np.shape(Data))
     
+    if np.shape(Data)[0]==0:
+        error("read_data_jac: No data read! Exit.")
+
     Freq = Data[:,0]
 
     nD = np.shape(Data)
