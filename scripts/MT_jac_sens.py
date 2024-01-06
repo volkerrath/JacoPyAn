@@ -152,7 +152,7 @@ jdims= np.shape(jacmask)
 j0 = jacmask.reshape(dims)
 j0[aircells] = blank
 jacmask = j0.reshape(jdims)
-
+jacflat = jacmask.flatten(order="F")
 
 #rhotest = jacmask.reshape(dims)*rho
 #TSTFile = WorkDir+WorkName+"1_MaskTest.rho"
@@ -187,22 +187,19 @@ else:
     err = np.reshape(Data[:, 5], (dsh[0], 1))
     Jac = jac.normalize_jac(Jac, err)
     
+
+    
 elapsed = time.perf_counter() - start
 print(" Used %7.4f s for reading Jacobian/data from %s" % (elapsed, JFile))
 total = total + elapsed
 
-mx = np.amax(np.abs(Jac))
-mn = np.amin(np.abs(Jac))
-print(JFile+" minimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))
-jm = jacmask.flatten(order="F")
-mx = np.amax(np.abs(Jac*jm))
-mn = np.amin(np.abs(Jac*jm))
-print(JFile+" minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx))
-# print(JFile+" number of elements in masked Jacobian is "+str(np.count_nonzero(~np.isfinite(Jac))))
-# print( np.count_nonzero(~np.isnan(jacmask))*np.shape(Jac)[0])
+print("Full Jacobian")
+jac.print_stats(jac=Jac, jacmask=jacflat)
+print("\n")               
+print("\n")
+        
 
 start = time.perf_counter()
-
 
 
 SensTmp = jac.calc_sensitivity(Jac,
@@ -266,8 +263,12 @@ for Split in Splits:
         ExistType = np.unique(Dtype)
         
         for icmp in ExistType:
-            print(icmp)
+            
             JacTmp = Jac[np.where(Dtype == icmp)]
+            print("Component: ",icmp)
+            jac.print_stats(jac=JacTmp, jacmask=jacflat)
+            print("\n")
+            
             SensTmp = jac.calc_sensitivity(JacTmp,
                          Type = Type, OutInfo=False)
             SensTmp = jac.transform_sensitivity(S=SensTmp, V=V,
@@ -302,6 +303,10 @@ for Split in Splits:
         
         for sit in SiteNames:            
            JacTmp = Jac[np.where(sit==Sites)]
+           print("Site: ",sit)
+           jac.print_stats(jac=JacTmp, jacmask=jacflat)
+           print("\n")
+           
            SensTmp = jac.calc_sensitivity(JacTmp,
                         Type = Type, OutInfo=False)
            SensTmp = jac.transform_sensitivity(S=SensTmp, V=V,
@@ -350,6 +355,10 @@ for Split in Splits:
         
            JacTmp = Jac[FreqList]
            if np.shape(JacTmp)[0] > 0:
+               print("Freqband: ", lowstr, "to", uppstr)
+               jac.print_stats(jac=JacTmp, jacmask=jacflat)
+               print("\n")
+
                SensTmp = jac.calc_sensitivity(JacTmp,
                             Type = Type, OutInfo=False)
                SensTmp = jac.transform_sensitivity(S=SensTmp, V=V,
