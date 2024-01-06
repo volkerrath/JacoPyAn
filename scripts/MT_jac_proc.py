@@ -64,25 +64,25 @@ nan = np.nan
 SparseThresh = 1.e-8
 Sparse = SparseThresh > 0
 
-ErrorScale =  True
+ErrorScale = False
 VolumeScale= False
-
 Scale = 1.
 
 
-WorkDir = JACOPYAN_DATA+"/NewJacTest/"
-WorkDir = JACOPYAN_DATA+"/NewJacTest/"
-# WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya//SABA8_Jac/"
+# WorkDir = JACOPYAN_DATA+"/Annecy/Jacobians/"
+# JFiles = [WorkDir+"ANN_P.jac",WorkDir+"ANN_T.jac", WorkDir+"ANN_Z.jac", WorkDir+"ANN_ZPT.jac"]
+# MFile = WorkDir + "ANN_best.rho"
+
+# WorkDir = JACOPYAN_DATA+"/NewJacTest/"
+# JFiles = [WorkDir+"NewJacTest_P.jac",WorkDir+"NewJacTest_T.jac",WorkDir+"NewJacTest_Z.jac"]
+# MFile = WorkDir + "JacTest.rho"
+
+WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya//SABA8_Jac/"
+JFiles = [WorkDir+"SABA8_T.jac", WorkDir+"SABA8_P.jac",] # WorkDir+"SABA8_Z.jac",] 
+MFile = WorkDir + "SABA8_best.rho"
+
 if not WorkDir.endswith("/"):
     WorkDir = WorkDir+"/"
-    
-# MFile = WorkDir + "SABA8_best.rho"
-MFile = WorkDir + "JacTest.rho"
-
-# JFiles = [WorkDir+"SABA8_Ti.jac", WorkDir+"SABA8_Pi.jac", WorkDir+"SABA8_Zi.jac",] 
-# JFiles = [WorkDir+"NewJacTest_P.jac",WorkDir+"NewJacTest_T.jac",WorkDir+"NewJacTest_Z.jac"]
-JFiles = [WorkDir+"NewJacTest_P.jac",WorkDir+"NewJacTest_T.jac",WorkDir+"NewJacTest_Z.jac"]
-
 nF = len(JFiles)
 
 total = 0.0
@@ -127,7 +127,8 @@ for f in np.arange(nF):
     elapsed = time.perf_counter() - start
     print(" Used %7.4f s for reading Data from %s " % (elapsed, DFile))
     total = total + elapsed
-    print(np.unique(DTyp))
+   
+    # print(np.unique(DTyp))
     start = time.perf_counter()
     print("Reading Jacobian from "+JFiles[f])
     Jac, Info = mod.read_jac(JFiles[f])

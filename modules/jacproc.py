@@ -736,7 +736,7 @@ def mult_by_cmsqr(m_like_in=None, smooth=[None, None, None], small=1.0e-14, out=
      					v(i,j,k-1) = v(i,j,k-1) + SmoothZ(i,j,k-1) * v(i,j,k)
      	    		end do
     	    	end do
-     	    end do
+     	    end dom_like_in=None, smooth=[None, None, None]
     """
     for ii in  np.arange(0,nx):
        i = ii
@@ -756,4 +756,25 @@ def mult_by_cmsqr(m_like_in=None, smooth=[None, None, None], small=1.0e-14, out=
                
     m_like_out =  m_like_in
     return m_like_out    
+
+def print_stats(jac=np.array([]), jacmask=np.array([])):
+    """
+    Prints dome info on jacobian
+    """
     
+    jdims = np.shape(jac)
+    print("Stats: Jacomian dimensions are:", jdims)
+    mx = np.amax(jac)
+    mn = np.amin(jac)
+    print("Stats: minimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))  
+    mx = np.amax(np.abs(jac))
+    mn = np.amin(np.abs(jac))
+    print("Stats: minimum/maximum abs Jacobian value is "+str(mn)+"/"+str(mx))
+ 
+    mx = np.amax(jac*jacmask)
+    mn = np.amin(jac*jacmask)
+    print("stats: minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx))
+    mx = np.amax(np.abs(jac*jacmask))
+    mn = np.amin(np.abs(jac*jacmask))
+    print("stats: minimum/maximum masked abs Jacobian value is "+str(mn)+"/"+str(mx))
+    print("\n")
