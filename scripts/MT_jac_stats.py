@@ -22,7 +22,7 @@ import numpy as np
 import numpy.linalg as npl
 import scipy.linalg as scl
 import scipy.sparse as scs
-import netCDF4 as nc
+
 
 
 JACOPYAN_DATA = os.environ["JACOPYAN_DATA"]
@@ -178,7 +178,7 @@ for Split in Splits:
     
         
         for sit in SiteNames:        
-            JacTmp = Jac[np.where(sit in Sites)]
+            JacTmp = Jac[np.where(sit==Sites)]
             print("Site: ",sit)
             jac.print_stats(jac=JacTmp, jacmask=jacflat)
             print("\n")
@@ -206,8 +206,7 @@ for Split in Splits:
 
         
            JacTmp = Jac[FreqList]
-           if np.shape(JacTmp)[0] > 0:
-               MaxTmp = np.amax()          
+           if np.shape(JacTmp)[0] > 0:  
                print("Freqband: ", lowstr, "to", uppstr)
                jac.print_stats(jac=JacTmp, jacmask=jacflat)
                print("\n")

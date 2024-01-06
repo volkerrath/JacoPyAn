@@ -301,7 +301,7 @@ for Split in Splits:
     
         
         for sit in SiteNames:            
-           JacTmp = Jac[np.where(sit in Sites)]
+           JacTmp = Jac[np.where(sit==Sites)]
            SensTmp = jac.calc_sensitivity(JacTmp,
                         Type = Type, OutInfo=False)
            SensTmp = jac.transform_sensitivity(S=SensTmp, V=V,

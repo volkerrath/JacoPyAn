@@ -763,13 +763,13 @@ def print_stats(jac=np.array([]), jacmask=np.array([])):
     """
     
     jdims = np.shape(jac)
-    print("Stats: Jacomian dimensions are:", jdims)
+    print("stats: Jacobian dimensions are:", jdims)
     mx = np.amax(jac)
     mn = np.amin(jac)
-    print("Stats: minimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))  
+    print("stats: minimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))  
     mx = np.amax(np.abs(jac))
     mn = np.amin(np.abs(jac))
-    print("Stats: minimum/maximum abs Jacobian value is "+str(mn)+"/"+str(mx))
+    print("stats: minimum/maximum abs Jacobian value is "+str(mn)+"/"+str(mx))
  
     mx = np.amax(jac*jacmask)
     mn = np.amin(jac*jacmask)
