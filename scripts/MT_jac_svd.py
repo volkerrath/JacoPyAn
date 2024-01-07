@@ -81,16 +81,10 @@ JFile = WorkDir +"ANN_ZPT_nerr_sp-8"
 
 
 JThresh  = 1.e-4
-NumSingular = [ 100, 200, 300, 400, 500, 1000]
+# NumSingular = [ 100, 200, 300, 400, 500, 1000]
+NumSingular = [ 500]
 OverSample=  [2]
-SubspaceIt = [0]
-# NSamples = 10000
-# NBodies  = 32
-# x_bounds = [-3000., 3000.]
-# y_bounds = [-3000., 3000.]
-# z_bounds = [-300., 3000.]
-# rad_bounds = [100.,1000.]
-# res_bounds = [-0.3, 0.3]
+SubspaceIt = [0, 1, 2, 4]
 
 
 
@@ -117,9 +111,11 @@ nsingval = NumSingular[0]
 noversmp = OverSample[0]
 nsubspit = SubspaceIt[0]
 
+info = []
 # for noversmp in OverSample:
-# for nsubspit in SubspaceIt: 
-for nsingval in NumSingular:
+for nsubspit in SubspaceIt: 
+
+# for nsingval in NumSingular:
     start = time.perf_counter()
     U, S, Vt = jac.rsvd(Jac.T, rank=nsingval, n_oversamples=noversmp*nsingval, n_subspace_iters=nsubspit)
     elapsed = time.perf_counter() - start
@@ -132,10 +128,11 @@ for nsingval in NumSingular:
     n_op = npl.norm(D@x_op)/npl.norm(x_op)
     j_op = npl.norm(Jac.T@x_op)/npl.norm(x_op)
     perc = 100. - n_op*100./j_op
+    tmp = [nsingval, noversmp, nsubspit, perc, elapsed]
+    info.append(tmp)
     
     print(" Op-norm J_k = "+str(n_op)+", explains "
           +str(perc)+"% of variations")
-    print(np.shape(U), np.shape(S), np.shape(Vt), )
     print("")
 
     File = JFile+"_SVD_k"+str(nsingval)\
@@ -143,4 +140,8 @@ for nsingval in NumSingular:
             +"_s"+str(nsubspit)\
             +"_"+str(np.around(perc,1))\
             +"%.npz"
+            
     np.savez_compressed(File, U=U, S=S, V=Vt, Nop=perc)
+
+    np.savetxt(JFile+"_run.dat",  np.vstack(info), 
+                fmt="%6i, %6i, %6i, %4.6g, %4.6g")
