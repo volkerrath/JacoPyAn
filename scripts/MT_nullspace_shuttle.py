@@ -39,9 +39,6 @@ import scipy.sparse as scs
 import netCDF4 as nc
 
 
-import vtk
-import pyvista as pv
-import PVGeo as pvg
 
 
 JACOPYAN_DATA = os.environ["JACOPYAN_DATA"]

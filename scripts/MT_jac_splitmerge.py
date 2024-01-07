@@ -166,30 +166,20 @@ if "spl" in Task.lower():
         start = time.perf_counter()
         
         nF = len(FreqBands)
-
+    
+    
         for ibnd in np.arange(nF):  
             if np.log10(FreqBands[ibnd][0])<0.:
                 lowstr=str(1./FreqBands[ibnd][0])+"s"
             else:
                 lowstr=str(FreqBands[ibnd][0])+"Hz"
-               
+                
             if np.log10(FreqBands[ibnd][1])<0.:
                 uppstr=str(1./FreqBands[ibnd][1])+"s"
             else:
-                uppstr=str(FreqBands[ibnd][1])+"Hz"              
-               
-       
-            # FreqNums = freq[np.sort(np.unique(freq, return_index=True)[1])] 
-            # FreqVals = Freq[np.sort(np.unique(Freq, return_index=True)[1])] 
-        
-            # freqstr = "" 
-            # FreqList = FreqNums[
-            #     np.where((FreqVals>=FreqBands[ibnd][0]) & (FreqVals<FreqBands[ibnd][1]))
-            #     ]
-            # print(FreqList)
-        
+                uppstr=str(FreqBands[ibnd][1])+"Hz"                   
+     
             indices = np.where((Freq>=FreqBands[ibnd][0]) & (Freq<FreqBands[ibnd][1]))
-            # np.where(np.isin(freq, FreqList))
             JacTmp = Jac[indices]
             
             FreqTmp=Freq[indices]
@@ -276,13 +266,12 @@ if "spl" in Task.lower():
         
         start = time.perf_counter()
         
-        SiteNums = freq[np.sort(np.unique(nsit, return_index=True)[1])] 
-        SiteNams = Site[np.sort(np.unique(Site, return_index=True)[1])] 
+        SiteNames = Site[np.sort(np.unique(Site, return_index=True)[1])] 
         
-        for isit in SiteNums:  
-            
-            indices = np.where(nsit == isit)
-            JacTmp = Jac[indices]
+
+        for sit in SiteNames:  
+            indices = np.where(sit==Site)
+            JacTmp = Jac[indices]  
             
             FreqTmp=Freq[indices]
             DataTmp=Data[indices,:]
@@ -293,7 +282,7 @@ if "spl" in Task.lower():
             ScalTmp=Scal
             
            
-            Name = SFile+"_"+SiteNams[isit].lower()
+            Name = SFile+"_"+sit.lower()
             Head =os.path.basename(Name).replace("_", " | ")              
            
             np.savez_compressed(Name +"_info.npz", 

@@ -163,7 +163,8 @@ for Split in Splits:
         ExistType = np.unique(Dtype)
         
         for icmp in ExistType:
-            JacTmp = Jac[np.where(Dtype == icmp)]
+            indices = np.where(Dtype==icmp)
+            JacTmp = Jac[indices]
             print("Component: ",icmp)
             jac.print_stats(jac=JacTmp, jacmask=jacflat)
             print("\n")
@@ -177,8 +178,9 @@ for Split in Splits:
         SiteNames = Sites[np.sort(np.unique(Sites, return_index=True)[1])] 
     
         
-        for sit in SiteNames:        
-            JacTmp = Jac[np.where(sit==Sites)]
+        for sit in SiteNames:       
+            indices = np.where(sit==Sites)
+            JacTmp = Jac[indices]
             print("Site: ",sit)
             jac.print_stats(jac=JacTmp, jacmask=jacflat)
             print("\n")
@@ -191,27 +193,19 @@ for Split in Splits:
         nF = len(FreqBands)
         
         for ibnd in np.arange(nF):  
-           if np.log10(FreqBands[ibnd][0])<0.:
-               lowstr=str(1./FreqBands[ibnd][0])+"s"
-           else:
-               lowstr=str(FreqBands[ibnd][0])+"Hz"
-               
-           if np.log10(FreqBands[ibnd][1])<0.:
-               uppstr=str(1./FreqBands[ibnd][1])+"s"
-           else:
-               uppstr=str(FreqBands[ibnd][1])+"Hz"                   
-
-           freqstr = "" 
-           FreqList = np.where((Freqs>=FreqBands[ibnd][0]) & (Freqs<FreqBands[ibnd][1]))
-
-        
-           JacTmp = Jac[FreqList]
-           if np.shape(JacTmp)[0] > 0:  
-               print("Freqband: ", lowstr, "to", uppstr)
-               jac.print_stats(jac=JacTmp, jacmask=jacflat)
-               print("\n")
-           else: 
-                print("Frequency band is empty! Continue.")
+            lowstr=str(FreqBands[ibnd][0])+"Hz"            
+            uppstr=str(FreqBands[ibnd][1])+"Hz"                   
+             
+ 
+            indices = np.where((Freqs>=FreqBands[ibnd][0]) & (Freqs<FreqBands[ibnd][1]))       
+            JacTmp = Jac[indices]
+            
+            if np.shape(JacTmp)[0] > 0:  
+                print("Freqband: ", lowstr, "to", uppstr)
+                jac.print_stats(jac=JacTmp, jacmask=jacflat)
+                print("\n")
+            else: 
+                 print("Frequency band is empty! Continue.")
         
         print("\n")
         print("Done!")

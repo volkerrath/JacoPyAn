@@ -95,6 +95,6 @@ if "ubc2mod" in Task.lower():
     ModExt = ".rho"
     mod.write_model_mod(MOD_Modl, ModExt,
                         dx, dy, dz, rho, 
-                        reference=refmod, trans="LINEAR", mvalair=blank, aircells=aircells)
+                        reference=refubc, trans="LINEAR", mvalair=blank, aircells=aircells)
 
 

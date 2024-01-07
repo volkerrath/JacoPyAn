@@ -54,17 +54,18 @@ InpFormat = "sparse"
 OutFormat = "mod ubc" 
 
 
-WorkDir = JACOPYAN_DATA+"/NewJacTest/"
+WorkDir = JACOPYAN_DATA+"/Annecy/Jacobians/"
 # WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya//SABA8_Jac/"
+
 if not WorkDir.endswith("/"):
     WorkDir = WorkDir+"/"
     
 # MFile = WorkDir + "SABA8_best.rho"
-MFile = WorkDir + "JacTest.rho"
+MFile = WorkDir + "ANN_best"
 
 # JFiles = [WorkDir+"NewJacTest_P.jac",WorkDir+"NewJacTest_T.jac",WorkDir+"NewJacTest_Z.jac"]
 
-SensDir = WorkDir+"/Sens/"
+SensDir = WorkDir+"/sens_euc/"
 if not os.path.isdir(SensDir):
     print("File: %s does not exist, but will be created" % SensDir)
     os.mkdir(SensDir)
@@ -72,17 +73,24 @@ if not os.path.isdir(SensDir):
 # necessary, but not relevant  for synthetic model 
 MOrig = [-15.767401, -71.854095]
 
-WorkName = "NewJacTest_P_nerr_sp-8"
+WorkName = "ANN_Z_nerr_sp-8"
 JFile = WorkDir + WorkName
 
 
 Splits = ["comp", "site", "freq"]
 
-FreqBands = [ [0.0001, 0.01], [0.01, 0.1], [0.1, 1.], [1., 100.], [100., 1000.], [1000., 10000.]]
+FreqBands = [ [0.0001, 0.01], 
+              [0.01, 0.1], 
+              [0.1, 1.], 
+              [1., 10.], 
+              [10., 100.], 
+              [100., 1000.], 
+              [1000., 10000.]]
 
 
 
-Type = "raw"
+#Type = "raw"
+Type = "euc"
 """
 Calculate sensitivities.
 Expects that Jacobian is already error-scaled, i.e Jac = C^(-1/2)*J.
@@ -100,7 +108,7 @@ Usesigma:
 # Transform = [ "max", "sqr"]
 # Transform = [ "siz"]
 # Transform = [ "max", "sqr", "log"]
-Transform = [ "max"]
+Transform = [ "sqr","max"]
 
 """
 Transform sensitivities. 
@@ -114,6 +122,27 @@ Options:
     Transform = "log"           Take the logaritm. This should always be the 
                                 last value in Transform list
 """
+# WorkDir = JACOPYAN_DATA+"/NewJacTest/"
+# # WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya//SABA8_Jac/"
+# if not WorkDir.endswith("/"):
+#     WorkDir = WorkDir+"/"
+    
+# # MFile = WorkDir + "SABA8_best.rho"
+# MFile = WorkDir + "JacTest.rho"
+
+# # JFiles = [WorkDir+"NewJacTest_P.jac",WorkDir+"NewJacTest_T.jac",WorkDir+"NewJacTest_Z.jac"]
+
+# SensDir = WorkDir+"/Sens/"
+# if not os.path.isdir(SensDir):
+#     print("File: %s does not exist, but will be created" % SensDir)
+#     os.mkdir(SensDir)
+
+# # necessary, but not relevant  for synthetic model 
+# MOrig = [-15.767401, -71.854095]
+
+# WorkName = "NewJacTest_P_nerr_sp-8"
+# JFile = WorkDir + WorkName
+
 
 total = 0.0
 
@@ -128,8 +157,15 @@ dims = np.shape(rho)
 sdims = np.size(rho)
 
 aircells = np.where(rho>rhoair/10)
+jacmask = jac.set_airmask(rho=rho, aircells=aircells, blank= blank, flat = False, out=True)
+jdims= np.shape(jacmask)
+j0 = jacmask.reshape(dims)
+j0[aircells] = blank
+jacmask = j0.reshape(jdims)
+jacflat = jacmask.flatten(order="F")
 
 name, ext = os.path.splitext(MFile)
+
 OFile = name
 Head = WorkName
 
@@ -146,13 +182,6 @@ Head = WorkName
     
 #TSTFile = WorkDir+WorkName+"0_MaskTest.rho"
 #mod.write_mod(TSTFile, dx, dy, dz, rho, refmod, trans="LOGE", mvalair=blank, aircells=aircells)
-
-jacmask = jac.set_airmask(rho=rho, aircells=aircells, blank= blank, flat = False, out=True)
-jdims= np.shape(jacmask)
-j0 = jacmask.reshape(dims)
-j0[aircells] = blank
-jacmask = j0.reshape(jdims)
-jacflat = jacmask.flatten(order="F")
 
 #rhotest = jacmask.reshape(dims)*rho
 #TSTFile = WorkDir+WorkName+"1_MaskTest.rho"
@@ -263,8 +292,8 @@ for Split in Splits:
         ExistType = np.unique(Dtype)
         
         for icmp in ExistType:
-            
-            JacTmp = Jac[np.where(Dtype == icmp)]
+            indices = np.where(Dtype == icmp)
+            JacTmp = Jac[indices]
             print("Component: ",icmp)
             jac.print_stats(jac=JacTmp, jacmask=jacflat)
             print("\n")
@@ -301,8 +330,9 @@ for Split in Splits:
         SiteNames = Sites[np.sort(np.unique(Sites, return_index=True)[1])] 
     
         
-        for sit in SiteNames:            
-           JacTmp = Jac[np.where(sit==Sites)]
+        for sit in SiteNames:        
+           indices = np.where(sit==Sites)
+           JacTmp = Jac[indices]
            print("Site: ",sit)
            jac.print_stats(jac=JacTmp, jacmask=jacflat)
            print("\n")
@@ -339,21 +369,14 @@ for Split in Splits:
         nF = len(FreqBands)
         
         for ibnd in np.arange(nF):  
-           if np.log10(FreqBands[ibnd][0])<0.:
-               lowstr=str(1./FreqBands[ibnd][0])+"s"
-           else:
-               lowstr=str(FreqBands[ibnd][0])+"Hz"
-               
-           if np.log10(FreqBands[ibnd][1])<0.:
-               uppstr=str(1./FreqBands[ibnd][1])+"s"
-           else:
-               uppstr=str(FreqBands[ibnd][1])+"Hz"                   
+           lowstr=str(FreqBands[ibnd][0])+"Hz"            
+           uppstr=str(FreqBands[ibnd][1])+"Hz"                   
 
-           freqstr = "" 
-           FreqList = np.where((Freqs>=FreqBands[ibnd][0]) & (Freqs<FreqBands[ibnd][1]))
+           
+           indices = np.where((Freqs>=FreqBands[ibnd][0]) & (Freqs<FreqBands[ibnd][1]))
 
         
-           JacTmp = Jac[FreqList]
+           JacTmp = Jac[indices]
            if np.shape(JacTmp)[0] > 0:
                print("Freqband: ", lowstr, "to", uppstr)
                jac.print_stats(jac=JacTmp, jacmask=jacflat)

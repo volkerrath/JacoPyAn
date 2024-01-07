@@ -587,7 +587,7 @@ def write_model_ncd(
 
 
 
-def write_mod(ModFile=None, ModExt=".rho",
+def write_mod(File=None, ModExt=".rho",
                     dx=None, dy=None, dz=None, mval=None, reference=None,
                     trans="LINEAR", aircells = None, mvalair = 1.e17, blank = 1.e-30, header="", out=True):
     """
@@ -611,8 +611,7 @@ def write_mod(ModFile=None, ModExt=".rho",
 
     """
 
-    M = os.path.splitext(ModFile)[0]
-    ModFile = M+ModExt
+    mod = File+ModExt
 
     dims = np.shape(mval)
 
@@ -639,12 +638,12 @@ def write_mod(ModFile=None, ModExt=".rho",
             mval = np.log(mval)
             mvalair = np.log(mvalair)
             if out:
-                print("values to " + ModFile + " transformed to: " + trans)
+                print("values to " + File + " transformed to: " + trans)
         elif trans == "LOG10":
             mval = np.log10(mval)
             mvalair = np.log10(mvalair)
             if out:
-                print("values to " + ModFile + " transformed to: " + trans)
+                print("values to " + File + " transformed to: " + trans)
         elif trans == "LINEAR":
             pass
     
@@ -665,7 +664,7 @@ def write_mod(ModFile=None, ModExt=".rho",
     else:
         cnt = np.asarray(reference)
         
-    with open(ModFile, "w") as f:
+    with open(mod, "w") as f:
         np.savetxt(
             f, [header], fmt="%s")
         line = np.array([nx, ny,nz, dummy, trns],dtype="object")
@@ -693,7 +692,7 @@ def write_mod(ModFile=None, ModExt=".rho",
 
 
 
-def write_ubc(ModFile=None,  MshExt=".mesh", ModExt=".ubc",
+def write_ubc(File=None,  MshExt=".mesh", ModExt=".ubc",
                     dx=None, dy=None, dz=None, mval=None, reference=None,
                     aircells = None, mvalair = 1.e17, blank = 1.e17, header="", out=True):
     """
@@ -705,9 +704,9 @@ def write_ubc(ModFile=None,  MshExt=".mesh", ModExt=".ubc",
     last changed: Aug 28, 2023
 
     """
-    M = os.path.splitext(ModFile)[0]
-    ModFile = M+ModExt
-    MshFile = M+MshExt
+    
+    mod = ModFile+ModExt
+    msh = ModFile+MshExt
 
 
     dims = np.shape(mval)
@@ -744,7 +743,7 @@ def write_ubc(ModFile=None,  MshExt=".mesh", ModExt=".ubc",
     val = val.flatten(order="C")
     
 
-    with open(MshFile , "w") as f:
+    with open(msh , "w") as f:
         np.savetxt(f, dimu, fmt="%i")
         np.savetxt(f, refu, fmt="%14.3f %14.3f %14.3f %10i")
 
@@ -754,10 +753,10 @@ def write_ubc(ModFile=None,  MshExt=".mesh", ModExt=".ubc",
 
 
 
-    with open(ModFile , "w") as f:
+    with open(mod , "w") as f:
         np.savetxt(f, val, fmt="%14.5g")
         
-def read_ubc(ModFile=None, ModExt=".mod", MshExt=".msh",
+def read_ubc(File=None, ModExt=".mod", MshExt=".msh",
                    trans="LINEAR", volumes=False, out=True):   
     """
     Read UBC model input.
@@ -766,12 +765,12 @@ def read_ubc(ModFile=None, ModExt=".mod", MshExt=".msh",
     last changed: Aug 30, 2023
 
     """
-    M = os.path.splitext(ModFile)[0]
-    ModFile = M+ModExt
-    MshFile = M+MshExt
+    
+    mod = File+ModExt
+    msh = File+MshExt
       
     
-    with open(MshFile, "r") as f:
+    with open(msh, "r") as f:
         lines = f.readlines()
 
     lines = [line.split() for line in lines]
@@ -804,7 +803,7 @@ def read_ubc(ModFile=None, ModExt=".mod", MshExt=".msh",
     refubc = np.array([refx, refy, refz, utmz])
 
 
-    with open(ModFile, "r") as f:
+    with open(mod, "r") as f:
         lines = f.readlines()
         
     val = np.array([])  
@@ -830,7 +829,7 @@ def read_ubc(ModFile=None, ModExt=".mod", MshExt=".msh",
 
     if out:
         print(
-            "read_model: %i x %i x %i model read from %s" % (nx, ny, nz, ModFile))
+            "read_model: %i x %i x %i model read from %s" % (nx, ny, nz, File))
     
     vcell = np.zeros_like(val)
     if volumes:
@@ -847,7 +846,7 @@ def read_ubc(ModFile=None, ModExt=".mod", MshExt=".msh",
     return dx, dy, dz, val, refubc, trans, vcell
 
 
-def read_mod(ModFile=None, ModExt=".rho", 
+def read_mod(File=None, ModExt=".rho", 
                    trans="LINEAR", volumes=False, out=True):
     """
     Read ModEM model input.
@@ -859,10 +858,10 @@ def read_mod(ModFile=None, ModExt=".rho",
 
     """
    
-    M = os.path.splitext(ModFile)[0]
-    ModFile = M+ModExt
+    
+    mod = File+ModExt
 
-    with open(ModFile, "r") as f:
+    with open(mod, "r") as f:
         lines = f.readlines()
 
     lines = [line.split() for line in lines]
@@ -879,7 +878,7 @@ def read_mod(ModFile=None, ModExt=".rho",
         mval = np.append(mval, np.array([float(sub) for sub in line]))
 
     if out:
-        print("values in " + ModFile + " are: " + trns)
+        print("values in " + File + " are: " + trns)
     if trns == "LOGE":
         mval = np.exp(mval)
     elif trns == "LOG10":
@@ -910,7 +909,7 @@ def read_mod(ModFile=None, ModExt=".rho",
 
     if out:
         print(
-            "read_model: %i x %i x %i model read from %s" % (nx, ny, nz, ModFile))
+            "read_model: %i x %i x %i model read from %s" % (nx, ny, nz, File))
 
     if volumes:
         vcell = np.zeros_like(mval)
@@ -931,7 +930,7 @@ def read_mod(ModFile=None, ModExt=".rho",
         return dx, dy, dz, mval, reference, trans
     
     
-def write_model_vtk(ModFile=None, dx=None, dy=None, dz=None, rho=None, 
+def write_model_vtk(File=None, dx=None, dy=None, dz=None, rho=None, 
                     reference=None, scale = [1., 1., -1.], trans="LINEAR",
                     out=True):
     """
@@ -952,8 +951,8 @@ def write_model_vtk(ModFile=None, dx=None, dy=None, dz=None, rho=None,
     D =  np.append(0.0, np.cumsum(dz))*scale[2]
     
    
-    gridToVTK(ModFile, N, E, D, cellData = {'resistivity (in Ohm)' : rho})
-    print("model-like parameter written to %s" % (ModFile))
+    gridToVTK(File, N, E, D, cellData = {'resistivity (in Ohm)' : rho})
+    print("model-like parameter written to %s" % (File))
     
 
 def write_data_vtk(SitFile=None, sx=None, sy=None, sz=None, sname=None,
