@@ -56,7 +56,7 @@ import util as utl
 
 from version import versionstrg
 
-# gc.enable()
+gc.enable()
 
 
 version, _ = versionstrg()
@@ -72,8 +72,12 @@ nan = np.nan
 
 # Annecy case
 WorkDir = "/home/vrath/MT_Data/Annecy/Jacobians/"
-MFile = WorkDir+"ANN_best.rho"
-JFile = WorkDir +"ANN_ZPT_sp-8"
+
+# if not os.path.isdir(WorkDir):
+#     print("File: %s does not exist, but will be created" % WorkDir)
+#     os.mkdir(WorkDir)
+MFile = WorkDir+"ANN_best"
+JFile = WorkDir +"ANN_ZPT_nerr_sp-8"
 
 
 JThresh  = 1.e-4
@@ -118,7 +122,7 @@ print(" Used %7.4f s for reading Jacobian from %s " % (elapsed, JFile))
 # nproj = 1000
 
 start = time.perf_counter()
-U, S, Vt = Jac.rsvd(Jac.T, rank=NSingulr, n_oversamples=0, n_subspace_iters=0)
+U, S, Vt = jac.rsvd(Jac.T, rank=NSingulr, n_oversamples=0, n_subspace_iters=0)
 elapsed = time.perf_counter() - start
 print(
     "Used %7.4f s for calculating k = %i SVD from %s " % (elapsed, NSingulr, JFile)

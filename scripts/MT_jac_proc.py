@@ -32,6 +32,8 @@ from datetime import datetime
 import warnings
 from sys import exit as error
 
+import gc
+
 
 import numpy as np
 import numpy.linalg as npl
@@ -56,6 +58,8 @@ version, _ = versionstrg()
 titstrng = utl.print_title(version=version, fname=__file__, out=False)
 print(titstrng+"\n\n")
 
+
+gc.enable()
 
 rng = np.random.default_rng()
 nan = np.nan

@@ -167,31 +167,31 @@ jacflat = jacmask.flatten(order="F")
 
 name, ext = os.path.splitext(MFile)
 
-ofile = name
-head = JacName
-trans = "LINEAR"
+# ofile = name
+# head = JacName
+# trans = "LINEAR"
 
-mod.write_mod(ofile, modext="_mod.rho", trans = trans,
-                  dx=dx, dy=dy, dz=dz, mval=rho,
-                  reference=refmod, mvalair=blank, aircells=aircells, header=head)
-print(" Model (ModEM format) written to "+ofile)
+# mod.write_mod(ofile, modext="_mod.rho", trans = trans,
+#                   dx=dx, dy=dy, dz=dz, mval=rho,
+#                   reference=refmod, mvalair=blank, aircells=aircells, header=head)
+# print(" Model (ModEM format) written to "+ofile)
     
-# elev = -refmod[2]
-# refubc =  [MOrig[0], MOrig[1], elev]
-# mod.write_ubc(OFile, modext="_rho_ubc.mod", mshext="_rho_ubc.msh",
-#                   dx=dx, dy=dy, dz=dz, mval=rho, reference=refubc, mvalair=blank, aircells=aircells, header=head)
-# print(" Model (UBC format) written to "+ofile)
+# # elev = -refmod[2]
+# # refubc =  [MOrig[0], MOrig[1], elev]
+# # mod.write_ubc(OFile, modext="_rho_ubc.mod", mshext="_rho_ubc.msh",
+# #                   dx=dx, dy=dy, dz=dz, mval=rho, reference=refubc, mvalair=blank, aircells=aircells, header=head)
+# # print(" Model (UBC format) written to "+ofile)
     
-TSTFile = WorkDir+JacName+"0_MaskTest"
-mod.write_mod(TSTFile, modext="_mod.rho", trans = trans,
-            dx=dx, dy=dy, dz=dz, mval=rho, reference=refmod, mvalair=blank, aircells=aircells, header=head)
-rhotest = jacmask.reshape(dims)*rho
-TSTFile = WorkDir+JacName+"1_MaskTest"
-mod.write_mod(TSTFile, modext="_mod.rho", trans = trans,
-            dx=dx, dy=dy, dz=dz, mval=rhotest, reference=refmod, mvalair=blank, aircells=aircells, header=head)
+# TSTFile = WorkDir+JacName+"0_MaskTest"
+# mod.write_mod(TSTFile, modext="_mod.rho", trans = trans,
+#             dx=dx, dy=dy, dz=dz, mval=rho, reference=refmod, mvalair=blank, aircells=aircells, header=head)
+# rhotest = jacmask.reshape(dims)*rho
+# TSTFile = WorkDir+JacName+"1_MaskTest"
+# mod.write_mod(TSTFile, modext="_mod.rho", trans = trans,
+#             dx=dx, dy=dy, dz=dz, mval=rhotest, reference=refmod, mvalair=blank, aircells=aircells, header=head)
 
 
-name, ext = os.path.splitext(JFile)
+# name, ext = os.path.splitext(JFile)
 
 start = time.perf_counter()
 print("Reading Jacobian from "+JFile)
