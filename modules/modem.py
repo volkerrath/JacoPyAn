@@ -49,7 +49,7 @@ def decode_h2(strng):
     ivals = [i1, i2, i3]
     return ivals
 
-def read_jac(JacFile=None, out=False):
+def read_jac(Jacfile=None, out=False):
     """
     Read Jacobian from ModEM output.
 
@@ -57,10 +57,10 @@ def read_jac(JacFile=None, out=False):
     last changed: Dec 17, 2023
     """
     if out:
-        print("Opening and reading " + JacFile)
+        print("Opening and reading " + Jacfile)
 
     eof = False
-    fjac = FortranFile(JacFile, "r")
+    fjac = FortranFile(Jacfile, "r")
     tmp1 = []
     tmp2 = []
 
@@ -134,12 +134,12 @@ def read_jac(JacFile=None, out=False):
     fjac.close()
 
     if out:
-        print("...done reading " + JacFile)
+        print("...done reading " + Jacfile)
 
     return Jac, Inf  #, Site, Freq, Comp
 
 
-def read_data_jac(DatFile=None, out=True):
+def read_data_jac(Datfile=None, out=True):
     """
     Read ModEM input data.
 
@@ -161,7 +161,7 @@ def read_data_jac(DatFile=None, out=True):
     """
 # 0          1       2       3    4        5          6     7   8    9       10
 # .227E-03 ACCO -15.794 -71.996 -2853.721 -15220.71 -4500. PTXX 6 .86997513 .25 
-    with open(DatFile) as fd:
+    with open(Datfile) as fd:
         for line in fd:
             if line.startswith("#") or line.startswith(">"):
                 Head.append(line)
@@ -206,12 +206,12 @@ def read_data_jac(DatFile=None, out=True):
 
     nD = np.shape(Data)
     if out:
-        print("readDat: %i data read from %s" % (nD[0], DatFile))
+        print("readDat: %i data read from %s" % (nD[0], Datfile))
 
     return Data, Site, Freq, Comp, Dtyp, Head
 
 
-def write_jac_ncd(NCFile=None, Jac=None, Dat=None, Site=None, Comp=None,
+def write_jac_ncd(NCfile=None, Jac=None, Dat=None, Site=None, Comp=None,
                zlib_in=True, shuffle_in=True, out=True):
     """
     Write Jacobian from ModEM output to NETCDF/HDF5 file.
@@ -231,7 +231,7 @@ def write_jac_ncd(NCFile=None, Jac=None, Dat=None, Site=None, Comp=None,
         )
         sys.exit(1)
 
-    ncout = nc.Dataset(NCFile, "w", format="NETCDF4")
+    ncout = nc.Dataset(NCfile, "w", format="NETCDF4")
     ncout.createDimension("data", JacDim[0])
     ncout.createDimension("param", JacDim[1])
 
@@ -281,12 +281,12 @@ def write_jac_ncd(NCFile=None, Jac=None, Dat=None, Site=None, Comp=None,
     if out:
         print(
             "writeJacNC: data written to %s in %s format" %
-            (NCFile, ncout.data_model)
+            (NCfile, ncout.data_model)
         )
 
 
 
-def read_data(DatFile=None, out=True):
+def read_data(Datfile=None, out=True):
     """
     Read ModEM input data.
 
@@ -298,7 +298,7 @@ def read_data(DatFile=None, out=True):
     Comp = []
     Head = []
 
-    with open(DatFile) as fd:
+    with open(Datfile) as fd:
         for line in fd:
             if line.startswith("#") or line.startswith(">"):
                 Head.append(line)
@@ -348,12 +348,12 @@ def read_data(DatFile=None, out=True):
 
     nD = np.shape(Data)
     if out:
-        print("readDat: %i data read from %s" % (nD[0], DatFile))
+        print("readDat: %i data read from %s" % (nD[0], Datfile))
 
     return Site, Comp, Data, Head
 
 
-def write_data(DatFile=None, Dat=None, Site=None, Comp=None, Head = None,
+def write_data(Datfile=None, Dat=None, Site=None, Comp=None, Head = None,
                out=True):
     """
     Write ModEM input data file.
@@ -369,7 +369,7 @@ def write_data(DatFile=None, Dat=None, Site=None, Comp=None, Head = None,
     nblck = int(nhead/8)
     print(str(nblck)+" blocks will be written.")
 
-    with open(DatFile,"w") as fd:
+    with open(Datfile,"w") as fd:
 
         for ib in np.arange(nblck):
             blockheader = Head[hlin:hlin+8]
@@ -429,7 +429,7 @@ def write_data(DatFile=None, Dat=None, Site=None, Comp=None, Head = None,
 
 
 def write_data_ncd(
-        NCFile=None, Dat=None, Site=None, Comp=None,
+        NCfile=None, Dat=None, Site=None, Comp=None,
         zlib_in=True, shuffle_in=True, out=True
         ):
     """
@@ -439,13 +439,13 @@ def write_data_ncd(
     last changed: July 24, 2020
     """
     try:
-        NCFile.close
+        NCfile.close
     except BaseException:
         pass
 
     DatDim = np.shape(Dat)
 
-    ncout = nc.Dataset(NCFile, "w", format="NETCDF4")
+    ncout = nc.Dataset(NCfile, "w", format="NETCDF4")
     ncout.createDimension("data", DatDim[0])
 
     S = ncout.createVariable(
@@ -498,12 +498,12 @@ def write_data_ncd(
     if out:
         print(
             "writeDatNC: data written to %s in %s format"
-            % (NCFile, ncout.data_model)
+            % (NCfile, ncout.data_model)
         )
 
 
 def write_model_ncd(
-    NCFile=None,
+    NCfile=None,
     x=None,
     y=None,
     z=None,
@@ -523,7 +523,7 @@ def write_model_ncd(
     """
     ModDim = np.shape(Mod)
 
-    ncout = nc.Dataset(NCFile, "w", format="NETCDF4")
+    ncout = nc.Dataset(NCfile, "w", format="NETCDF4")
 
     ncout.createDimension("msiz", ModDim)
     ncout.createDimension("nx", ModDim[0])
@@ -547,11 +547,11 @@ def write_model_ncd(
     if trans == "LOGE":
         Mod = np.log(Mod)
         if out:
-            print("resistivities to " + NCFile + " transformed to: " + trans)
+            print("resistivities to " + NCfile + " transformed to: " + trans)
     elif trans == "LOG10":
         Mod = np.log10(Mod)
         if out:
-            print("resistivities to " + NCFile + " transformed to: " + trans)
+            print("resistivities to " + NCfile + " transformed to: " + trans)
     elif trans == "LINEAR":
         pass
     else:
@@ -580,14 +580,14 @@ def write_model_ncd(
     if out:
         print(
             "write_modelNC: data written to %s in %s format"
-            % (NCFile, ncout.data_model)
+            % (NCfile, ncout.data_model)
         )
 
 
 
 
 
-def write_mod(File=None, ModExt=".rho",
+def write_mod(file=None, modext=".rho",
                     dx=None, dy=None, dz=None, mval=None, reference=None,
                     trans="LINEAR", aircells = None, mvalair = 1.e17, blank = 1.e-30, header="", out=True):
     """
@@ -610,8 +610,10 @@ def write_mod(File=None, ModExt=".rho",
     ENDDO
 
     """
-
-    mod = File+ModExt
+    print(file)
+    print(modext)
+    
+    modl = file+modext
 
     dims = np.shape(mval)
 
@@ -638,12 +640,12 @@ def write_mod(File=None, ModExt=".rho",
             mval = np.log(mval)
             mvalair = np.log(mvalair)
             if out:
-                print("values to " + File + " transformed to: " + trans)
+                print("values to " + file + " transformed to: " + trans)
         elif trans == "LOG10":
             mval = np.log10(mval)
             mvalair = np.log10(mvalair)
             if out:
-                print("values to " + File + " transformed to: " + trans)
+                print("values to " + file + " transformed to: " + trans)
         elif trans == "LINEAR":
             pass
     
@@ -664,7 +666,7 @@ def write_mod(File=None, ModExt=".rho",
     else:
         cnt = np.asarray(reference)
         
-    with open(mod, "w") as f:
+    with open(modl, "w") as f:
         np.savetxt(
             f, [header], fmt="%s")
         line = np.array([nx, ny,nz, dummy, trns],dtype="object")
@@ -692,7 +694,7 @@ def write_mod(File=None, ModExt=".rho",
 
 
 
-def write_ubc(File=None,  MshExt=".mesh", ModExt=".ubc",
+def write_ubc(file=None,  mshext=".mesh", modext=".ubc",
                     dx=None, dy=None, dz=None, mval=None, reference=None,
                     aircells = None, mvalair = 1.e17, blank = 1.e17, header="", out=True):
     """
@@ -705,8 +707,8 @@ def write_ubc(File=None,  MshExt=".mesh", ModExt=".ubc",
 
     """
     
-    mod = ModFile+ModExt
-    msh = ModFile+MshExt
+    modl = file+modext
+    mesh = file+mshext
 
 
     dims = np.shape(mval)
@@ -743,7 +745,7 @@ def write_ubc(File=None,  MshExt=".mesh", ModExt=".ubc",
     val = val.flatten(order="C")
     
 
-    with open(msh , "w") as f:
+    with open(mesh , "w") as f:
         np.savetxt(f, dimu, fmt="%i")
         np.savetxt(f, refu, fmt="%14.3f %14.3f %14.3f %10i")
 
@@ -753,10 +755,10 @@ def write_ubc(File=None,  MshExt=".mesh", ModExt=".ubc",
 
 
 
-    with open(mod , "w") as f:
+    with open(modl , "w") as f:
         np.savetxt(f, val, fmt="%14.5g")
         
-def read_ubc(File=None, ModExt=".mod", MshExt=".msh",
+def read_ubc(file=None, modext=".mod", mshext=".msh",
                    trans="LINEAR", volumes=False, out=True):   
     """
     Read UBC model input.
@@ -766,11 +768,11 @@ def read_ubc(File=None, ModExt=".mod", MshExt=".msh",
 
     """
     
-    mod = File+ModExt
-    msh = File+MshExt
+    modl = file+modext
+    mesh = file+mshext
       
     
-    with open(msh, "r") as f:
+    with open(mesh, "r") as f:
         lines = f.readlines()
 
     lines = [line.split() for line in lines]
@@ -803,7 +805,7 @@ def read_ubc(File=None, ModExt=".mod", MshExt=".msh",
     refubc = np.array([refx, refy, refz, utmz])
 
 
-    with open(mod, "r") as f:
+    with open(modl, "r") as f:
         lines = f.readlines()
         
     val = np.array([])  
@@ -829,7 +831,7 @@ def read_ubc(File=None, ModExt=".mod", MshExt=".msh",
 
     if out:
         print(
-            "read_model: %i x %i x %i model read from %s" % (nx, ny, nz, File))
+            "read_model: %i x %i x %i model read from %s" % (nx, ny, nz, file))
     
     vcell = np.zeros_like(val)
     if volumes:
@@ -846,7 +848,7 @@ def read_ubc(File=None, ModExt=".mod", MshExt=".msh",
     return dx, dy, dz, val, refubc, trans, vcell
 
 
-def read_mod(File=None, ModExt=".rho", 
+def read_mod(file=None, modext=".rho", 
                    trans="LINEAR", volumes=False, out=True):
     """
     Read ModEM model input.
@@ -859,9 +861,9 @@ def read_mod(File=None, ModExt=".rho",
     """
    
     
-    mod = File+ModExt
+    modl = file+modext
 
-    with open(mod, "r") as f:
+    with open(modl, "r") as f:
         lines = f.readlines()
 
     lines = [line.split() for line in lines]
@@ -878,7 +880,7 @@ def read_mod(File=None, ModExt=".rho",
         mval = np.append(mval, np.array([float(sub) for sub in line]))
 
     if out:
-        print("values in " + File + " are: " + trns)
+        print("values in " + file + " are: " + trns)
     if trns == "LOGE":
         mval = np.exp(mval)
     elif trns == "LOG10":
@@ -909,7 +911,7 @@ def read_mod(File=None, ModExt=".rho",
 
     if out:
         print(
-            "read_model: %i x %i x %i model read from %s" % (nx, ny, nz, File))
+            "read_model: %i x %i x %i model read from %s" % (nx, ny, nz, file))
 
     if volumes:
         vcell = np.zeros_like(mval)
@@ -930,7 +932,7 @@ def read_mod(File=None, ModExt=".rho",
         return dx, dy, dz, mval, reference, trans
     
     
-def write_model_vtk(File=None, dx=None, dy=None, dz=None, rho=None, 
+def write_model_vtk(file=None, dx=None, dy=None, dz=None, rho=None, 
                     reference=None, scale = [1., 1., -1.], trans="LINEAR",
                     out=True):
     """
@@ -951,11 +953,11 @@ def write_model_vtk(File=None, dx=None, dy=None, dz=None, rho=None,
     D =  np.append(0.0, np.cumsum(dz))*scale[2]
     
    
-    gridToVTK(File, N, E, D, cellData = {'resistivity (in Ohm)' : rho})
-    print("model-like parameter written to %s" % (File))
+    gridToVTK(file, N, E, D, cellData = {'resistivity (in Ohm)' : rho})
+    print("model-like parameter written to %s" % (file))
     
 
-def write_data_vtk(SitFile=None, sx=None, sy=None, sz=None, sname=None,
+def write_data_vtk(Sitfile=None, sx=None, sy=None, sz=None, sname=None,
                    reference=None, scale = [1., 1., -1.], out=True):
     """
     Convert ModEM data file to VTK station set (unstructured grid)
@@ -973,9 +975,9 @@ def write_data_vtk(SitFile=None, sx=None, sy=None, sz=None, sname=None,
     #dummy scalar values
     dummy = np.ones((len(N)))
 
-    pointsToVTK(SitFile, N, E, D, data = {"value" : dummy})
+    pointsToVTK(Sitfile, N, E, D, data = {"value" : dummy})
 
-    print("site positions written to %s" % (SitFile))
+    print("site positions written to %s" % (Sitfile))
 
 
 def fix_cells( covfile_i=None,

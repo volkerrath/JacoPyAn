@@ -77,8 +77,14 @@ print(SFile)
 print(" The file will be split into components:")
 print(Split)
 
-FreqBands = [ [0.0001, 0.01], [0.01, 0.1], [0.1, 1.], [1., 100.], [100., 1000.], [1000., 10000.]]
-
+PerIntervals = [ [0.0001, 0.001], 
+              [0.001, 0.01], 
+              [0.01, 0.1], 
+              [0.1, 1.], 
+              [1., 10.], 
+              [10., 100.], 
+              [100., 1000.], 
+              [1000., 10000.]]
 
 if "mer" in Task.lower():
     
@@ -165,21 +171,15 @@ if "spl" in Task.lower():
 
         start = time.perf_counter()
         
-        nF = len(FreqBands)
+        nF = len(PerIntervals)
     
     
         for ibnd in np.arange(nF):  
-            if np.log10(FreqBands[ibnd][0])<0.:
-                lowstr=str(1./FreqBands[ibnd][0])+"s"
-            else:
-                lowstr=str(FreqBands[ibnd][0])+"Hz"
-                
-            if np.log10(FreqBands[ibnd][1])<0.:
-                uppstr=str(1./FreqBands[ibnd][1])+"s"
-            else:
-                uppstr=str(FreqBands[ibnd][1])+"Hz"                   
+            lowstr=str(1./PerIntervals[ibnd][0])+"Hz"
+            uppstr=str(1./PerIntervals[ibnd][1])+"Hz"
+              
      
-            indices = np.where((Freq>=FreqBands[ibnd][0]) & (Freq<FreqBands[ibnd][1]))
+            indices = np.where((Freq>=PerIntervals[ibnd][0]) & (Freq<PerIntervals[ibnd][1]))
             JacTmp = Jac[indices]
             
             FreqTmp=Freq[indices]

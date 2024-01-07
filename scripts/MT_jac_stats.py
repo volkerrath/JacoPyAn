@@ -60,25 +60,21 @@ if not WorkDir.endswith("/"):
     WorkDir = WorkDir+"/"
     
 # MFile = WorkDir + "SABA8_best.rho"
-MFile = WorkDir + "ANN_best.rho"
+MFile = WorkDir + "ANN_best"
 
 # JFiles = [WorkDir+"NewJacTest_P.jac",WorkDir+"NewJacTest_T.jac",WorkDir+"NewJacTest_Z.jac"]
 
-SensDir = WorkDir+"/SensRaw/"
-if not os.path.isdir(SensDir):
-    print("File: %s does not exist, but will be created" % SensDir)
-    os.mkdir(SensDir)
+
 
 # necessary, but not relevant  for synthetic model 
 MOrig = [-15.767401, -71.854095]
 
-WorkName = "ANN_P_sp-8"
-JFile = WorkDir + WorkName
+JacName = "ANN_P_sp-8"
+JFile = WorkDir + JacName
 
 
 Splits = ["comp", "site", "freq"]
-FreqBands = [ [0.0001, 0.01], [0.01, 0.1], [0.1, 1.], [1., 100.], [100., 1000.], [1000., 10000.]]
-
+PerIntervals = [ [0.0001, 0.01], [0.01, 0.1], [0.1, 1.], [1., 100.], [100., 1000.], [1000., 10000.]]
 
 
 
@@ -103,7 +99,7 @@ jacmask = j0.reshape(jdims)
 jacflat = jacmask.flatten(order="F")
 
 #rhotest = jacmask.reshape(dims)*rho
-#TSTFile = WorkDir+WorkName+"1_MaskTest.rho"
+#TSTFile = WorkDir+JacName+"1_MaskTest.rho"
 #mod.write_mod(TSTFile, dx, dy, dz, rhotest, refmod, trans="LOGE", mvalair=blank, aircells=aircells)
 
 
@@ -190,14 +186,14 @@ for Split in Splits:
     if "freq" in Split.lower():
         start = time.perf_counter()
         
-        nF = len(FreqBands)
+        nF = len(PerIntervals)
         
         for ibnd in np.arange(nF):  
-            lowstr=str(FreqBands[ibnd][0])+"Hz"            
-            uppstr=str(FreqBands[ibnd][1])+"Hz"                   
+            lowstr=str(1./PerIntervals[ibnd][0])+"Hz"            
+            uppstr=str(1./PerIntervals[ibnd][1])+"Hz"                   
              
  
-            indices = np.where((Freqs>=FreqBands[ibnd][0]) & (Freqs<FreqBands[ibnd][1]))       
+            indices = np.where((Freqs>=PerIntervals[ibnd][0]) & (Freqs<PerIntervals[ibnd][1]))       
             JacTmp = Jac[indices]
             
             if np.shape(JacTmp)[0] > 0:  
