@@ -81,8 +81,9 @@ JFile = WorkDir +"ANN_ZPT_nerr_sp-8"
 
 
 JThresh  = 1.e-4
-NSingulr = 300
-
+NumSingular = [ 100, 200, 300, 400, 500, 1000]
+OverSample=  [2]
+SubspaceIt = [0]
 # NSamples = 10000
 # NBodies  = 32
 # x_bounds = [-3000., 3000.]
@@ -94,10 +95,6 @@ NSingulr = 300
 
 
 total = 0.0
-
-start = time.perf_counter()
-
-
 start =time.perf_counter()
 print("\nReading Data from "+JFile)
 
@@ -116,53 +113,34 @@ elapsed = time.perf_counter() - start
 total = total + elapsed
 print(" Used %7.4f s for reading Jacobian from %s " % (elapsed, JFile))
 
-# mu = 0.0
-# sigma = 0.5
-# r = rho.flat
-# nproj = 1000
+nsingval = NumSingular[0]
+noversmp = OverSample[0]
+nsubspit = SubspaceIt[0]
 
-start = time.perf_counter()
-U, S, Vt = jac.rsvd(Jac.T, rank=NSingulr, n_oversamples=0, n_subspace_iters=0)
-elapsed = time.perf_counter() - start
-print(
-    "Used %7.4f s for calculating k = %i SVD from %s " % (elapsed, NSingulr, JFile)
-)
+# for noversmp in OverSample:
+# for nsubspit in SubspaceIt: 
+for nsingval in NumSingular:
+    start = time.perf_counter()
+    U, S, Vt = jac.rsvd(Jac.T, rank=nsingval, n_oversamples=noversmp*nsingval, n_subspace_iters=nsubspit)
+    elapsed = time.perf_counter() - start
+    print("Used %7.4f s for calculating k = %i SVD " % (elapsed, nsingval))
+    print("Oversamplinng factor =  ", str(noversmp))
+    print("Subspace iterations  =  ", str(nsubspit))
+    
+    D = U@scs.diags(S[:])@Vt - Jac.T
+    x_op = np.random.normal(size=np.shape(D)[1])
+    n_op = npl.norm(D@x_op)/npl.norm(x_op)
+    j_op = npl.norm(Jac.T@x_op)/npl.norm(x_op)
+    perc = 100. - n_op*100./j_op
+    
+    print(" Op-norm J_k = "+str(n_op)+", explains "
+          +str(perc)+"% of variations")
+    print(np.shape(U), np.shape(S), np.shape(Vt), )
+    print("")
 
-D = U@scs.diags(S[:])@Vt - Jac.T
-x_op = np.random.normal(size=np.shape(D)[1])
-n_op = npl.norm(D@x_op)/npl.norm(x_op)
-j_op = npl.norm(Jac.T@x_op)/npl.norm(x_op)
-print(" Op-norm J_k = "+str(n_op)+", explains "
-      +str(100. - n_op*100./j_op)+"% of variations")
-
-
-# m_avg = 0.
-# v_avg = 0.
-# s = time.perf_counter()
-# for isample in np.arange(NSamples):
-
-#     body = [
-#     "ellipsoid", "add",
-#     0., 0., 0.,
-#     3000.,
-#     1000., 2000., 1000.,
-#     0., 0., 30.]
-
-# # m = r + np.random.normal(mu, sigma, size=np.shape(r))
-# #     t = time.perf_counter() - s
-# #     print(" Used %7.4f s for generating m  " % (t))
-
-# #     s = time.perf_counter()
-# #     for proj in range(nproj):
-# #         p = jac.projectMod(m, U)
-
-# #     t = time.perf_counter() - s
-# #     print(" Used %7.4f s for %i projections" % (t, nproj))
-
-# # total = total + elapsed
-# # print(" Total time used:  %f s " % (total))
-# NSMFile = WorkDir+"Krafla1_Ellipsoids_median.sns"
-# tmp = []
-# tmp = np.reshape(tmp, dims, order="F")
-# mod.write_model_mod(NSMFile, dx, dy, dz, S, reference, trans="linear", air=aircells)
-# print(" Sensitivities written to "+NSMFile)
+    File = JFile+"_SVD_k"+str(nsingval)\
+            +"_o"+str(noversmp)\
+            +"_s"+str(nsubspit)\
+            +"_"+str(np.around(perc,1))\
+            +"%.npz"
+    np.savez_compressed(File, U=U, S=S, V=Vt, Nop=perc)
