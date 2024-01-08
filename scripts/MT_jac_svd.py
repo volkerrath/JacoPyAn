@@ -79,11 +79,10 @@ WorkDir = "/home/vrath/MT_Data/Annecy/Jacobians/"
 MFile = WorkDir+"ANN_best"
 JFile = WorkDir +"ANN_ZPT_nerr_sp-8"
 
-
-JThresh  = 1.e-4
+OutName = "_run_subsit"
 # NumSingular = [ 100, 200, 300, 400, 500, 1000]
 NumSingular = [ 500]
-OverSample=  [2]
+OverSample =  [2]
 SubspaceIt = [0, 1, 2, 4]
 
 
@@ -145,5 +144,5 @@ for noversmp in OverSample:
 
             np.savez_compressed(File, U=U, S=S, V=Vt, Nop=perc)
 
-np.savetxt(JFile+"_run.dat",  np.vstack(info),
+np.savetxt(JFile+OutName+".dat",  np.vstack(info),
                 fmt="%6i, %6i, %6i, %4.6g, %4.6g")

@@ -53,6 +53,7 @@ for pth in mypath:
 import jacproc as jac
 import modem as mod
 import util as utl
+
 from version import versionstrg
 
 # gc.enable()
@@ -64,52 +65,78 @@ print(titstrng+"\n\n")
 
 rng = np.random.default_rng()
 nan = np.nan
-# Ubaye caase"
-# WorkDir = r"/home/vrath/work/MT_Data/Ubaye/UB22_jac_best/"
-# MFile   = WorkDir +r"Ub22_ZoffPT_02_NLCG_014.rho"
-# MPad=[12, 12 , 12, 12, 0, 36]
-# # JFile = [WorkDir+r"Ub22_Zoff.jac", ]
-# # DFile = [WorkDir+r"Ub22_Zoff.dat", ]
-
-# # JFile = [WorkDir+r"Ub22_P.jac", ]
-# # DFile = [WorkDir+r"Ub22_P.dat", ]
-
-# # JFile = [WorkDir+r"Ub22_T.jac", ]
-# # DFile = [WorkDir+r"Ub22_T.dat", ]
-
 
 # KRAFLA case
-WorkDir = r"/media/vrath/BlackOne/MT_Data/Krafla/Krafla1/"
-MFile   = WorkDir +r"Krafla.rho"
-MPad=[15, 15 , 15, 15, 0, 36]
+# WorkDir = "/media/vrath/BlackOne/MT_Data/Krafla/Krafla1/"
+# MFile   = WorkDir +r"Krafla.rho"
 
-JFile = WorkDir +r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/Ann21_Prior100_T-T3.jac"
-MFile = r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/Ann21_Prior100_T_NLCG_033.rho"
-SFile = r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/Ann21_Prior100_T-Z3.sns"
+# Annecy case
+WorkDir = "/home/vrath/MT_Data/Annecy/Jacobians/"
+MFile = WorkDir+"ANN_best.rho"
+JFile = WorkDir +"ANN_ZPT_sp-8"
+
 
 JThresh  = 1.e-4
 NSingulr = 300
-NSamples = 10000
-NBodies  = 32
-x_bounds = [-3000., 3000.]
-y_bounds = [-3000., 3000.]
-z_bounds = [-300., 3000.]
-rad_bounds = [100.,1000.]
-res_bounds = [-0.3, 0.3]
+
+# NSamples = 10000
+# NBodies  = 32
+# x_bounds = [-3000., 3000.]
+# y_bounds = [-3000., 3000.]
+# z_bounds = [-300., 3000.]
+# rad_bounds = [100.,1000.]
+# res_bounds = [-0.3, 0.3]
 
 
 
 total = 0.0
-start = time.perf_counter()
-dx, dy, dz, rho, reference, _, vcell = mod.read_mod(MFile, trans="log10", volumes=True)
-elapsed = time.perf_counter() - start
-total = total + elapsed
-print(" Used %7.4f s for reading model from %s " % (elapsed, MFile))
-dims = np.shape(rho)
-resair = 1.e17
-aircells = np.where(rho>resair/100)
 
 start = time.perf_counter()
+
+
+start =time.perf_counter()
+print("\nReading Data from "+JFile)
+
+jac = scs.load_npz(JFile +"_jac.npz", allow_pickle=True)
+dat = scs.load_npz(JFile +"_info.npz", allow_pickle=True)
+
+Freq = dat["Freq"]
+Comp = dat["Comp"]
+Site = dat["Site"]
+DTyp = dat["DTyp"]
+Data = dat["Data"]
+Scale = dat["Scale"]
+Info = dat["Info"]
+
+elapsed = time.perf_counter() - start
+print(" Used %7.4f s for reading Jacobian from %s " % (elapsed, MFiles[Jfile]))
+
+
+
+if Jfile==0:
+    Jac_merged = Jac 
+    print(Jfile, type(Jac_merged), type(Jac), np.shape(Jac_merged))
+    Data_merged = Data 
+    Site_merged = Site
+    Freq_merged = Freq
+    Comp_merged = Comp
+    DTyp_merged = DTyp 
+    Infblk = Info
+    Scales = Scale
+else:
+    Jac_merged = scs.vstack((Jac_merged, Jac))            
+    print(Jfile, type(Jac_merged), np.shape(Jac_merged))
+    Data_merged = np.vstack((Data_merged, Data)) 
+    Site_merged = np.hstack((Site_merged, Site))
+    Freq_merged = np.hstack((Freq_merged, Freq))
+    Comp_merged = np.hstack((Comp_merged, Comp))
+    DTyp_merged = np.hstack((DTyp_merged, DTyp))
+    Infblk = np.vstack((Infblk, Info))
+    Scales = np.hstack((Scales, Scale))
+      
+# Scale = np.amax(Scales)
+        
+
 
 Jac = mod.read_jac(JFile)
 elapsed = time.perf_counter() - start
