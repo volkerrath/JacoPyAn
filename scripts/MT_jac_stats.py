@@ -69,8 +69,13 @@ MFile = WorkDir + "ANN_best"
 # necessary, but not relevant  for synthetic model 
 MOrig = [-15.767401, -71.854095]
 
-JacName = "ANN_P_sp-8"
+JacName = "ANN_ZPT_nerr_sp-8"
 JFile = WorkDir + JacName
+
+OutFile = JFile+"_stats.dat"
+open(OutFile, "w")
+ 
+
 
 
 Splits = ["comp", "site", "freq"]

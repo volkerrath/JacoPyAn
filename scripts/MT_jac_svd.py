@@ -39,8 +39,6 @@ import scipy.sparse as scs
 import netCDF4 as nc
 
 
-
-
 JACOPYAN_DATA = os.environ["JACOPYAN_DATA"]
 JACOPYAN_ROOT = os.environ["JACOPYAN_ROOT"]
 
@@ -55,6 +53,13 @@ import modem as mod
 import util as utl
 
 from version import versionstrg
+
+
+# RunParallel = False
+# if RunParallel:
+#     pth = JACOPYAN_ROOT+"/external/PyParSVD/pyparsvd/"
+#     if pth not in sys.path:
+#         sys.path.insert(0,pth)
 
 gc.enable()
 
@@ -78,6 +83,8 @@ WorkDir = "/home/vrath/MT_Data/Annecy/Jacobians/"
 #     os.mkdir(WorkDir)
 MFile = WorkDir+"ANN_best"
 JFile = WorkDir +"ANN_ZPT_nerr_sp-8"
+MOrig = [45.941551, 6.079800]
+
 
 OutName = "_run_subsit"
 # NumSingular = [ 100, 200, 300, 400, 500, 1000]

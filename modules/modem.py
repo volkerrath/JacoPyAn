@@ -159,8 +159,7 @@ def read_data_jac(Datfile=None, out=True):
     !    Off_Diagonal_Rho_Phase      = 5
     !    Phase_Tensor                = 6
     """
-# 0          1       2       3    4        5          6     7   8    9       10
-# .227E-03 ACCO -15.794 -71.996 -2853.721 -15220.71 -4500. PTXX 6 .86997513 .25 
+
     with open(Datfile) as fd:
         for line in fd:
             if line.startswith("#") or line.startswith(">"):
@@ -610,8 +609,7 @@ def write_mod(file=None, modext=".rho",
     ENDDO
 
     """
-    print(file)
-    print(modext)
+    
     
     modl = file+modext
 

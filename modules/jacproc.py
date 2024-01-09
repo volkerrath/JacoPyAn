@@ -757,24 +757,35 @@ def mult_by_cmsqr(m_like_in=None, smooth=[None, None, None], small=1.0e-14, out=
     m_like_out =  m_like_in
     return m_like_out    
 
-def print_stats(jac=np.array([]), jacmask=np.array([])):
+def print_stats(jac=np.array([]), jacmask=np.array([]), outfile=None):
     """
     Prints dome info on jacobian
     """
     
     jdims = np.shape(jac)
     print("stats: Jacobian dimensions are:", jdims)
+    if not  outfile==None: 
+        outfile.write("Jacobian dimensions are:", jdims)
+        
     mx = np.amax(jac)
     mn = np.amin(jac)
     print("stats: minimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))  
-    mx = np.amax(np.abs(jac))
+    if not  outfile==None: 
+        outfile.write("Mminimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))
     mn = np.amin(np.abs(jac))
+    mx = np.amax(np.abs(jac))
     print("stats: minimum/maximum abs Jacobian value is "+str(mn)+"/"+str(mx))
- 
-    mx = np.amax(jac*jacmask)
-    mn = np.amin(jac*jacmask)
+    if not  outfile==None: 
+        outfile.write("Minimum/maximum abs Jacobian value is "+str(mn)+"/"+str(mx))
+  
+    mjac = jac*scs.diags(jacmask,0)
+    mx = np.amax(mjac)
+    mn = np.amin(mjac)
     print("stats: minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx))
-    mx = np.amax(np.abs(jac*jacmask))
-    mn = np.amin(np.abs(jac*jacmask))
+    if not  outfile==None: 
+        outfile.write("Minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx))
+    mx = np.amax(np.abs(mjac))
+    mn = np.amin(np.abs(mjac))
     print("stats: minimum/maximum masked abs Jacobian value is "+str(mn)+"/"+str(mx))
+    if not  outfile==None: outfile.write("Minimum/maximum masked abs Jacobian value is "+str(mn)+"/"+str(mx)+"\n")
     print("\n")
