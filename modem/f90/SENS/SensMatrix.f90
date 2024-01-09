@@ -310,7 +310,7 @@ Contains
     character(80) header, fmtstring
     character(40) sRx, cRx
     character(20) compid, sit
-    character(200) tmpstr
+    character(256) tmpstr
     
     smallval = 1.e-32
     largeval = 1.e+32
@@ -342,14 +342,10 @@ Contains
     end if
     write(*,*) 'written to ',tmpstr
 
-!     tmpstr=trim(jfile)
-!     dotpos = scan(tmpstr,".", BACK= .true.)
-!     if (dotpos>0) then
-!       tmpstr = tmpstr(1:dotpos-1)//'.sns'
-!       open(ioJdt,file=tmpstr)
-!     end if
-!     write(*,*) 'written to ',tmpstr
-
+    call get_command(tmpstr)
+    write(ioJdt,*) '# ',trim(tmpstr)
+    write(*,*) 'header:'
+    write(*,*) '# ',trim(tmpstr)
 
     write(header,*) 'Sensitivity Matrix'
 	nAll = count_sensMatrixMTX(sens)
