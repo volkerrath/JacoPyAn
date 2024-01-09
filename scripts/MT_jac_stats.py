@@ -80,8 +80,16 @@ ofile=open(OutFile, "w")
 
 
 Splits = ["comp", "site", "freq"]
-PerIntervals = [ [0.0001, 0.01], [0.01, 0.1], [0.1, 1.], [1., 100.], [100., 1000.], [1000., 10000.]]
-
+PerIntervals = [ 
+                [0.0001, 0.001], 
+                [0.001, 0.01], 
+                [0.01, 0.1], 
+                [0.1, 1.], 
+                [1., 10.], 
+                [10., 100.], 
+                [100., 1000.], 
+                [1000., 10000.]
+                ]
 
 
 total = 0.0
@@ -169,7 +177,7 @@ for Split in Splits:
             indices = np.where(Dtype==icmp)
             JacTmp = Jac[indices]
             print("Component: ",icmp)
-            ofile.write("\n Component: ",icmp)
+            ofile.write("\n Component: "+str(icmp))
             jac.print_stats(jac=JacTmp, jacmask=jacflat, outfile=ofile)
             print("\n")
             
@@ -186,7 +194,7 @@ for Split in Splits:
             indices = np.where(sit==Sites)
             JacTmp = Jac[indices]
             print("Site: ",sit)
-            ofile.write("\n Site: ",icmp)
+            ofile.write("\n Site: "+sit)
             jac.print_stats(jac=JacTmp, jacmask=jacflat, outfile=ofile)
             print("\n")
         
@@ -207,7 +215,7 @@ for Split in Splits:
             
             if np.shape(JacTmp)[0] > 0:  
                 print("Freqband: ", lowstr, "to", uppstr)
-                ofile.write("\n Freqband: ", lowstr, "to", uppstr)
+                ofile.write("\n Freqband: "+lowstr+"to"+uppstr)
                 jac.print_stats(jac=JacTmp, jacmask=jacflat, outfile=ofile)
                 print("\n")
             else: 
