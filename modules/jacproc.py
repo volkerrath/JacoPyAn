@@ -573,21 +573,6 @@ def project_model(m=None, U=None, small=1.0e-14, out=True):
     return mp
 
 
-def transfrom_model(m=None, M=None, small=1.0e-14, out=True):
-    """
-    Transform Model.
-
-    M should be something analog to C_m^1/2 or C_m^-1/2.
-
-    
-    author: vrath
-    last changed:  dec 20, 2023
-    """
-    transm = np.dot(M, m)
-    error("transform_model not implemented! Exit.")
-    return transm
-
-
 def mult_by_cmsqr(m_like_in=None, smooth=[None, None, None], small=1.0e-14, out=True):
     """
     Multyiply by sqrt of paramter prior covariance (aka "smoothing")

@@ -56,7 +56,7 @@ import util as utl
 
 from version import versionstrg
 
-# gc.enable()
+gc.enable()
 
 
 version, _ = versionstrg()
@@ -72,124 +72,18 @@ nan = np.nan
 
 # Annecy case
 WorkDir = "/home/vrath/MT_Data/Annecy/Jacobians/"
-MFile = WorkDir+"ANN_best.rho"
-JFile = WorkDir +"ANN_ZPT_sp-8"
-
-
-JThresh  = 1.e-4
-NSingulr = 300
-
-# NSamples = 10000
-# NBodies  = 32
-# x_bounds = [-3000., 3000.]
-# y_bounds = [-3000., 3000.]
-# z_bounds = [-300., 3000.]
-# rad_bounds = [100.,1000.]
-# res_bounds = [-0.3, 0.3]
-
+MODFile = WorkDir+"ANN_best.rho"
+SVDFile = WorkDir +"/svd/ANN_ZPT_nerr_sp-8_SVD_k500_o2_s0_96.8percent.npz"
 
 
 total = 0.0
-
-start = time.perf_counter()
-
-
 start =time.perf_counter()
-print("\nReading Data from "+JFile)
+print("\nReading Jacobina decomposition from "+SVDFile)
 
-jac = scs.load_npz(JFile +"_jac.npz", allow_pickle=True)
-dat = scs.load_npz(JFile +"_info.npz", allow_pickle=True)
+U = np.load(SVDFile)["U"]
 
-Freq = dat["Freq"]
-Comp = dat["Comp"]
-Site = dat["Site"]
-DTyp = dat["DTyp"]
-Data = dat["Data"]
-Scale = dat["Scale"]
-Info = dat["Info"]
 
 elapsed = time.perf_counter() - start
-print(" Used %7.4f s for reading Jacobian from %s " % (elapsed, MFiles[Jfile]))
+print(" Used %7.4f s for reading from %s " % (elapsed, SVDFile))
 
 
-
-if Jfile==0:
-    Jac_merged = Jac 
-    print(Jfile, type(Jac_merged), type(Jac), np.shape(Jac_merged))
-    Data_merged = Data 
-    Site_merged = Site
-    Freq_merged = Freq
-    Comp_merged = Comp
-    DTyp_merged = DTyp 
-    Infblk = Info
-    Scales = Scale
-else:
-    Jac_merged = scs.vstack((Jac_merged, Jac))            
-    print(Jfile, type(Jac_merged), np.shape(Jac_merged))
-    Data_merged = np.vstack((Data_merged, Data)) 
-    Site_merged = np.hstack((Site_merged, Site))
-    Freq_merged = np.hstack((Freq_merged, Freq))
-    Comp_merged = np.hstack((Comp_merged, Comp))
-    DTyp_merged = np.hstack((DTyp_merged, DTyp))
-    Infblk = np.vstack((Infblk, Info))
-    Scales = np.hstack((Scales, Scale))
-      
-# Scale = np.amax(Scales)
-        
-
-
-Jac = mod.read_jac(JFile)
-elapsed = time.perf_counter() - start
-total = total + elapsed
-print(" Used %7.4f s for reading Jacobian from %s " % (elapsed, JFile))
-
-mu = 0.0
-sigma = 0.5
-r = rho.flat
-nproj = 1000
-
-start = time.perf_counter()
-U, S, Vt = jac.rsvd(Jac.T, rank=NSingulr, n_oversamples=0, n_subspace_iters=0)
-elapsed = time.perf_counter() - start
-print(
-    "Used %7.4f s for calculating k = %i SVD from %s " % (elapsed, NSingulr, JFile)
-)
-
-D = U@scs.diags(S[:])@Vt - Jac.T
-x_op = np.random.normal(size=np.shape(D)[1])
-n_op = npl.norm(D@x_op)/npl.norm(x_op)
-j_op = npl.norm(Jac.T@x_op)/npl.norm(x_op)
-print(" Op-norm J_k = "+str(n_op)+", explains "
-      +str(100. - n_op*100./j_op)+"% of variations")
-
-
-# m_avg = 0.
-# v_avg = 0.
-# s = time.perf_counter()
-for isample in np.arange(NSamples):
-
-    body = [
-    "ellipsoid", "add",
-    0., 0., 0.,
-    3000.,
-    1000., 2000., 1000.,
-    0., 0., 30.]
-
-# m = r + np.random.normal(mu, sigma, size=np.shape(r))
-#     t = time.perf_counter() - s
-#     print(" Used %7.4f s for generating m  " % (t))
-
-#     s = time.perf_counter()
-#     for proj in range(nproj):
-#         p = jac.projectMod(m, U)
-
-#     t = time.perf_counter() - s
-#     print(" Used %7.4f s for %i projections" % (t, nproj))
-
-# total = total + elapsed
-# print(" Total time used:  %f s " % (total))
-NSMFile = WorkDir+"Krafla1_Ellipsoids_median.sns"
-tmp = []
-tmp = np.reshape(tmp, dims, order="F")
-mod.write_model_mod(NSMFile, dx, dy, dz, S, reference, trans="linear", air=aircells)
-print(" Sensitivities written to "+NSMFile)
