@@ -765,7 +765,7 @@ def print_stats(jac=np.array([]), jacmask=np.array([]), outfile=None):
     jdims = np.shape(jac)
     print("stats: Jacobian dimensions are:", jdims)
     if not  outfile==None: 
-        outfile.write("Jacobian dimensions are:", jdims)
+        outfile.write("Jacobian dimensions are:"+str(jdims))
         
     mx = np.amax(jac)
     mn = np.amin(jac)

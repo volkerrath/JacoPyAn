@@ -70,10 +70,11 @@ MFile = WorkDir + "ANN_best"
 MOrig = [-15.767401, -71.854095]
 
 JacName = "ANN_ZPT_nerr_sp-8"
+# JacName = "ANN_Z_nerr_sp-8"
 JFile = WorkDir + JacName
 
 OutFile = JFile+"_stats.dat"
-open(OutFile, "w")
+ofile=open(OutFile, "w")
  
 
 
@@ -137,9 +138,10 @@ else:
     Jac = jac.normalize_jac(Jac, err)
     
 print("Full Jacobian")
-jac.print_stats(jac=Jac, jacmask=jacflat)
+jac.print_stats(jac=Jac, jacmask=jacflat, outfile=ofile)
 print("\n")               
 print("\n")
+ofile.write("Full Jacobian")
 
 start = time.perf_counter()
 
@@ -167,7 +169,8 @@ for Split in Splits:
             indices = np.where(Dtype==icmp)
             JacTmp = Jac[indices]
             print("Component: ",icmp)
-            jac.print_stats(jac=JacTmp, jacmask=jacflat)
+            ofile.write("\n Component: ",icmp)
+            jac.print_stats(jac=JacTmp, jacmask=jacflat, outfile=ofile)
             print("\n")
             
         print("\n")
@@ -183,7 +186,8 @@ for Split in Splits:
             indices = np.where(sit==Sites)
             JacTmp = Jac[indices]
             print("Site: ",sit)
-            jac.print_stats(jac=JacTmp, jacmask=jacflat)
+            ofile.write("\n Site: ",icmp)
+            jac.print_stats(jac=JacTmp, jacmask=jacflat, outfile=ofile)
             print("\n")
         
         print("\n")
@@ -203,10 +207,13 @@ for Split in Splits:
             
             if np.shape(JacTmp)[0] > 0:  
                 print("Freqband: ", lowstr, "to", uppstr)
-                jac.print_stats(jac=JacTmp, jacmask=jacflat)
+                ofile.write("\n Freqband: ", lowstr, "to", uppstr)
+                jac.print_stats(jac=JacTmp, jacmask=jacflat, outfile=ofile)
                 print("\n")
             else: 
                  print("Frequency band is empty! Continue.")
         
         print("\n")
         print("Done!")
+
+ofile.close()
