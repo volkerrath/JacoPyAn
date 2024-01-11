@@ -59,13 +59,13 @@ titstrng = utl.print_title(version=version, fname=__file__, out=False)
 print(titstrng+"\n\n")
 
 
-WorkDir = JACOPYAN_ROOT+"/work/"
-#WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/UbiJacNewFormat/"
+#WorkDir = JACOPYAN_ROOT+"/work/"
+WorkDir = JACOPYAN_DATA+"/Peru/Sababcaya/SABA8_Jac/"
 if not WorkDir.endswith("/"): WorkDir=WorkDir+"/"
 
 Task = "merge"
-MergedFile = "merged/UBI_ZPT_sp-8_merged"
-MFiles = [WorkDir+"//UBI_Z_nerr_sp-8", WorkDir+"//UBI_P_nerr_sp-8",WorkDir+"//UBI_T_nerr_sp-8",]
+MergedFile = "SABA8_ZPT__nerr_sp-8_merged"
+MFiles = [WorkDir+"SABA8_Z_nerr_sp-8", WorkDir+"SABA8_P_nerr_sp-8",WorkDir+"SABA8_T_nerr_sp-8",]
 nF = np.size(MFiles)
 print(" The following files will be merged:")
 print(MFiles)
@@ -76,7 +76,6 @@ Split = "type  site  freq"
 print(SFile)
 print(" The file will be split into components:")
 print(Split)
-
 PerIntervals = [ [0.0001, 0.001], 
               [0.001, 0.01], 
               [0.01, 0.1], 
@@ -211,7 +210,7 @@ if "spl" in Task.lower():
         print("\n")
         
 
-    if "typ" in Split.lower():
+    if "com" in Split.lower():
            
         start = time.perf_counter()
     

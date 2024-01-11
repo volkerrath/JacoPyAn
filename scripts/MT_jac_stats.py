@@ -66,10 +66,11 @@ MFile = WorkDir + "ANN_best"
 
 
 
-# necessary, but not relevant  for synthetic model 
-MOrig = [-15.767401, -71.854095]
+# necessary for ubc, but not relevant  for synthetic model
+MOrig = [-15.767401, -71.854095] # ANN
+MOrig = [45.941551, 6.079800] # SABA
 
-JacName = "ANN_ZPT_nerr_sp-8"
+JacName = "SABA8_ZPT_nerr_sp-8_merged"
 # JacName = "ANN_Z_nerr_sp-8"
 JFile = WorkDir + JacName
 

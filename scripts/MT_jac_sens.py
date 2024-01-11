@@ -88,8 +88,8 @@ PerIntervals = [
 
 
 
-# Type = "raw"
-Type = "euc"
+Type = "raw"
+# Type = "euc"
 """
 Calculate sensitivities.
 Expects that Jacobian is already error-scaled, i.e Jac = C^(-1/2)*J.
@@ -104,8 +104,8 @@ Usesigma:
 """
 
 
-# Transform = [ "max"]
-Transform = [ "sqr","max"]
+Transform = [ "max"]
+# Transform = [ "sqr","max"]
 
 """
 Transform sensitivities. 
