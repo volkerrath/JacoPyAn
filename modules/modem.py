@@ -501,7 +501,7 @@ def write_data_ncd(
         )
 
 
-def write_model_ncd(
+def write_mod_ncd(
     NCfile=None,
     x=None,
     y=None,
@@ -630,7 +630,10 @@ def write_mod(file=None, modext=".rho",
 
     if len(header)==0:
         header ="# 3D MT model written by ModEM in WS format"
-
+        
+    if header[0] != "#":
+        header = "#"+header 
+        
     if trans is not None:
         trans = trans.upper()
 
@@ -831,23 +834,52 @@ def read_ubc(file=None, modext=".mod", mshext=".msh",
         print(
             "read_model: %i x %i x %i model read from %s" % (nx, ny, nz, file))
     
-    vcell = np.zeros_like(val)
-    if volumes:
+    return dx, dy, dz, val, refubc, trans
+
+def get_volumes(dx=None, dy=None, dz=None, mval=None, out=True):
+    nx, ny,nz = np.shape(mval)
+    vcell = np.zeros_like(mval)
+    for ii in np.arange(nx):
+        for jj in np.arange(ny):
+            for kk in np.arange(nz):
+                vcell[ii,jj,kk] = dx[ii]*dy[jj]*dz[kk]
+
+    if out:
+        print(
+            "ger_volumes: %i x %i x %i cell volumes calculated" % 
+            (nx, ny, nz))
+        
+    return vcell
+
+
+def get_topo(dx=None, dy=None, dz=None, mval=None, ref= [0., 0., 0.],
+             mvalair = 1.e17, out=True):
+        nx, ny,nz = np.shape(mval)
+        
+        
+        x = np.append(0.0, np.cumsum(dx))
+        xcnt = 0.5 * (x[0:nx] + x[1:nx+1]) + ref[0]
+        
+        y = np.append(0.0, np.cumsum(dy))
+        ycnt = 0.5 * (y[0:ny] + y[1:ny+1]) + ref[1]
+        
+        ztop = np.append(0.0, np.cumsum(dz)) + ref[3]
+        
+        topo = np.zeros(nx, ny, 3)
         for ii in np.arange(nx):
             for jj in np.arange(ny):
-                for kk in np.arange(nz):
-                    vcell[ii,jj,kk] = dx[0,ii]*dy[0,jj]*dz[0,kk]
+                col = mval[ii,jj,:]
+                nsurf = np.argmax(col<mvalair)
+                topo[ii, jj, :] = xcnt[ii], ycnt[jj], ztop[nsurf]
 
         if out:
             print(
-                "read_model: %i x %i x %i cell volumes calculated" % (nx, ny, nz))
-
-
-    return dx, dy, dz, val, refubc, trans, vcell
-
+                "get topo: %i x %i x %i ccell surfaces marked" % (nx, ny, nz))
+            
+        return topo
 
 def read_mod(file=None, modext=".rho", 
-                   trans="LINEAR", volumes=False, out=True):
+                   trans="LINEAR", volumes=False, topo = False,  out=True):
     """
     Read ModEM model input.
 
@@ -911,26 +943,14 @@ def read_mod(file=None, modext=".rho",
         print(
             "read_model: %i x %i x %i model read from %s" % (nx, ny, nz, file))
 
-    if volumes:
-        vcell = np.zeros_like(mval)
-        for ii in np.arange(len(dx)):
-            for jj in np.arange(len(dy)):
-                for kk in np.arange(len(dz)):
-                    vcell[ii,jj,kk] = dx[ii]*dy[jj]*dz[kk]
-
-        if out:
-            print(
-                "read_model: %i x %i x %i cell volumes calculated" % (nx, ny, nz))
-
-        return dx, dy, dz, mval, reference, trans, vcell
-
-
+   
 
     else:
         return dx, dy, dz, mval, reference, trans
     
+
     
-def write_model_vtk(file=None, dx=None, dy=None, dz=None, rho=None, 
+def write_mod_vtk(file=None, dx=None, dy=None, dz=None, rho=None, 
                     reference=None, scale = [1., 1., -1.], trans="LINEAR",
                     out=True):
     """
@@ -955,7 +975,7 @@ def write_model_vtk(file=None, dx=None, dy=None, dz=None, rho=None,
     print("model-like parameter written to %s" % (file))
     
 
-def write_data_vtk(Sitfile=None, sx=None, sy=None, sz=None, sname=None,
+def write_dat_vtk(Sitfile=None, sx=None, sy=None, sz=None, sname=None,
                    reference=None, scale = [1., 1., -1.], out=True):
     """
     Convert ModEM data file to VTK station set (unstructured grid)
