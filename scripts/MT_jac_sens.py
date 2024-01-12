@@ -214,8 +214,6 @@ mdims = np.shape(rho)
 aircells = np.where(rho>Rhoair/10)
 jacmask = jac.set_airmask(rho=rho, aircells=aircells, blank=Blank, flat = False, out=True)
 jacflat = jacmask.flatten(order="F")
-
-print(np.shape(jacmask), np.shape(jacflat))
 name, ext = os.path.splitext(MFile)
 
 # ofile = name
