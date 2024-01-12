@@ -114,7 +114,7 @@ def calc_sensitivity(Jac=np.array([]),
     return S
 
 
-def transform_sensitivity(S=np.array([]), V=np.array([]),
+def transform_sensitivity(S=np.array([]), vol=np.array([]),
                           Transform=["size","max", "sqrt"],
                           asinhpar=[0.], Maxval=None, OutInfo=False):
     """
@@ -143,19 +143,20 @@ def transform_sensitivity(S=np.array([]), V=np.array([]),
     if np.size(S)==0:
         error("transform_sensitivity: Sensitivity size is 0! Exit.")
     
-    ns = np.shape(S)
+    # ns = np.shape(S)
+    
     
 
     for item in Transform:       
         
         if "siz" in item.lower():
              print("trans_sensitivity: Transformed by layer thickness.")
-             if np.size(V)==0:
-                 error("Transform_sensitivity: No thicknesses given! Exit.")
+             if np.size(vol)==0:
+                 error("Transform_sensitivity: no volumes given! Exit.")
 
              else:
-                 V = V.reshape(ns)
-                 S = S/V
+                 sS= np.sum(1./vol)
+                 S = sS*S/vol
                  # print("S0v", np.shape(S))
                  # print("S0v", np.shape(V))
                  
@@ -191,9 +192,7 @@ def transform_sensitivity(S=np.array([]), V=np.array([]),
                     S = np.arcsinh(S/scale)
 
     
-    # S = S.A1    
-    # print(type(S))
-    
+   
     return S
 
 def get_scale(d=np.array([]), F=0.1, method = "other", OutInfo = False):
@@ -531,7 +530,7 @@ def set_padmask(rho=None, pad=[0, 0 , 0, 0, 0, 0], blank= np.nan, flat=True, out
     return mask
 
 
-def set_airmask(rho=None, aircells=np.array([]), blank= 1.e-30, flat=True, out=True):
+def set_airmask(rho=None, aircells=np.array([]), blank= 1.e-30, flat=False, out=True):
     """
     Set aircell masc for Jacobian calculations.
 

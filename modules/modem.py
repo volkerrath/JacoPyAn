@@ -863,20 +863,20 @@ def get_topo(dx=None, dy=None, dz=None, mval=None, ref= [0., 0., 0.],
         y = np.append(0.0, np.cumsum(dy))
         ycnt = 0.5 * (y[0:ny] + y[1:ny+1]) + ref[1]
         
-        ztop = np.append(0.0, np.cumsum(dz)) + ref[3]
+        ztop = np.append(0.0, np.cumsum(dz)) + ref[2]
         
-        topo = np.zeros(nx, ny, 3)
+        topo = np.zeros((nx, ny))
         for ii in np.arange(nx):
             for jj in np.arange(ny):
                 col = mval[ii,jj,:]
                 nsurf = np.argmax(col<mvalair)
-                topo[ii, jj, :] = xcnt[ii], ycnt[jj], ztop[nsurf]
+                topo[ii, jj]= ztop[nsurf]
 
         if out:
             print(
                 "get topo: %i x %i x %i ccell surfaces marked" % (nx, ny, nz))
             
-        return topo
+        return xcnt, ycnt, topo
 
 def read_mod(file=None, modext=".rho", 
                    trans="LINEAR", volumes=False, topo = False,  out=True):
@@ -945,8 +945,7 @@ def read_mod(file=None, modext=".rho",
 
    
 
-    else:
-        return dx, dy, dz, mval, reference, trans
+    return dx, dy, dz, mval, reference, trans
     
 
     

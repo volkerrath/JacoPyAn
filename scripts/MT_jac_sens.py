@@ -47,12 +47,13 @@ print(titstrng+"\n\n")
 gc.enable()
 
 rng = np.random.default_rng()
-blank = 1.e-30 # np.nan
-rhoair = 1.e17
+Blank = 1.e-30 # np.nan
+Rhoair = 1.e17
 
 InpFormat = "sparse"
-OutFormat = "mod ubc" 
-
+OutFormat = "mod" # "ubc"
+# for 3d-Grid:
+ModExt = "_sns.rho"
 
 WorkDir = JACOPYAN_DATA+"/Annecy/Jacobians/"
 # WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya//SABA8_Jac/"
@@ -62,15 +63,22 @@ if not WorkDir.endswith("/"):
     
 # MFile = WorkDir + "SABA8_best.rho"
 MFile = WorkDir + "ANN_best"
-
-# JFiles = [WorkDir+"NewJacTest_P.jac",WorkDir+"NewJacTest_T.jac",WorkDir+"NewJacTest_Z.jac"]
-
 # necessary, but not relevant  for synthetic model 
 MOrig = [45.941551, 6.079800]
 
 
 JacName = "ANN_T_nerr_sp-8"
 JFile = WorkDir + JacName
+
+VolExtract = False
+if VolExtract:
+    VolFile = MFile
+    VolFmt = ""
+    
+TopoExtract = True
+if TopoExtract:
+    TopoFile = WorkDir + "ANN_Topo.dat"
+    TopoFmt = ""
 
 
 Splits = ["comp", "site", "freq"]
@@ -110,7 +118,7 @@ Transform = [ "max"]
 """
 Transform sensitivities. 
 Options:
-    Transform = "siz",          Normalize by the values optional array V ("volume"), 
+    Transform = "vol"           Normalize by the values optional array vol ("volume"), 
                                 i.e in our case layer thickness. This should always 
                                 be the first value in Transform list.
     Transform = "max"           Normalize by maximum (absolute) value.
@@ -150,47 +158,88 @@ if not os.path.isdir(SensDir):
 total = 0.0
 
 start = time.perf_counter()
-dx, dy, dz, rho, refmod, _, vcell = mod.read_mod(MFile, trans="linear", volumes=True)
-V= vcell.flatten(order="F")
+dx, dy, dz, rho, refmod, _ = mod.read_mod(MFile, trans="linear", volumes=True)
 elapsed = time.perf_counter() - start
 total = total + elapsed
 print(" Used %7.4f s for reading model from %s " % (elapsed, MFile))
 
-dims = np.shape(rho)
-sdims = np.size(rho)
+aircells = np.where(rho>Rhoair/10)
 
-aircells = np.where(rho>rhoair/10)
-jacmask = jac.set_airmask(rho=rho, aircells=aircells, blank= blank, flat = False, out=True)
-jdims= np.shape(jacmask)
-j0 = jacmask.reshape(dims)
-j0[aircells] = blank
-jacmask = j0.reshape(jdims)
+
+
+if TopoExtract:
+    
+    xcnt, ycnt, topo = mod.get_topo(dx=dx, dy=dy, dz=dz, mval=rho, ref= refmod,
+             mvalair = 1.e17, out=True)
+    
+    if os.path.isfile(TopoFile):
+        os.remove(TopoFile)
+        
+    with open(TopoFile, "a") as f:
+
+        for ii in np.arange(len(dx)):
+            for jj in np.arange(len(dy)):
+                line = str(xcnt[ii])+", "+str(ycnt[jj])+", "+str(topo[ii,jj])+"\n"
+                f.write(line)
+
+        
+    
+if VolExtract or ("size" in Transform):
+    vol = mod.get_volumes(dx=dx, dy=dy, dz=dz, mval=rho, out=True)
+    print(np.shape(vol))
+    Header = "# "+MFile
+    
+    if "mod" in OutFormat.lower():
+        # for modem_readable files
+
+        mod.write_mod(VolFile, modext="_vol.rho",
+                      dx=dx, dy=dy, dz=dz, mval=vol,
+                      reference=refmod, mvalair=Blank, aircells=aircells, header=Header)
+        print(" Cell volumes (ModEM format) written to "+VolFile)
+        
+    if "ubc" in OutFormat.lower():
+        elev = -refmod[2]
+        refubc =  [MOrig[0], MOrig[1], elev]
+        mod.write_ubc(VolFile, modext="_ubc.vol", mshext="_ubc.msh",
+                      dx=dx, dy=dy, dz=dz, mval=vol, reference=refubc, mvalair=Blank, aircells=aircells, header=Header)
+        print(" Cell volumes (UBC format) written to "+VolFile)
+  
+    
+else:
+    vol = np.array([])
+    
+        
+mdims = np.shape(rho)
+
+aircells = np.where(rho>Rhoair/10)
+jacmask = jac.set_airmask(rho=rho, aircells=aircells, blank=Blank, flat = False, out=True)
 jacflat = jacmask.flatten(order="F")
 
+print(np.shape(jacmask), np.shape(jacflat))
 name, ext = os.path.splitext(MFile)
 
 # ofile = name
-# head = JacName
+# Header = JacName
 # trans = "LINEAR"
 
 # mod.write_mod(ofile, modext="_mod.rho", trans = trans,
 #                   dx=dx, dy=dy, dz=dz, mval=rho,
-#                   reference=refmod, mvalair=blank, aircells=aircells, header=head)
+#                   reference=refmod, mvalair=Blank, aircells=aircells, header=Header)
 # print(" Model (ModEM format) written to "+ofile)
     
 # # elev = -refmod[2]
 # # refubc =  [MOrig[0], MOrig[1], elev]
 # # mod.write_ubc(OFile, modext="_rho_ubc.mod", mshext="_rho_ubc.msh",
-# #                   dx=dx, dy=dy, dz=dz, mval=rho, reference=refubc, mvalair=blank, aircells=aircells, header=head)
+# #                   dx=dx, dy=dy, dz=dz, mval=rho, reference=refubc, mvalair=Blank, aircells=aircells, header=Header)
 # # print(" Model (UBC format) written to "+ofile)
     
 # TSTFile = WorkDir+JacName+"0_MaskTest"
 # mod.write_mod(TSTFile, modext="_mod.rho", trans = trans,
-#             dx=dx, dy=dy, dz=dz, mval=rho, reference=refmod, mvalair=blank, aircells=aircells, header=head)
+#             dx=dx, dy=dy, dz=dz, mval=rho, reference=refmod, mvalair=Blank, aircells=aircells, header=Header)
 # rhotest = jacmask.reshape(dims)*rho
 # TSTFile = WorkDir+JacName+"1_MaskTest"
 # mod.write_mod(TSTFile, modext="_mod.rho", trans = trans,
-#             dx=dx, dy=dy, dz=dz, mval=rhotest, reference=refmod, mvalair=blank, aircells=aircells, header=head)
+#             dx=dx, dy=dy, dz=dz, mval=rhotest, reference=refmod, mvalair=Blank, aircells=aircells, header=Header)
 
 
 # name, ext = os.path.splitext(JFile)
@@ -238,40 +287,26 @@ start = time.perf_counter()
 
 SensTmp = jac.calc_sensitivity(Jac,
                      Type = Type, OutInfo=False)
-SensTot = jac.transform_sensitivity(S=SensTmp, V=V, 
+SensTot = jac.transform_sensitivity(S=SensTmp, vol=vol, 
                           Transform=Transform, OutInfo=False)
 
 SensFile = SensDir+JacName+"_total_"+Type+"_"+"_".join(Transform)
-Head = (JacName+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
-S = SensTot.reshape(dims, order="F")
+Header = ("# "+JacName+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
+S = SensTot.reshape(mdims, order="F")
 
 if "mod" in OutFormat.lower():
-    mod.write_mod(SensFile, modext="_mod.sns",
+    mod.write_mod(SensFile, modext=ModExt,
                   dx=dx, dy=dy, dz=dz, mval=S,
-                  reference=refmod, mvalair=blank, aircells=aircells, header=Head)
+                  reference=refmod, mvalair=Blank, aircells=aircells, header=Header)
     print(" Sensitivities (ModEM format) written to "+SensFile)
     
 if "ubc" in OutFormat.lower():
     elev = -refmod[2]
     refubc =  [MOrig[0], MOrig[1], elev]
     mod.write_ubc(SensFile, modext="_ubc.sns", mshext="_ubc.msh",
-                  dx=dx, dy=dy, dz=dz, mval=S, reference=refubc, mvalair=blank, aircells=aircells, header=Head)
+                  dx=dx, dy=dy, dz=dz, mval=S, reference=refubc, mvalair=Blank, aircells=aircells, header=Header)
     print(" Sensitivities (UBC format) written to "+SensFile)
     
-    
-V = V.reshape(dims, order="F")   
-if "mod" in OutFormat.lower():
-    mod.write_mod(SensFile, modext="_mod.vol",
-                  dx=dx, dy=dy, dz=dz, mval=V,
-                  reference=refmod, mvalair=blank, aircells=aircells, header=Head)
-    print(" Cell volumes (ModEM format) written to "+SensFile)
-    
-if "ubc" in OutFormat.lower():
-    elev = -refmod[2]
-    refubc =  [MOrig[0], MOrig[1], elev]
-    mod.write_ubc(SensFile, modext="_ubc.vol", mshext="_ubc.msh",
-                  dx=dx, dy=dy, dz=dz, mval=V, reference=refubc, mvalair=blank, aircells=aircells, header=Head)
-    print(" Cell volumes (UBC format) written to "+SensFile)
   
   
 elapsed = time.perf_counter() - start
@@ -287,7 +322,7 @@ for Split in Splits:
         """
         Full_Impedance              = 1
         Off_Diagonal_Impedance      = 2
-        Full_Vertical_Components    = 3
+        Full_volertical_Components    = 3
         Full_Interstation_TF        = 4
         Off_Diagonal_Rho_Phase      = 5
         Phase_Tensor                = 6
@@ -305,15 +340,15 @@ for Split in Splits:
             
             SensTmp = jac.calc_sensitivity(JacTmp,
                          Type = Type, OutInfo=False)
-            SensTmp = jac.transform_sensitivity(S=SensTmp, V=V,
+            SensTmp = jac.transform_sensitivity(S=SensTmp, vol=vol,
                               Transform=Transform, OutInfo=False)
             SensFile = SensDir+JacName+"_"+compstr[icmp-1]+"_"+Type+"_"+"_".join(Transform)
-            Head = (JacName+"_"+compstr[icmp-1]+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
-            S = np.reshape(SensTmp, dims, order="F")
+            Header = ("# "+JacName+"_"+compstr[icmp-1]+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
+            S = np.reshape(SensTmp, mdims, order="F")
             if "mod" in OutFormat.lower():
-                mod.write_mod(SensFile, "_mod.sns",
+                mod.write_mod(SensFile, ModExt,
                               dx=dx, dy=dy, dz=dz, mval=S,
-                              reference=refmod, mvalair=blank, aircells=aircells, header=Head)
+                              reference=refmod, mvalair=Blank, aircells=aircells, header=Header)
                 print(" Component sensitivities (ModEM format) written to "+SensFile)
                 
             if "ubc" in OutFormat.lower():
@@ -321,7 +356,7 @@ for Split in Splits:
                 refubc =  [MOrig[0], MOrig[1], elev]
                 mod.write_ubc(SensFile, modext="_ubc.sns" ,mshext="_ubc.msh",
                               dx=dx, dy=dy, dz=dz, mval=S,
-                              reference=refubc, mvalair=blank, aircells=aircells, header=Head)
+                              reference=refubc, mvalair=Blank, aircells=aircells, header=Header)
                 print(" Component sensitivities (UBC format) written to "+SensFile)
             
         elapsed = time.perf_counter() - start
@@ -344,15 +379,15 @@ for Split in Splits:
            
            SensTmp = jac.calc_sensitivity(JacTmp,
                         Type = Type, OutInfo=False)
-           SensTmp = jac.transform_sensitivity(S=SensTmp, V=V,
+           SensTmp = jac.transform_sensitivity(S=SensTmp, vol=vol,
                              Transform=Transform, OutInfo=False)
            SensFile = SensDir+JacName+"_"+sit.lower()+"_"+Type+"_"+"_".join(Transform)
-           Head = (JacName+"_"+sit.lower()+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
-           S = np.reshape(SensTmp, dims, order="F") 
+           Header = ("# "+JacName+"_"+sit.lower()+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
+           S = np.reshape(SensTmp, mdims, order="F") 
            if "mod" in OutFormat.lower():
-                mod.write_mod(SensFile, modext="_mod.sns",
+                mod.write_mod(SensFile, modext=ModExt,
                               dx=dx, dy=dy, dz=dz, mval=S,
-                              reference=refmod, mvalair=blank, aircells=aircells, header=Head)
+                              reference=refmod, mvalair=Blank, aircells=aircells, header=Header)
                 print(" Site sensitivities (ModEM format) written to "+SensFile)
                 
            if "ubc" in OutFormat.lower():
@@ -360,7 +395,7 @@ for Split in Splits:
                 refubc =  [MOrig[0], MOrig[1], elev]
                 mod.write_ubc(SensFile, modext="_ubc.sns", mshext="_ubc.msh",
                               dx=dx, dy=dy, dz=dz, mval=S,
-                              reference=refubc, mvalair=blank, aircells=aircells, header=Head)
+                              reference=refubc, mvalair=Blank, aircells=aircells, header=Header)
                 print(" Site sensitivities (UBC format) written to "+SensFile)           
            
         
@@ -390,15 +425,15 @@ for Split in Splits:
 
                SensTmp = jac.calc_sensitivity(JacTmp,
                             Type = Type, OutInfo=False)
-               SensTmp = jac.transform_sensitivity(S=SensTmp, V=V,
+               SensTmp = jac.transform_sensitivity(S=SensTmp, vol=vol,
                                  Transform=Transform, OutInfo=False)
                SensFile = SensDir+JacName+"_freqband"+lowstr+"_to_"+uppstr+"_"+Type+"_"+"_".join(Transform)
-               Head = (JacName+"_freqband"+lowstr+"to"+uppstr+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
-               S = np.reshape(SensTmp, dims, order="F") 
+               Header = ("# "+JacName+"_freqband"+lowstr+"to"+uppstr+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
+               S = np.reshape(SensTmp, mdims, order="F") 
                if "mod" in OutFormat.lower():
-                   mod.write_mod(SensFile, modext="_mod.sns",
+                   mod.write_mod(SensFile, modext=ModExt,
                                  dx=dx, dy=dy, dz=dz, mval=S,
-                                 reference=refmod, mvalair=blank, aircells=aircells, header=Head)
+                                 reference=refmod, mvalair=Blank, aircells=aircells, header=Header)
                    print(" Frequency band sensitivities (ModEM format) written to "+SensFile)
          
                if "ubc" in OutFormat.lower():
@@ -406,7 +441,7 @@ for Split in Splits:
                    refubc =  [MOrig[0], MOrig[1], elev]
                    mod.write_ubc(SensFile, modext="_ubc.sns", mshext="_ubc.msh",
                                  dx=dx, dy=dy, dz=dz, mval=S,
-                                 reference=refubc, mvalair=blank, aircells=aircells, header=Head)
+                                 reference=refubc, mvalair=Blank, aircells=aircells, header=Header)
                    print(" Frequency band sensitivities (UBC format) written to "+SensFile)   
            else: 
                 print("Frequency band is empty! Continue.")

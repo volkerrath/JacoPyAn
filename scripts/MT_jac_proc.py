@@ -68,8 +68,10 @@ nan = np.nan
 SparseThresh = 1.e-8
 Sparse = SparseThresh > 0
 
-ErrorScale = False
-VolumeScale= False
+"""
+Errorscale should be set to false if Jacobian originates from the ModEM3DJE.x version
+"""
+ErrorScale = True 
 Scale = 1.
 
 
@@ -149,8 +151,7 @@ for f in np.arange(nF):
     mn = np.nanmin(Jac)
     print(JFiles[f]+" raw minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx)) 
    
-    
-    # No longer used here 
+
     if ErrorScale:
         nstr = nstr+"_nerr"
         start = time.perf_counter()
@@ -167,18 +168,6 @@ for f in np.arange(nF):
         print(" Used %7.4f s for normalizing Jacobian with data error from %s " %
               (elapsed, DFile))
         start = time.perf_counter()
-
-    # if VolumeScale:     
-    #     nstr = nstr+"_vcell"
-    #     start = time.perf_counter()
-    #     wcell   = 1. /vcell.flatten(order="F")
-    #     print(np.amin(err), np.amax(err))
-    #     Jac = Jac*wcell
-    #     elapsed = time.perf_counter() - start
-    #     print(" Used %7.4f s for normalizing Jacobian with inverse cell volumes " %
-    #           (elapsed))
-    #     start = time.perf_counter()
-
 
 
 
