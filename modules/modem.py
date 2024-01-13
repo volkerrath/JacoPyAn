@@ -167,7 +167,7 @@ def read_data_jac(Datfile=None, out=True):
                 continue
 
             t = line.split()
-            
+            print(t[8])
             if t:
                 if int(t[8]) in [1,2,3,6,5]:
 

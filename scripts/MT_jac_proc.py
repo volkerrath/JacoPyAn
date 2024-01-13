@@ -87,19 +87,21 @@ WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya//SABA8_Jac/"
 JFiles = [WorkDir+"SABA8_T.jac", WorkDir+"SABA8_P.jac",] # WorkDir+"SABA8_Z.jac",] 
 MFile = WorkDir + "SABA8_best.rho"
 
+
+
 if not WorkDir.endswith("/"):
     WorkDir = WorkDir+"/"
 nF = len(JFiles)
 
 total = 0.0
 start = time.perf_counter()
-dx, dy, dz, rho, reference, _, vcell = mod.read_mod(
+dx, dy, dz, rho, reference, _, = mod.read_mod(
     MFile, trans="linear", volumes=True)
 dims = np.shape(rho)
-sdims = np.size(rho)
+# sdims = np.size(rho)
 
-rhoair = 1.e17
-aircells = np.where(rho > rhoair/10)
+Rhoair = 1.e17
+aircells = np.where(rho > Rhoair/10)
 blank = 1.e-30 #np.nan
 
 airmask = jac.set_airmask(rho=rho, aircells=aircells, flat = False, out=True)
