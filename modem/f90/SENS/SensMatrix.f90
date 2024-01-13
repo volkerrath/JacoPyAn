@@ -343,7 +343,7 @@ Contains
     write(*,*) 'written to ',tmpstr
 
     call get_command(tmpstr)
-    write(ioJdt,*) '# ',trim(tmpstr)
+    write(ioJdt,'(a,a)') '# ',tmpstr
     write(*,*) 'header:'
     write(*,*) '# ',trim(tmpstr)
 
