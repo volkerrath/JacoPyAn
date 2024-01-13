@@ -53,24 +53,22 @@ rhoair = 1.e17
 InpFormat = "sparse"
 
 
-WorkDir = JACOPYAN_DATA+"/Annecy/Jacobians/"
+# WorkDir = JACOPYAN_DATA+"/Annecy/Jacobians/"
 # WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya//SABA8_Jac/"
+WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/"
 
 if not WorkDir.endswith("/"):
     WorkDir = WorkDir+"/"
     
 # MFile = WorkDir + "SABA8_best.rho"
-MFile = WorkDir + "ANN_best"
-
-# JFiles = [WorkDir+"NewJacTest_P.jac",WorkDir+"NewJacTest_T.jac",WorkDir+"NewJacTest_Z.jac"]
-
-
+MFile = WorkDir + "UBI9_best"
 
 # necessary for ubc, but not relevant  for synthetic model
-MOrig = [-15.767401, -71.854095] # ANN
-MOrig = [45.941551, 6.079800] # SABA
+#MOrig = [-15.767401, -71.854095] # ANN
+#MOrig = [45.941551, 6.079800] # SABA
+MOrig = [45.941551, 6.079800] # UBI
 
-JacName = "SABA8_ZPT_nerr_sp-8_merged"
+JacName = "UBI9_ZPTss_nerr_sp-8"
 # JacName = "ANN_Z_nerr_sp-8"
 JFile = WorkDir + JacName
 
@@ -96,8 +94,7 @@ PerIntervals = [
 total = 0.0
 
 start = time.perf_counter()
-dx, dy, dz, rho, refmod, _, vcell = mod.read_mod(MFile, trans="linear", volumes=True)
-V= vcell.flatten(order="F")
+dx, dy, dz, rho, refmod, _ = mod.read_mod(MFile, trans="linear", volumes=True)
 elapsed = time.perf_counter() - start
 total = total + elapsed
 print(" Used %7.4f s for reading model from %s " % (elapsed, MFile))

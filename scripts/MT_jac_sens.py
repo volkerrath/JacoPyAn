@@ -55,19 +55,19 @@ OutFormat = "mod" # "ubc"
 # for 3d-Grid:
 ModExt = "_sns.rho"
 
-WorkDir = JACOPYAN_DATA+"/Annecy/Jacobians/"
-# WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya//SABA8_Jac/"
+# WorkDir = JACOPYAN_DATA+"/Annecy/Jacobians/"
+# WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya/"
+WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/"
 
 if not WorkDir.endswith("/"):
     WorkDir = WorkDir+"/"
     
 # MFile = WorkDir + "SABA8_best.rho"
-MFile = WorkDir + "ANN_best"
+MFile = WorkDir + "UBI9_best"
 # necessary, but not relevant  for synthetic model 
-MOrig = [45.941551, 6.079800]
+MOrig = [-16.345800 -70.908249]
 
-
-JacName = "ANN_T_nerr_sp-8"
+JacName = "UBI9_ZPTss_nerr_sp-8"
 JFile = WorkDir + JacName
 
 VolExtract = False
@@ -77,7 +77,7 @@ if VolExtract:
     
 TopoExtract = True
 if TopoExtract:
-    TopoFile = WorkDir + "ANN_Topo.dat"
+    TopoFile = WorkDir + "UBI9_Topo.dat"
     TopoFmt = ""
 
 
@@ -96,8 +96,8 @@ PerIntervals = [
 
 
 
-Type = "raw"
-# Type = "euc"
+# Type = "raw"
+Type = "euc"
 """
 Calculate sensitivities.
 Expects that Jacobian is already error-scaled, i.e Jac = C^(-1/2)*J.
@@ -112,8 +112,8 @@ Usesigma:
 """
 
 
-Transform = [ "max"]
-# Transform = [ "sqr","max"]
+# Transform = [ "max"]
+Transform = [ "sqr","max"]
 
 """
 Transform sensitivities. 
@@ -127,26 +127,7 @@ Options:
     Transform = "log"           Take the logaritm. This should always be the 
                                 last value in Transform list
 """
-# WorkDir = JACOPYAN_DATA+"/NewJacTest/"
-# # WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya//SABA8_Jac/"
-# if not WorkDir.endswith("/"):
-#     WorkDir = WorkDir+"/"
-    
-# # MFile = WorkDir + "SABA8_best.rho"
-# MFile = WorkDir + "JacTest.rho"
 
-# # JFiles = [WorkDir+"NewJacTest_P.jac",WorkDir+"NewJacTest_T.jac",WorkDir+"NewJacTest_Z.jac"]
-
-# SensDir = WorkDir+"/Sens/"
-# if not os.path.isdir(SensDir):
-#     print("File: %s does not exist, but will be created" % SensDir)
-#     os.mkdir(SensDir)
-
-# # necessary, but not relevant  for synthetic model 
-# MOrig = [-15.767401, -71.854095]
-
-# JacName = "NewJacTest_P_nerr_sp-8"
-# JFile = WorkDir + JacName
 SensDir = WorkDir+"/sens_"+Type.lower()+"/"
 if not SensDir.endswith("/"):
     SensDir = SensDir+"/"
