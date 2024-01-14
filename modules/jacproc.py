@@ -574,13 +574,13 @@ def project_model(m=None, U=None, tst_sample= None, nsamp=1, small=1.0e-14, out=
     else:
         nsamp = np.shape(tst_sample)[0]
         
-    spc_sample = np.zeros(nsamp, len(m))
+    nss_sample = np.zeros(nsamp, len(m))
     
     for isamp in np.arange(nsamp):
         b = U.T@tst_sample[isamp,:]
-        spc_sample[isamp, :] = m - U@b
+        nss_sample[isamp, :] = m - U@b
 
-    return spc_sample
+    return nss_sample
 
 def sample_pcovar(cpsqrti=None, m=None, tst_sample = None,
                   nsamp = 1, small=1.0e-14, out=True):
