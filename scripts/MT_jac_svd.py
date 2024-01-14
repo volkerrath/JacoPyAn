@@ -134,7 +134,7 @@ for noversmp in OverSample:
             print("Subspace iterations  =  ", str(nsubspit))
 
             D = U@scs.diags(S[:])@Vt - Jac.T
-            x_op = np.random.normal(size=np.shape(D)[1])
+            x_op = np.random.default_rng().normal(size=np.shape(D)[1])
             n_op = npl.norm(D@x_op)/npl.norm(x_op)
             j_op = npl.norm(Jac.T@x_op)/npl.norm(x_op)
             perc = 100. - n_op*100./j_op
