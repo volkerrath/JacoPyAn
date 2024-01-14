@@ -369,7 +369,7 @@ def find_range(A, n_samples, n_subspace_iters=None):
     """
     # print('here we are in range-finder')
     m, n = A.shape
-    O = np.random.randn(n, n_samples)
+    O = np.random.default_rng().normal(0., 1., (n, n_samples))
     Y = A @ O
 
     if n_subspace_iters:
@@ -460,7 +460,7 @@ def sparsify_jac(Jac=None,
         print("sparsify_jac:"
                 +" output J is sparse, and has %i nonzeros, %f percent"
                 % (ns, 100.0 * ns / nel))
-        test = np.random.normal(size=np.shape(Jac)[1])
+        test = np.random.default_rng().normal(size=np.shape(Jac)[1])
         normx = npl.norm(Jf@test)
         normo = npl.norm(Jf@test-Js@test)
         
@@ -554,7 +554,7 @@ def set_airmask(rho=None, aircells=np.array([]), blank= 1.e-30, flat=False, out=
 
 
 
-def project_model(m=None, U=None, small=1.0e-14, out=True):
+def project_model(m=None, U=None, tst_sample= None, nsamp=1, small=1.0e-14, out=True):
     """
     Project to Nullspace.
 
@@ -562,14 +562,72 @@ def project_model(m=None, U=None, small=1.0e-14, out=True):
     author: vrath
     last changed: Sep 25, 2020
     """
-    b = np.dot(U.T, m)
-    # print(m.shape)
-    # print(b.shape)
-    # print(U.shape)
+    if m.ndim(m)>1:
+        m = m.flatten(order="F")
+    
+    if tst_sample == None:
+        print("project_model: "+str(nsamp)+" sample models will be generated!")
+        if nsamp==0:
+           error("project_model: No number of samples given! Exit.") 
+        tst_sample = np.random.default_rng().normal(0., 1. (nsamp, len(m)))
+        
+    else:
+        nsamp = np.shape(tst_sample)[0]
+        
+    spc_sample = np.zeros(nsamp, len(m))
+    
+    for isamp in np.arange(nsamp):
+        b = U.T@tst_sample[isamp,:]
+        spc_sample[isamp, :] = m - U@b
 
-    mp = m - np.dot(U, b)
+    return spc_sample
 
-    return mp
+def sample_pcovar(cpsqrti=None, m=None, tst_sample = None,
+                  nsamp = 1, small=1.0e-14, out=True):
+    """
+    Sample Posterior Covariance.
+    Algorithm given by  Osypov (2013)
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    spc_sanple
+
+    References:
+
+    Osypov K, Yang Y, Fournier A, Ivanova N, Bachrach R, 
+    Can EY, You Y, Nichols D, Woodward M (2013)
+    Model-uncertainty quantification in seismic tomography: method and applications 
+    Geophysical Prospecting, 61, pp. 1114–1134, 2013, doi: 10.1111/1365-2478.12058.
+  
+
+    """
+    error("sample_pcovar: Not yet fully implemented! Exit.")
+    
+    if (cpsqrti==None) or  (m==None):
+        error("sample_pcovar: No covarince or ref model given! Exit.")
+    
+    if m.ndim(m)>1:
+        m = m.flatten(order="F")
+    
+    if tst_sample == None:
+        print("sample_pcovar: "+str(nsamp)+" sample models will be generated!")
+        if nsamp==0:
+           error("sample_pcovar: No number of samples given! Exit.") 
+        tst_sample = np.random.default_rng().normal(0., 1. (nsamp, len(m)))
+        
+    else:
+        nsamp = np.shape(tst_sample)[0]
+        
+        
+    spc_sample = np.zeros(nsamp, len(m))
+        
+    for isamp in np.arange(nsamp):
+        spc_sample[isamp,:] = m + cpsqrti@tst_sample[isamp,:]
+    
+    return spc_sample
 
 
 def mult_by_cmsqr(m_like_in=None, smooth=[None, None, None], small=1.0e-14, out=True):
