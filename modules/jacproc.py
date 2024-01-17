@@ -609,8 +609,7 @@ def sample_pcovar(cpsqrti=None, m=None, tst_sample = None,
     if (cpsqrti==None) or  (m==None):
         error("sample_pcovar: No covarince or ref model given! Exit.")
     
-    if m.ndim(m)>1:
-        m = m.flatten(order="F")
+
     
     if tst_sample == None:
         print("sample_pcovar: "+str(nsamp)+" sample models will be generated!")

@@ -78,7 +78,7 @@ SVDFile = WorkDir +"/svd/ANN_ZPT_nerr_sp-8_SVD_k500_o2_s0_96.8percent.npz"
 
 total = 0.0
 start =time.perf_counter()
-print("\nReading Jacobina decomposition from "+SVDFile)
+print("\nReading Jacobian decomposition from "+SVDFile)
 
 U = np.load(SVDFile)["U"]
 

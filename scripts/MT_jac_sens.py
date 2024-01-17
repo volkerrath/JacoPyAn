@@ -1,4 +1,4 @@
-F#!/usr/bin/env python3
+#!/usr/bin/env python3
 
 """
 Reads ModEM's Jacobian, does fancy things.
