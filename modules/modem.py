@@ -626,7 +626,7 @@ def write_mod(file=None, modext=".rho",
 
     if not blank == None:
         blanks = np.where(~np.isfinite(mval))
-        mval[blanks] = mvalair
+        mval[blanks] = blank
 
     if len(header)==0:
         header ="# 3D MT model written by ModEM in WS format"
@@ -1897,14 +1897,14 @@ def prepare_model(rho, rhoair=1.0e17):
 def generate_checkerboard(rho=None, 
                           pad=[5, 5, 10], mindepth =3, 
                           bs = [3, 3, 3], ba=[0.5,0.],
-                          rhoair = 1.e17, out=True):
+                          out=True):
     """
     Generates checkerboard model.
 
     Parameters
     ----------
     rho : nparray
-        model. 
+        model (log10) 
     pad : integer list, optional
         padding in x,y,z directions
     mindepth : integer, optional
@@ -1933,15 +1933,26 @@ def generate_checkerboard(rho=None,
     cx, cy, cz = np.shape(mcore)
     
     
-    for iz in np.arange(0, cz, 2*bs[2]):
-        for iy in np.arange(0, cy, bs[1]):
-            for ix in np.arange(0, cx, bs[0]):
+    for jz in np.arange(0, cz, 2*bs[2]):
+        for jy in np.arange(0, cy, bs[1]):
+            for jx in np.arange(0, cx, bs[0]):
+                ix = jx
+                iy = jy
+                iz = jz
                 if ix>cx or iy>cy or iz>cz:
                     continue
                 
                 mcore[ix:ix+bs[0], iy:iy+bs[1], iz:iz+bs[2]]\
                     = mcore[ix:ix+bs[0], iy:iy+bs[1], iz:iz+bs[2]] + ba[0]
                 
+                ix = jx+bs[0]
+                iy = jy+bs[1]
+                iz = jz+bs[2]
+                if ix>cx or iy>cy or iz>cz:
+                    continue
+                
+                mcore[ix:ix+bs[0], iy:iy+bs[1], iz:iz+bs[2]]\
+                    = mcore[ix:ix+bs[0], iy:iy+bs[1], iz:iz+bs[2]] + ba[0]   
                 
 
     return rcb
