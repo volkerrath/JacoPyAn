@@ -1893,3 +1893,55 @@ def prepare_model(rho, rhoair=1.0e17):
             rho_new[ii, jj, :] = tmp
 
     return rho_new
+
+def generate_checkerboard(rho=None, 
+                          pad=[5, 5, 10], mindepth =3, 
+                          bs = [3, 3, 3], ba=[0.5,0.],
+                          rhoair = 1.e17, out=True):
+    """
+    Generates checkerboard model.
+
+    Parameters
+    ----------
+    rho : nparray
+        model. 
+    pad : integer list, optional
+        padding in x,y,z directions
+    mindepth : integer, optional
+        minimal depth for checkerboard. The default is 3.
+        careful with models including topography!
+    bs : intger list, optional
+        box size for checkerboard. The default is [3, 3, 3].
+    ba : list of floats, optional
+        box perturbation (log10). The default is [0.5,0.].
+    out : logical, optional
+        determines screen output. The default is True.
+
+    Returns
+    -------
+    None.
+
+    """
+    rcb = rho.copy()
+    nx, ny, nz = np.shape(rcb)
+    p0, p1, p2, p3, p4, p5 = [pad[0], nx-pad[0],    
+                              pad[1], ny-pad[1],   
+                              mindepth,  nz-pad[2]]
+    
+    
+    mcore = rcb[p0:p1, p2:p3, p4:p5]
+    cx, cy, cz = np.shape(mcore)
+    
+    
+    for iz in np.arange(0, cz, 2*bs[2]):
+        for iy in np.arange(0, cy, bs[1]):
+            for ix in np.arange(0, cx, bs[0]):
+                if ix>cx or iy>cy or iz>cz:
+                    continue
+                
+                mcore[ix:ix+bs[0], iy:iy+bs[1], iz:iz+bs[2]]\
+                    = mcore[ix:ix+bs[0], iy:iy+bs[1], iz:iz+bs[2]] + ba[0]
+                
+                
+
+    return rcb
