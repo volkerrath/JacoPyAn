@@ -51,7 +51,7 @@ Blank = 1.e-30 # np.nan
 Rhoair = 1.e17
 
 InpFormat = "sparse"
-OutFormat = "mod" # "ubc"
+OutFormat = "mod rlm" # "ubc"
 # for 3d-Grid:
 ModExt = "_sns.rho"
 
@@ -185,7 +185,11 @@ if VolExtract or ("size" in Transform):
                       dx=dx, dy=dy, dz=dz, mval=vol, reference=refubc, mvalair=Blank, aircells=aircells, header=Header)
         print(" Cell volumes (UBC format) written to "+VolFile)
   
-    
+    if "rlm" in OutFormat.lower():
+        mod.write_rlm(VolFile, modext="_vol.rlm", 
+                      dx=dx, dy=dy, dz=dz, mval=vol, reference=refmod, mvalair=Blank, aircells=aircells, comment=Header)
+        print(" Cell volumes (UBC format) written to "+VolFile)
+
 else:
     vol = np.array([])
     
@@ -286,6 +290,10 @@ if "ubc" in OutFormat.lower():
                   dx=dx, dy=dy, dz=dz, mval=S, reference=refubc, mvalair=Blank, aircells=aircells, header=Header)
     print(" Sensitivities (UBC format) written to "+SensFile)
     
+    if "rlm" in OutFormat.lower():
+        mod.write_rlm(SensFile, modext="_sns.rlm", 
+                      dx=dx, dy=dy, dz=dz, mval=S, reference=refmod, mvalair=Blank, aircells=aircells, comment=Header)
+        print(" Cell volumes (CGG format) written to "+SensFile)
   
   
 elapsed = time.perf_counter() - start
@@ -338,6 +346,12 @@ for Split in Splits:
                               reference=refubc, mvalair=Blank, aircells=aircells, header=Header)
                 print(" Component sensitivities (UBC format) written to "+SensFile)
             
+            if "rlm" in OutFormat.lower():
+                mod.write_rlm(SensFile, modext="_sns.rlm", 
+                              dx=dx, dy=dy, dz=dz, mval=S, reference=refmod, mvalair=Blank, aircells=aircells, comment=Header)
+                print(" Cell volumes (CGG format) written to "+SensFile)
+             
+            
         elapsed = time.perf_counter() - start
         print(" Used %7.4f s for comp sensitivities " % (elapsed))        
         print("\n")
@@ -376,7 +390,12 @@ for Split in Splits:
                               dx=dx, dy=dy, dz=dz, mval=S,
                               reference=refubc, mvalair=Blank, aircells=aircells, header=Header)
                 print(" Site sensitivities (UBC format) written to "+SensFile)           
-           
+                     
+           if "rlm" in OutFormat.lower():
+                mod.write_rlm(SensFile, modext="_sns.rlm", 
+                              dx=dx, dy=dy, dz=dz, mval=S, reference=refmod, mvalair=Blank, aircells=aircells, comment=Header)
+                print(" Cell volumes (CGG format) written to "+SensFile)
+               
         
         elapsed = time.perf_counter() - start
         print(" Used %7.4f s for site sensitivities " % (elapsed))
@@ -422,6 +441,13 @@ for Split in Splits:
                                  dx=dx, dy=dy, dz=dz, mval=S,
                                  reference=refubc, mvalair=Blank, aircells=aircells, header=Header)
                    print(" Frequency band sensitivities (UBC format) written to "+SensFile)   
+                   
+                                     
+               if "rlm" in OutFormat.lower():
+                    mod.write_rlm(SensFile, modext="_sns.rlm", 
+                                  dx=dx, dy=dy, dz=dz, mval=S, reference=refmod, mvalair=Blank, aircells=aircells, comment=Header)
+                    print(" Cell volumes (CGG format) written to "+SensFile)
+                    
            else: 
                 print("Frequency band is empty! Continue.")
 

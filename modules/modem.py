@@ -173,15 +173,9 @@ def read_data_jac(Datfile=None, out=True):
 
                     #print(" 1: ", t[5], t[6], len(t))
                     tmp= [
-                        float(t[0]),
-                        float(t[2]),
-                        float(t[3]),
-                        float(t[4]),
-                        float(t[5]),
-                        float(t[6]),
-                        float(t[9]),
-                        float(t[10]),
-                    ]
+                        float(t[0]), float(t[2]), float(t[3]), float(t[4]),
+                        float(t[5]), float(t[6]), float(t[9]), float(t[10]),
+                        ]
                     Data.append(tmp)
                     Site.append([t[1]])
                     Comp.append([t[7]])
@@ -571,9 +565,6 @@ def write_mod_ncd(
         )
 
 
-
-
-
 def write_mod(file=None, modext=".rho",
                     dx=None, dy=None, dz=None, mval=None, reference=None,
                     trans="LINEAR", aircells = None, mvalair = 1.e17, blank = 1.e-30, header="", out=True):
@@ -681,9 +672,10 @@ def write_mod(file=None, modext=".rho",
         np.savetxt(f, cnt.reshape(1, cnt.shape[0]), fmt="%10.1f")
         f.write("%10.2f  \n" % (0.0))
 
-def write_rlm(file=None, modext=".rho",
+def write_rlm(file=None, modext=".rlm",
                     dx=None, dy=None, dz=None, mval=None, reference=None,
-                    aircells = None, mvalair = 1.e17, blank = 1.e-30, header="", out=True):
+                    aircells = None, mvalair = 1.e17, blank = 1.e-30, 
+                    comment="", name="", out=True):
     """
     Write GGG model input.
 
@@ -701,13 +693,7 @@ def write_rlm(file=None, modext=".rho",
     
     modl = file+modext
 
-    dims = np.shape(mval)
-
-    nx = dims[0]
-    ny = dims[1]
-    nz = dims[2]
-    dummy = 0
-
+    nx, ny, nz  = np.shape(mval)
 
     if not aircells == None:
         mval[aircells] = mvalair
@@ -716,14 +702,15 @@ def write_rlm(file=None, modext=".rho",
         blanks = np.where(~np.isfinite(mval))
         mval[blanks] = blank
 
-    if len(header)==0:
-        header ="# 3D MT model in RLM format"
+    if len(comment)==0:
+        comment ="# 3D MT model in RLM format"
      
-    header = header.strip()
-    if header[0] != "#":
-        header = "#"+header 
+    comment = comment.strip()
+    if comment[0] != "#":
+        comment = "#"+comment 
         
-
+    if len(name)==0:
+        name=file
     if reference==None:
         ncorner = -0.5*np.sum(dx)
         ecorner = -0.5*np.sum(dy)
@@ -745,15 +732,16 @@ def write_rlm(file=None, modext=".rho",
             f.write(zi+1)
             for yi in range(dy.size):
                 line = mval[:, yi, zi]
-                # line = np.flipud(mval[:, yi, zi])
-                # line = mval[:, yi, zi]
                 np.savetxt(f, line.reshape(1, nx), fmt="%12.5e")
 
  
         np.savetxt(
-            f, [header], fmt="%s")
+            f, [comment], fmt="%s")
         np.savetxt(
-            f, [file], fmt="%s")
+            f, [name], fmt="%s")
+        
+        np.savetxt(
+            f, [1, 1], fmt="%i")
         
         np.savetxt(f, cnt[0], cnt[1], fmt="%16.6g")        
         f.write("%10.2f  \n" % (0.0))
