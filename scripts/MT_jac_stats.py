@@ -66,7 +66,7 @@ MFile = WorkDir + "UBI9_best"
 # necessary for ubc, but not relevant  for synthetic model
 #MOrig = [-15.767401, -71.854095] # ANN
 #MOrig = [45.941551, 6.079800] # SABA
-MOrig = [45.941551, 6.079800] # UBI
+MOrig = [45.941551, 6.079800] # ANN
 
 JacName = "UBI9_ZPTss_nerr_sp-8"
 # JacName = "ANN_Z_nerr_sp-8"

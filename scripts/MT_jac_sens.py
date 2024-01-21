@@ -55,19 +55,20 @@ OutFormat = "mod rlm" # "ubc"
 # for 3d-Grid:
 ModExt = "_sns.rho"
 
-# WorkDir = JACOPYAN_DATA+"/Annecy/Jacobians/"
+WorkDir = JACOPYAN_DATA+"/Annecy/Jacobians/"
 # WorkDir = JACOPYAN_DATA+"/Peru/Sabancaya/"
-WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/"
+# WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/"
 
 if not WorkDir.endswith("/"):
     WorkDir = WorkDir+"/"
     
 # MFile = WorkDir + "SABA8_best.rho"
-MFile = WorkDir + "UBI9_best"
+MFile = WorkDir + "ANN_best"
 # necessary, but not relevant  for synthetic model 
-MOrig = [-16.345800 -70.908249]
+MOrig = [45.941551, 6.079800] # ANN
+# MOrig = [-16.345800 -70.908249] UBI
 
-JacName = "UBI9_ZPTss_nerr_sp-8"
+JacName = "ANN_ZPT_nerr_sp-8"
 JFile = WorkDir + JacName
 
 VolExtract = False
@@ -77,7 +78,7 @@ if VolExtract:
     
 TopoExtract = True
 if TopoExtract:
-    TopoFile = WorkDir + "UBI9_Topo.dat"
+    TopoFile = WorkDir + "ANN_Topo.dat"
     TopoFmt = ""
 
 
@@ -290,10 +291,10 @@ if "ubc" in OutFormat.lower():
                   dx=dx, dy=dy, dz=dz, mval=S, reference=refubc, mvalair=Blank, aircells=aircells, header=Header)
     print(" Sensitivities (UBC format) written to "+SensFile)
     
-    if "rlm" in OutFormat.lower():
-        mod.write_rlm(SensFile, modext="_sns.rlm", 
-                      dx=dx, dy=dy, dz=dz, mval=S, reference=refmod, mvalair=Blank, aircells=aircells, comment=Header)
-        print(" Cell volumes (CGG format) written to "+SensFile)
+if "rlm" in OutFormat.lower():
+    mod.write_rlm(SensFile, modext="_sns.rlm", 
+                  dx=dx, dy=dy, dz=dz, mval=S, reference=refmod, mvalair=Blank, aircells=aircells, comment=Header)
+    print(" Cell volumes (CGG format) written to "+SensFile)
   
   
 elapsed = time.perf_counter() - start
@@ -309,7 +310,7 @@ for Split in Splits:
         """
         Full_Impedance              = 1
         Off_Diagonal_Impedance      = 2
-        Full_volertical_Components    = 3
+        Full_vertical_Components    = 3
         Full_Interstation_TF        = 4
         Off_Diagonal_Rho_Phase      = 5
         Phase_Tensor                = 6

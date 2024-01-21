@@ -44,11 +44,11 @@ import modem as mod
 import util as utl
 from version import versionstrg
 
-Strng, _ = versionstrg()
-now = datetime.now()
-print("\n\n"+Strng)
-print("Image processing on model"+"\n"+"".join("Date " + now.strftime("%m/%d/%Y, %H:%M:%S")))
-print("\n\n")
+rng = np.random.default_rng()
+nan = np.nan  # float("NaN")
+version, _ = versionstrg()
+titstrng = utl.print_title(version=version, fname=__file__, out=False)
+print(titstrng+"\n\n")
 
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
@@ -57,31 +57,29 @@ rhoair = 1.e17
 
 total = 0
 
-PFile = r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/Ann21_T"
-DFile = r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/Ann21_T3.dat"
-MFile = r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/Ann21_Prior100_T_NLCG_033.rho"
-SFile = r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/Ann21_Prior100_T-Z3.sns"
+WorkDir = JACOPYAN_DATA+"Annecy/Jacobians/"
+if not WorkDir.endswith("/"):
+    WorkDir = WorkDir+"/"
+    
+ModFile = WorkDir+"ANN_best"
+SnsFile = WorkDir+"/sens_euc/"
 
 
 start = time.perf_counter()
-dx, dy, dz, rho, reference = mod.read_mod(MFile, trans="LOG10")
+dx, dy, dz, rho, reference = mod.read_mod(ModFile, trans="LOG10")
 elapsed = time.perf_counter() - start
 total = total + elapsed
-print("Used %7.4f s for reading model from %s " % (elapsed, MFile))
+print("Used %7.4f s for reading model from %s " % (elapsed, ModFile))
 print("ModEM reference is "+str(reference))
 print("Min/max rho = "+str(np.min(rho))+"/"+str(np.max(rho)))
 
 start = time.perf_counter()
-dx, dy, dz, sns, reference = mod.read_mod(SFile, trans="LOG10")
+dx, dy, dz, sns, reference = mod.read_mod(SnsFile, trans="LOG10")
 elapsed = time.perf_counter() - start
 total = total + elapsed
-print("Used %7.4f s for reading model from %s " % (elapsed, SFile))
+print("Used %7.4f s for reading model from %s " % (elapsed, SnsFile))
 
-start = time.perf_counter()
-Site, Comp, Data, Head = mod.read_data(DFile)
-elapsed = time.perf_counter() - start
-total = total + elapsed
-print("Used %7.4f s for reading data from %s " % (elapsed, DFile))
+
 
 
 Bounds = [-5.,5., -5.,5., -1. ,3.]

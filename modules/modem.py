@@ -722,14 +722,14 @@ def write_rlm(file=None, modext=".rlm",
     with open(modl, "w") as f:
 
         line = np.array([nx, ny,nz],dtype="object")
-        np.savetxt(f, line.reshape(1, 3), fmt =["  %i","  %i","  %i","  %i", "  %s"])
+        np.savetxt(f, line.reshape(1, 3), fmt ="  %i")
         np.savetxt(f, dx.reshape(1, dx.shape[0]), fmt="%12.3f")
         np.savetxt(f, dy.reshape(1, dy.shape[0]), fmt="%12.3f")
         np.savetxt(f, dz.reshape(1, dz.shape[0]), fmt="%12.3f")
         
         # write out the layers from resmodel
         for zi in range(dz.size):
-            f.write(zi+1)
+            f.write(str(zi+1))
             for yi in range(dy.size):
                 line = mval[:, yi, zi]
                 np.savetxt(f, line.reshape(1, nx), fmt="%12.5e")
@@ -743,9 +743,9 @@ def write_rlm(file=None, modext=".rlm",
         np.savetxt(
             f, [1, 1], fmt="%i")
         
-        np.savetxt(f, cnt[0], cnt[1], fmt="%16.6g")        
+        np.savetxt(f, [cnt[0], cnt[1]], fmt="%16.6g")        
         f.write("%10.2f  \n" % (0.0))
-        np.savetxtt(f, cnt[2], fmt="%16.6g")
+        np.savetxt(f, [cnt[2]], fmt="%16.6g")
 
 
 
