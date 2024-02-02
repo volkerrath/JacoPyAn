@@ -11,10 +11,11 @@ can be used.
 **Preprocessing the Jacobian**
 
 The Jacobian  of a data and parameter set is defined as $J_{ij} = \dfrac{\delta d_i}{\delta m_j}$. Before being able to use it for further
-action, a  few steps are necessary. ModEM seeks the MAP solution to the usual Bayesianinverse problem defined by:
-$$
-  \Theta  = {({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}})^T}{\mathbf{C}}_{\mathbf{d}}^{ - 1}({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}}) + {({\mathbf{p}} - {{\mathbf{p}}_a})^T}{\mathbf{C}}_{\mathbf{p}}^{ - 1}({\mathbf{p}} - {{\mathbf{p}}_a}) = \left| {{\mathbf{C}}_{\mathbf{d}}^{ - 1/2}({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}})} \right|_2^2 + \left| {{\mathbf{C}}_{\mathbf{p}}^{ - 1/2}({\mathbf{p}} - {{\mathbf{p}}_a})} \right|_2^2 
-$$
+action, a  few steps are necessary. ModEM seeks the MAP solution to the usual Bayesian inverse problem defined by:
+
+```math
+  \Theta  = {({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}})^T}{\mathbf{C}}_{\mathbf{d}}^{ - 1}({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}}) + {({\mathbf{p}} - {{\mathbf{p}}_a})^T}{\mathbf{C}}_{\mathbf{p}}^{ - 1}({\mathbf{p}} - {{\mathbf{p}}_a}) = \left||| {{\mathbf{C}}_{\mathbf{d}}^{ - 1/2}({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}})} \right|||_2^2 + \left||| {{\mathbf{C}}_{\mathbf{p}}^{ - 1/2}({\mathbf{p}} - {{\mathbf{p}}_a})} \right|||_2^2 
+```
 
 
 However, it uses a transformation of data and parameter, given by:
@@ -53,13 +54,12 @@ volume of the model, it seems useful normalize by the cell volume. On the other 
 the true role of this cell in the inversion. Finally, for comparing different data (sub)sets, it is convenient to do a final 
 normalization by the maximum value in the model. All these options are implemented in the $\texttt{JacoPyAn}$ toolbox. 
 
-_[1] M. Deal and G. Nolet (1996)_ 
-_“Nullspace shuttles"_ 
-_Geophysical Journal International, 124, 372–380_
+_[1] M. Deal and G. Nolet (1996)
+“Nullspace shuttles", Geophysical Journal International, 124, 372–380_
 
 _[2] G. Muñoz and V. Rath (2006)_
 _“Beyond smooth inversion: the use of nullspace projection for the exploration of non-uniqueness in MT"_
-_Geophysical Journal International, 164, 301–311, 2006, doi: 10.1111/j.1365-246X.2005.02825.x_
+_Geophysical Journal International, 164, 301–311, 2006, doi: http://dx.doi.org/10.1111/j.1365-246X.2005.02825.x_
 
 _[3] G. D. Egbert and A. Kelbert (2012)_ 
 _“Computational recipes for electromagnetic inverse problems”_ 
