@@ -29,7 +29,7 @@ to the everyday use of the word. Sensitivities are derived from the final model 
 itself. It needs to be kept in mind that this implies any conclusions drawn are valid in the domain of validity for the Taylor expansion involved only. 
 This may be a grave disadvantage in highly non-linear settings, but we believe that it still can be usefull for fast characterization of uncertainty.
 
-Here, the parameter vector $\mathbf(m)$ is the natural logarithm of resistivity. This Jacobian is first normalized with the data error 
+Here, the parameter vector $\mathbf{m}$ is the natural logarithm of resistivity. This Jacobian is first normalized with the data error 
 to obtain $\mathbf{\tilde{J}}$. While this procedure is uncontroversial, the definition of sensitivity is not unique, and various forms
 an be found in the literature, and $\texttt{JacoPyAn}$ calculates several of them:
 
