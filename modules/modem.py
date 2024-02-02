@@ -1366,22 +1366,27 @@ def insert_body(
     pad=[0, 0, 0],
     smooth=None,
     scale=1.0,
+    reference = None,
     Out=True,
 ):
     """
     Insert 3d ellipsoid or box into given model.
 
     Created on Sun Jan 3 10:35:28 2021
+    
     @author: vrath
     """
     xpad = pad[0]
     ypad = pad[1]
     zpad = pad[2]
 
-    xc, yc, zc = cells3d(dx, dy, dz, otype='c')
+    xc, yc, zc = cells3d(dx, dy, dz)
 
-    modcenter = [0.5 * np.sum(dx), 0.5 * np.sum(dy), 0.0]
-
+    if reference==None:
+        modcenter = [0.5 * np.sum(dx), 0.5 * np.sum(dy), 0.0]
+    else: 
+        modcenter = reference
+        
     xc = xc - modcenter[0]
     yc = yc - modcenter[1]
     zc = zc - modcenter[2]
@@ -1390,15 +1395,18 @@ def insert_body(
     ny = np.shape(yc)[0]
     nz = np.shape(zc)[0]
 
-    rho_out = np.log10(rho_in)
+    rho_out = np.log(rho_in.copy())
 
-    geom = body[0]
+    geom= body[0]
     action = body[1]
     rhoval = body[2]
     bcent = body[3:6]
     baxes = body[6:9]
     bangl = body[9:12]
 
+
+    rhoval = np.log(rhoval) 
+    
     if action[0:3] == "rep":
         actstring = "rhoval"
     elif action[0:3] == "add":
@@ -1409,14 +1417,14 @@ def insert_body(
     if Out:
         print(
             "Body type   : " + geom + ", " + action + " rho =",
-            str(np.power(10.0, rhoval)) + " Ohm.m",
+            str(np.exp(rhoval)) + " Ohm.m",
         )
         print("Body center : " + str(bcent))
         print("Body axes   : " + str(baxes))
         print("Body angles : " + str(bangl))
         print("Smoothed with " + smooth[0] + " filter")
 
-    if geom[0:3] == "ell":
+    if "ell" in geom.lower():
 
         for kk in np.arange(0, nz - zpad - 1):
             zpoint = zc[kk]
@@ -1434,8 +1442,7 @@ def insert_body(
                         # if Out:
                         #     print("cell %i %i %i" % (ii, jj, kk))
 
-    if geom[0:3] == "box":
-
+    if "box" in geom.lower():
         for kk in np.arange(0, nz - zpad - 1):
             zpoint = zc[kk]
             for jj in np.arange(ypad + 1, ny - ypad - 1):
@@ -1465,7 +1472,7 @@ def insert_body(
         else:
             error("Smoothing filter  " + smooth[0] + " not implemented! Exit.")
 
-    rho_out = np.power(10.0, rho_out)
+    rho_out = np.exp(rho_out)
 
     return rho_out
 
@@ -1936,12 +1943,12 @@ def prepare_model(rho, rhoair=1.0e17):
     """
     nn = np.shape(rho)
 
-    rho_new = rho
+    rho_new = rho.copy()
 
     for ii in range(nn[0]):
         for jj in range(nn[1]):
             tmp = rho[ii, jj, :]
-            na = np.argwhere(tmp < rhoair / 100.0)[0]
+            na = np.argwhere(tmp < rhoair / 10.0)[0]
             # print(' orig')
             # print(tmp)
             tmp[: na[0]] = tmp[na[0]]
