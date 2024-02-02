@@ -14,21 +14,9 @@ The Jacobian  of a data and parameter set is defined as $J_{ij} = \dfrac{\delta 
 action, a  few steps are necessary. ModEM seeks the MAP solution to the usual Bayesianinverse problem defined by:
 
 ```math
-\Theta = (\mathbf{d} - \mathbf{g}(\mathbf{p}))^T}\mathbf{C}_{d}^{-1}(\mathbf{d} - \mathbf{g}(\mathbf{p})) + (\mathbf{p} - \mathbf{p}_a)^T \mathbf{C}_{p}^{-1}(bf{p} - \mathbf{p}_a) = \min !
+  \Theta  = {({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}})^T}{\mathbf{C}}_{\mathbf{d}}^{ - 1}({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}}) + {({\mathbf{p}} - {{\mathbf{p}}_a})^T}{\mathbf{C}}_{\mathbf{p}}^{ - 1}({\mathbf{p}} - {{\mathbf{p}}_a}) = \left| {{\mathbf{C}}_{\mathbf{d}}^{ - 1/2}({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}})} \right|_2^2 + \left| {{\mathbf{C}}_{\mathbf{p}}^{ - 1/2}({\mathbf{p}} - {{\mathbf{p}}_a})} \right|_2^2 \\
 ```
 
-```math
-\begin{gathered}
-  \Theta  = {({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}})^T}{\mathbf{C}}_{\mathbf{d}}^{ - 1}({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}}) + {({\mathbf{p}} - {{\mathbf{p}}_a})^T}{\mathbf{C}}_{\mathbf{p}}^{ - 1}({\mathbf{p}} - {{\mathbf{p}}_a}) \\
-   = \left| {{\mathbf{C}}_{\mathbf{d}}^{ - 1/2}({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}})} \right|_2^2 + \left| {{\mathbf{C}}_{\mathbf{p}}^{ - 1/2}({\mathbf{p}} - {{\mathbf{p}}_a})} \right|_2^2 \\
-\end{gathered}
-```
-```math
-\begin{array}{c}
-\Theta  = {({\bf{g}}({\bf{p}}) - {\bf{d}})^T}{\bf{C}}_{\bf{d}}^{ - 1}({\bf{g}}({\bf{p}}) - {\bf{d}}) + {({\bf{p}} - {{\bf{p}}_a})^T}{\bf{C}}_{\bf{p}}^{ - 1}({\bf{p}} - {{\bf{p}}_a})\\
- = \left\| {{\bf{C}}_{\bf{d}}^{ - 1/2}({\bf{g}}({\bf{p}}) - {\bf{d}})} \right\|_2^2 + \left\| {{\bf{C}}_{\bf{p}}^{ - 1/2}({\bf{p}} - {{\bf{p}}_a})} \right\|_2^2
-\end{array}
-```
 
 However, it uses a transformation of data and parameter, given by:
 
