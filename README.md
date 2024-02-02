@@ -54,8 +54,8 @@ volume of the model, it seems useful normalize by the cell volume. On the other 
 the true role of this cell in the inversion. Finally, for comparing different data (sub)sets, it is convenient to do a final 
 normalization by the maximum value in the model. All these options are implemented in the $\texttt{JacoPyAn}$ toolbox. 
 
-_[1] M. Deal and G. Nolet (1996)_ 
-_“Nullspace shuttles"_ 
+_[1] M. Deal and G. Nolet (1996)                                                                 _ 
+_“Nullspace shuttles"                                                                            _ 
 _Geophysical Journal International, 124, 372–380_
 
 _[2] G. Muñoz and V. Rath (2006)_
