@@ -44,14 +44,17 @@ volume of the model, it seems useful normalize by the cell volume. On the other 
 the true role of this cell in the inversion. Finally, for comparing different data (sub)sets, it is convenient to do a final 
 normalization by the maximum value in the model. All these options are implemented in the $\texttt{JacoPyAn}$ toolbox. 
 
+_[2] G. Muñoz and V. Rath (2006)_
+_“Beyond smooth inversion: the use of nullspace projection for the exploration of non-uniqueness in MT"_
+_Geophysical Journal International, 164, 301–311, 2006, doi: 10.1111/j.1365-246X.2005.02825.x_
 
 _[3] G. D. Egbert and A. Kelbert (2012)_ 
 _“Computational recipes for electromagnetic inverse problems”_ 
-_Geophysical Journal International, 189 (1), 251–267, doi: 10.1111/j.1365-246X.2011.05347.x_
+_Geophysical Journal International, 189, 251–267, doi: http://dx.doi.org/10.1111/j.1365-246X.2011.05347.x_
 
 _[4] A. Kelbert, N. Meqbel, G. D. Egbert, and K. Tandon (2014)_
 _“ModEM: A Modular System for Inversion of Electromagnetic Geophysical Data”_
-_Computers & Geosciences, 66, pp. 440–53, doi: http://dx.doi.org/10.1016/j.cageo.2014.01.010_
+_Computers & Geosciences, 66, 440–53, doi: http://dx.doi.org/10.1016/j.cageo.2014.01.010_
 
 
   
