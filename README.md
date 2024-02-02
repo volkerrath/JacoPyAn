@@ -11,9 +11,9 @@ can be used.
 **Preprocessing the Jacobian**
 
 The Jacobian  of a data and parameter set is defined as $J_{ij} = \dfrac{\delta d_i}{\delta m_j}$. Before being able to use it for further
-action, a  few steps are necessary. Modem seeks the MAP solution to tha usual Bayesian inverse problem defined by:
+action, a  few steps are necessary. Modem seeks the MAP solution to the usual Bayesianinverse problem defined by:
 
-${\Theta _B} = {({\mathbf{d}} - {\mathbf{g}}({\mathbf{p}}))^T}{\mathbf{C}}_{\mathbf{d}}^{ - 1}({\mathbf{d}} - {\mathbf{g}}({\mathbf{p}})) + {({\mathbf{p}} - {{\mathbf{p}}_a})^T}{\mathbf{C}}_{\mathbf{p}}^{ - 1}({\mathbf{p}} - {{\mathbf{p}}_a}) = \min !$
+$${\Theta _B} = {({\mathbf{d}} - {\mathbf{g}}({\mathbf{p}}))^T}{\mathbf{C}}_{\mathbf{d}}^{ - 1}({\mathbf{d}} - {\mathbf{g}}({\mathbf{p}})) + {({\mathbf{p}} - {{\mathbf{p}}_a})^T}{\mathbf{C}}_{\mathbf{p}}^{ - 1}({\mathbf{p}} - {{\mathbf{p}}_a}) = \min !$$
 
 However it uses a transformation of data and parameter, given by:
 
