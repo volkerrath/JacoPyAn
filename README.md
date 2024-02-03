@@ -48,7 +48,7 @@ many popular inversion codes.
 For a definition of a depth of investigation (DoI), or model blanking/shading, forms (2) and (3) can be used. This, however, requires the 
 choice of a threshold/scale is required, depending on the form applied. 
 
-When moving from the error-normalised Jacobian,$\mathbf{J}_d$ to sensitivity, there are more choices for further normalisation, depending 
+When moving from the error-normalised Jacobian, $\mathbf{J}_d$ to sensitivity, there are more choices for further normalisation, depending 
 on the understanding and use of this parameter. If sensitivity is to be interpreted as an approximation to a continuous field over the 
 volume of the model, it seems useful normalize by the cell volume. On the other hand, effect of the size is important when investigating 
 the true role of this cell in the inversion. Finally, for comparing different data (sub)sets, it is convenient to do a final 
