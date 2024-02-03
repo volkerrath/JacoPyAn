@@ -1,6 +1,6 @@
 # JacoPyAn
 
-_**NOTE: This repository is work in progress, not all scripts have been finished and tested. Use at your own risk! However, we will succesively 
+_**NOTE: This repository and in particular this description is work in progress, not all scripts have been finished and tested. Use at your own risk! However, we will succesively 
 update the repository correcting bugs, and adding additional functionality.**_
 
 This repository contains the tools for manipulating, processing, analysing Jacobians from 3-D magnetotelluric inversion, including 
