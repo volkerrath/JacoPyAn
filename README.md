@@ -28,7 +28,7 @@ $${\mathbf{\tilde{d}}}={\mathbf{C}_\mathbf{d}^{-1/2}} {\mathbf{d}}$$
 
 leads to the further transformations of the remaining terms as:
 
-$$ {\mathbf{\tilde{g}}}({\mathbf{\tilde{p}}}) = {\mathbf{C}}_{\mathbf{d}}^{-1/2}{\mathbf{g}} ( {{\mathbf{C}}_{\mathbf{m}}^{1/2}{\mathbf{\tilde{p}}}})$$
+$${\mathbf{\tilde{g}}}({\mathbf{\tilde{p}}}) = {\mathbf{C}}_{\mathbf{d}}^{-1/2}{\mathbf{g}} ( {{\mathbf{C}}_{\mathbf{m}}^{1/2}{\mathbf{\tilde{p}}}})$$
   
   {\mathbf{\tilde J}} = {\mathbf{C}}_{\mathbf{d}}^{ - 1/2}{\mathbf{JC}}_{\mathbf{m}}^{1/2} \hfill $$
   \tilde \Theta ({\mathbf{\tilde p,\tilde d}}) = {\left\| {{\mathbf{\tilde d - \tilde g(\tilde p)}}} \right\|^2} + \lambda {\left\| {{\mathbf{\tilde p}}} \right\|^2} \hfill \\ 
