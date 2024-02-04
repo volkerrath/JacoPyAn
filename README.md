@@ -26,17 +26,20 @@ and the data by
 
 $${\mathbf{\tilde{d}}}={\mathbf{C}_\mathbf{d}^{-1/2}} {\mathbf{d}}$$ 
 
-leads to the further transformations of the remaining terms as:
+leads to the further transformations 
 
 $${\mathbf{\tilde{g}}}({\mathbf{\tilde{p}}})={\mathbf{C}_\mathbf{d}^{-1/2}} {\mathbf{g}} (\mathbf{C}_\mathbf{m}^{-1/2} \mathbf{p})$$
 
 {\mathbf{g}}({\mathbf{C}}_\mathbf{m}^{1/2}{\mathbf{\tilde{p}}})$$
 
-= {\mathbf{C}}_\mathbf{d}^{-1/2}{\mathbf{g}} $$
-  
-  {\mathbf{\tilde J}} = {\mathbf{C}}_{\mathbf{d}}^{ - 1/2}{\mathbf{JC}}_{\mathbf{m}}^{1/2}  $$
-  \tilde \Theta ({\mathbf{\tilde p,\tilde d}}) = {\left\| {{\mathbf{\tilde d - \tilde g(\tilde p)}}} \right\|^2} + \lambda {\left\| {{\mathbf{\tilde p}}} \right\|^2} \hfill \\ 
-$$
+= {\mathbf{C}}_\mathbf{d}^{-1/2}{\mathbf{g}} 
+
+
+$$ {\mathbf{\tilde{J}}} = {\mathbf{C}}_{\mathbf{d}}^{-1/2}{\mathbf{J}} {mathbf{C}}_{\mathbf{m}}^{1/2}$$
+
+Tis leads to the simplified objective function
+
+$$\tilde{\Theta} ({\mathbf{\tilde{p},\tilde{d}}}) = {\left||| {{\mathbf{\tilde d - \tilde g(\tilde p)}}} \right|||_2^2} + \lambda {\left|| {{\mathbf{\tilde p}}} \right||_2^2}$$
 
 
 **Sensitivities**
