@@ -18,9 +18,13 @@ action, a  few steps are necessary. ModEM seeks the MAP solution to the usual Ba
 ```
 
 
-With ${\mathbf{\tilde{p}}}={\mathbf{C}}_\mathbf{m}^{-1/2} {({\mathbf{p}}-{\mathbf{p}_a})}$ 
+Transformig the parameter vector by
 
-and ${\mathbf{\tilde{d}}}={\mathbf{C}_\mathbf{d}^{-1/2}} {\mathbf{d}}$ .
+$${\mathbf{\tilde{p}}}={\mathbf{C}}_\mathbf{m}^{-1/2} {({\mathbf{p}}-{\mathbf{p}_a})}$$
+
+and the data by 
+
+$${\mathbf{\tilde{d}}}={\mathbf{C}_\mathbf{d}^{-1/2}} {\mathbf{d}}$$ leads to the further transformations of the remaining terms.
 
 
 **Sensitivities**
