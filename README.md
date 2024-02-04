@@ -34,7 +34,7 @@ $${\mathbf{\tilde{g}}}({\mathbf{\tilde{p}}})={\mathbf{C}_\mathbf{d}^{-1/2}} {\ma
 
 = {\mathbf{C}}_\mathbf{d}^{-1/2}{\mathbf{g}} $$
   
-  {\mathbf{\tilde J}} = {\mathbf{C}}_{\mathbf{d}}^{ - 1/2}{\mathbf{JC}}_{\mathbf{m}}^{1/2} \hfill $$
+  {\mathbf{\tilde J}} = {\mathbf{C}}_{\mathbf{d}}^{ - 1/2}{\mathbf{JC}}_{\mathbf{m}}^{1/2}  $$
   \tilde \Theta ({\mathbf{\tilde p,\tilde d}}) = {\left\| {{\mathbf{\tilde d - \tilde g(\tilde p)}}} \right\|^2} + \lambda {\left\| {{\mathbf{\tilde p}}} \right\|^2} \hfill \\ 
 $$
 
