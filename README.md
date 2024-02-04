@@ -19,19 +19,27 @@ action, a  few steps are necessary. ModEM seeks the MAP solution to the usual Ba
 
 
 Transformig the parameter vector by
-
-$${\mathbf{\tilde{p}}}={\mathbf{C}}_{m}^{-1/2} {({\mathbf{p}}-{\mathbf{p}_a})}$$ 
-
+```math
+{\mathbf{\tilde{p}}}={\mathbf{C}}_{m}^{-1/2} {({\mathbf{p}}-{\mathbf{p}_a})} 
+```
 and the data by
 
-$${\mathbf{\tilde{d}}}={\mathbf{C}_{d}^{-1/2}} {\mathbf{d}}$$ 
+```math
+{\mathbf{\tilde{d}}}={\mathbf{C}_{d}^{-1/2}} {\mathbf{d}}
+```
 
 leads to the further transformations 
 
-$${\mathbf{\tilde{g}}}({\mathbf{\tilde{p}}})= {\mathbf{C}_{d}^{-1/2}}{\mathbf{g}}({\mathbf{p}})$$
+```math
+{\mathbf{\tilde{g}}}({\mathbf{\tilde{p}}})={\mathbf{C}_{d}^{-1/2}} {\mathbf{g}} ({\mathbf{\tilde{p}}})
+```
+
+```math
+{\bf{\tilde{J}}} = {\bf{C}}_{d}^{-1/2}{\bf{J}} {bf{C}_{m}^{1/2}$$
+```
 
 
-{(\mathbf{C}_\mathbf{m}^{1/2} \mathbf{\tilde{p}))}$$
+{\mathbf{C}_\mathbf{m}^{1/2}} \mathbf{\tilde{p}))}$$
 
 {\mathbf{g}}({\mathbf{C}}_\mathbf{m}^{1/2}{\mathbf{\tilde{p}}})
 
