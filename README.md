@@ -18,7 +18,7 @@ action, a  few steps are necessary. ModEM seeks the MAP solution to the usual Ba
 ```
 
 However, it uses transformations of parameters and data given by ${\mathbf{\tilde{p}}}= {\mathbf{C}_\mathbf{m}^{-1/2}} ({\mathbf{p}} - {\mathbf{p}_a})$ and ${\mathbf{\tilde{d}}}=
-{\mathbf{C}}_\mathbf{d}^{-1/2}{\mathbf{d}}$ .
+{\mathbf{C}_\mathbf{d}^{-1/2}}{\mathbf{d}}$ .
 
 
 **Sensitivities**
