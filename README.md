@@ -28,7 +28,7 @@ $${\mathbf{\tilde{d}}}={\mathbf{C}_\mathbf{d}^{-1/2}} {\mathbf{d}}$$
 
 leads to the further transformations of the remaining terms as:
 
-$${\mathbf{\tilde{g}}}({\mathbf{\tilde{p}}})={\mathbf{C}_\mathbf{d}^{-1/2}} $$$
+$${\mathbf{\tilde{g}}}({\mathbf{\tilde{p}}})={\mathbf{C}_\mathbf{d}^{-1/2}} {\mathbf{g}}$$
 
 {\mathbf{g}}({\mathbf{C}}_\mathbf{m}^{1/2}{\mathbf{\tilde{p}}})$$
 
