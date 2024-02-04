@@ -18,13 +18,11 @@ action, a  few steps are necessary. ModEM seeks the MAP solution to the usual Ba
 ```
 
 
-However, it uses a transformation of data and parameter, given by:
+However, it uses a transformation of data and parameters, given by $\[{\mathbf{\tilde p}} = {\mathbf{C}}_{\mathbf{m}}^{ - 1/2}\left( {{\mathbf{p}} - {{\mathbf{p}}_a}} \right)\]$ and
+$\[{\mathbf{\tilde d}} = {\mathbf{C}}_{\mathbf{d}}^{ - 1/2}{\mathbf{d}}\]$.
 
 ```math
-\begin{array}{c}
-{\bf{\tilde p}} = {\bf{C}}_{\bf{m}}^{ - 1/2}\left( {{\bf{p}} - {{\bf{p}}_a}} \right)\\
-{\bf{\tilde d}} = {\bf{C}}_{\bf{d}}^{ - 1/2}{\bf{d}}
-\end{array}\]
+
 ```
 
 **Sensitivities**
