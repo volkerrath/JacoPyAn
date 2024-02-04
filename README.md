@@ -20,7 +20,21 @@ action, a  few steps are necessary. ModEM seeks the MAP solution to the usual Ba
 
 Transformig the parameter vector by
 
-$${\mathbf{\tilde{p}}}={\mathbf{C}}_\mathbf{m}^{-1/2} {({\mathbf{p}}-{\mathbf{p}_a})}$$ and the data by $${\mathbf{\tilde{d}}}={\mathbf{C}_\mathbf{d}^{-1/2}} {\mathbf{d}}$$ leads to the further transformations of the remaining terms.
+$${\mathbf{\tilde{p}}}={\mathbf{C}}_\mathbf{m}^{-1/2} {({\mathbf{p}}-{\mathbf{p}_a})}$$ 
+
+and the data by
+
+$${\mathbf{\tilde{d}}}={\mathbf{C}_\mathbf{d}^{-1/2}} {\mathbf{d}}$$ 
+
+leads to the further transformations of the remaining terms as:
+
+$$ {\mathbf{\tilde g}}({\mathbf{\tilde p}}) = {\mathbf{C}}_{\mathbf{d}}^{ - 1/2}{\mathbf{g}}\left( {{\mathbf{C}}_{\mathbf{m}}^{1/2}{\mathbf{\tilde p}}} \right)$$
+
+$$ \[\begin{gathered}
+  {\mathbf{\tilde g}}({\mathbf{\tilde p}}) = {\mathbf{C}}_{\mathbf{d}}^{ - 1/2}{\mathbf{g}}\left( {{\mathbf{C}}_{\mathbf{m}}^{1/2}{\mathbf{\tilde p}}} \right) \hfill \\
+  {\mathbf{\tilde J}} = {\mathbf{C}}_{\mathbf{d}}^{ - 1/2}{\mathbf{JC}}_{\mathbf{m}}^{1/2} \hfill \\
+  \tilde \Theta ({\mathbf{\tilde p,\tilde d}}) = {\left\| {{\mathbf{\tilde d - \tilde g(\tilde p)}}} \right\|^2} + \lambda {\left\| {{\mathbf{\tilde p}}} \right\|^2} \hfill \\ 
+\end{gathered} \]$$
 
 
 **Sensitivities**
