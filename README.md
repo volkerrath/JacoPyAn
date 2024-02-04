@@ -19,7 +19,9 @@ action, a  few steps are necessary. ModEM seeks the MAP solution to the usual Ba
 
 
 However, it uses a transformation of data and parameter, given by:
+```math
 
+```
 
 
 **Sensitivities**
