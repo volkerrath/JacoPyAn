@@ -17,9 +17,8 @@ action, a  few steps are necessary. ModEM seeks the MAP solution to the usual Ba
   \Theta  = {({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}})^T}{\mathbf{C}}_{\mathbf{d}}^{ - 1}({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}}) + {({\mathbf{p}} - {{\mathbf{p}}_a})^T}{\mathbf{C}}_{\mathbf{p}}^{ - 1}({\mathbf{p}} - {{\mathbf{p}}_a}) = \left||| {{\mathbf{C}}_{\mathbf{d}}^{ - 1/2}({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}})} \right|||_2^2 + \left||| {{\mathbf{C}}_{\mathbf{p}}^{ - 1/2}({\mathbf{p}} - {{\mathbf{p}}_a})} \right|||_2^2 
 ```
 
-However, it uses transformations of parameters and data given by ${\mathbf{\tilde{p}}}= {\mathbf{C}_\mathbf{m}^{-1/2}} ({\mathbf{p}} - {\mathbf{p}_a})$ and ${\mathbf{\tilde{d}}}=$ 
-
-{\mathbf{C}}_\mathbf{d}^{ - 1/2}{\mathbf{d}}$ .
+However, it uses transformations of parameters and data given by ${\mathbf{\tilde{p}}}= {\mathbf{C}_\mathbf{m}^{-1/2}} ({\mathbf{p}} - {\mathbf{p}_a})$ and ${\mathbf{\tilde{d}}}=
+{\mathbf{C}}_\mathbf{d}^{-1/2}{\mathbf{d}}$ .
 
 
 **Sensitivities**
