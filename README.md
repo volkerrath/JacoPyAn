@@ -18,11 +18,11 @@ action, a  few steps are necessary. ModEM seeks the MAP solution to the usual Ba
 ```
 
 
-With ${\mathbf{\tilde{p}}}=\mathbf{C}_\mathbf{m}^{-1/2} {({\mathbf{p}}-{\mathbf{p}_a})}$ and ${\mathbf{\tilde{d}}}={\mathbf{C}_\mathbf{d}^{-1/2}} {\mathbf{d}}$ .
+With ${\mathbf{\tilde{p}}}={\mathbf{C}}_\mathbf{m}^{-1/2} {({\mathbf{p}}-{\mathbf{p}_a})}$ and ${\mathbf{\tilde{d}}}={\mathbf{C}_\mathbf{d}^{-1/2}} {\mathbf{d}}$ .
 
 
 **Sensitivities**
-
+https://github.com/volkerrath/JacoPyAn/edit/main/README.md
 The use of sensitivities (in a variety of flavours) is comparatively easy, but needs some clarification, as it does not really conform 
 to the everyday use of the word. Sensitivities are derived from the final model Jacobian matrix, which often is available from the inversion algorithm 
 itself. It needs to be kept in mind that this implies any conclusions drawn are valid in the domain of validity for the Taylor expansion involved only. 
