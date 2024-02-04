@@ -20,39 +20,30 @@ action, a  few steps are necessary. ModEM seeks the MAP solution to the usual Ba
 
 Transformig the parameter vector by
 ```math
-{\mathbf{\tilde{p}}}={\mathbf{C}}_{m}^{-1/2} {({\mathbf{p}}-{\mathbf{p}_a})} 
+{\mathbf{\tilde{p}}}={\mathbf{C}}_{m}^{-1/2} {({\mathbf{p}}-{\mathbf{p}_a})} ,
 ```
-and the data by
+the data by
 
 ```math
-{\mathbf{\tilde{d}}}={\mathbf{C}_{d}^{-1/2}} {\mathbf{d}}
+{\mathbf{\tilde{d}}}={\mathbf{C}_{d}^{-1/2}} {\mathbf{d}},
 ```
 
-leads to the further transformations 
+leads to the further transformation
 
 ```math
-{\mathbf{\tilde{g}}}({\mathbf{\tilde{p}}})={\mathbf{C}_{d}^{-1/2}} {\mathbf{g}} ({\mathbf{\tilde{p}}})
+{\mathbf{\tilde{g}}}({\mathbf{\tilde{p}}})={\mathbf{C}_{d}^{-1/2}} {\mathbf{g}} ({\mathbf{C}}_{m}^{1/2} {\mathbf{\tilde{p}}}).
 ```
+
+From this we havethe simplified objective function
 
 ```math
-{\bf{\tilde{J}}} = {\bf{C}}_{d}^{-1/2}{\bf{J}} {bf{C}_{m}^{1/2}$$
+\tilde{\Theta} ({\mathbf{\tilde{p},\tilde{d}}}) = {\left||| {{\mathbf{\tilde d - \tilde g(\tilde p)}}} \right|||_2^2} + \lambda {\left|| {{\mathbf{\tilde p}}} \right||_2^2}.
 ```
+The jJacobian used within ModEM is also clculated in the transformed system:
 
-
-{\mathbf{C}_\mathbf{m}^{1/2}} \mathbf{\tilde{p}))}$$
-
-{\mathbf{g}}({\mathbf{C}}_\mathbf{m}^{1/2}{\mathbf{\tilde{p}}})
-
-
-= {\mathbf{C}}_\mathbf{d}^{-1/2}{\mathbf{g}} 
-
-
-$${\mathbf{\tilde{J}}} = {\mathbf{C}}_\mathbf{d}^{-1/2}{\mathbf{J}}{mathbf{C}}_{\mathbf{m}}^{1/2}$$
-
-This leads to the simplified objective function
-
-$$\tilde{\Theta} ({\mathbf{\tilde{p},\tilde{d}}}) = {\left||| {{\mathbf{\tilde d - \tilde g(\tilde p)}}} \right|||_2^2} + \lambda {\left|| {{\mathbf{\tilde p}}} \right||_2^2}$$
-
+```math
+  {\mathbf{\tilde{J}}} = {\mathbf{C}}_{d}^{-1/2} {\mathbf{J}} {\mathbf{C}}_{m}^{1/2}
+```
 
 **Sensitivities**
 
