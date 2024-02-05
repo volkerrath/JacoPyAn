@@ -14,7 +14,8 @@ The Jacobian  of a data and parameter set is defined as $J_{ij} = \dfrac{\delta 
 action, a  few steps are necessary. $\texttt{ModEM}$ seeks the MAP solution to the usual Bayesian inverse problem [5] defined by:
 
 ```math
-  \Theta  = {({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}})^T}{\mathbf{C}}_{d}^{-1}({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}}) + {({\mathbf{p}} - {{\mathbf{p}}_a})^T}{\mathbf{C}}_{p}^{-1}({\mathbf{p}} - {{\mathbf{p}}_a}) = \left||| {{\mathbf{C}}_{d}^{-1/2}({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}})} \right|||_2^2 + \left||| {{\mathbf{C}}_{p}^{-1/2}({\mathbf{p}} - {{\mathbf{p}}_a})} \right|||_2^2 
+\Theta  = {({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}})^T}{\mathbf{C}}_{d}^{-1}({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}}) + {({\mathbf{p}} - {{\mathbf{p}}_a})^T}{\mathbf{C}}_{p}^{-1}({\mathbf{p}} - {{\mathbf{p}}_a}) =
+\left||| {{\mathbf{C}}_{d}^{-1/2}({\mathbf{g}}({\mathbf{p}}) - {\mathbf{d}})} \right|||_2^2 + \left||| {{\mathbf{C}}_{p}^{-1/2}({\mathbf{p}} - {{\mathbf{p}}_a})} \right|||_2^2 
 ```
 
 
@@ -47,7 +48,7 @@ The Jacobian used within $\texttt{ModEM}$ is also calculated in the transformed 
 For this reason, some minor changes in $\texttt{ModEM}$ were made. They do not touchb the usual functionality, as they are controled by 
 compiler directives. Activating the new code is done by adding $\texttt{-DJAC}$ to the $\texttt{FFLAGS}$ line in the corresponding 
 $\texttt{Makefile}$. The adapted code can be found in the $\texttt{modem}$ subdirectory of the  $\texttt{JacoPyAn}$ repository, and 
-can be simply copied to the original $\texttt{f90}$ subdirectory in the original souce code. 
+can be simply copied to the original $\texttt{f90}$ subdirectory in the original source code. 
 
 The changes made in the souce code will only be relevant to the parts used  by the calculation and storage of the Jacobian. In addition to the 
 binary file $\texttt{Model.jac}$ containing the physical-space Jacobian (the name is arbitrary), also an ASCII file $`\texttt{Model\_jac.dat}`$ is 
