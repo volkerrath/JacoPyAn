@@ -57,7 +57,7 @@ created, which contains data information in the correct sequence and units.
 
 The generated Jacobians for realistic models  can be large (several tens of Gb). For this reason the first step in working with the Jacobians is
 to put them into a format easier to handle by \texttt{python}$, and, as many of the elements of these matrices are small, reduce their size. This
-is done in the script \texttt{MT_jac_proc.py}$.
+is done in the script $\texttt{MT_jac_proc.py}$.
 
 **Sensitivities**
 
