@@ -50,14 +50,14 @@ $\texttt{Makefile}$. The adapted code can be found in the $\texttt{modem}$ subdi
 can be simply copied to the original $\texttt{f90}$ subdirectory in the original souce code. 
 
 The changes made in the souce code will only be relevant to the parts used  by the calculation and storage of the Jacobian. In addition to the 
-binary file \texttt{Model.jac}$ containing the physical-space Jacobian (the name is arbitrary), also an ASCII file \texttt{Model_jac.dat}$ is 
+binary file $\texttt{Model.jac}$ containing the physical-space Jacobian (the name is arbitrary), also an ASCII file \texttt{Model_jac.dat}$ is 
 created, which contains data information in the correct sequence and units. 
 
 **Preprocessing the Jacobian**
 
 The generated Jacobians for realistic models  can be large (several tens of Gb). For this reason the first step in working with the Jacobians is
 to put them into a format easier to handle by \texttt{python}$, and, as many of the elements of these matrices are small, reduce their size. This
-is done in the script $\texttt{MT_jac_proc.py}$ .
+is done in the script $`\texttt{MT\_jac\_proc.py}`$ .
 
 **Sensitivities**
 
