@@ -44,7 +44,9 @@ The jJacobian used within $\texttt{ModEM}$ is also calculated in the transformed
 ```math
   {\mathbf{\tilde{J}}} = {\mathbf{C}}_{d}^{-1/2} {\mathbf{J}} {\mathbf{C}}_{m}^{1/2}
 ```
-For this reason, some minor changes in 
+For this reason, some minor changes in $\texttt{ModEM}$ were made. They do not touchb the usual functionality, as they are controled by 
+compiler directives. Activating the new code is done by adding $\texttt{-DJAC}$ to the $\texttt{FFLAGS}$ line in the corresponding 
+$\texttt{Makefile}$. The adapted code can be found in the $\texttt{modem}$ subdirectory of the  $\texttt{JacoPyAn}$ repository. 
 
 **Sensitivities**
 
