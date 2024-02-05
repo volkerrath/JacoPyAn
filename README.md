@@ -89,6 +89,7 @@ _[3] G. D. Egbert and A. Kelbert (2012) “Computational recipes for electromagn
 
 _[4] A. Kelbert, N. Meqbel, G. D. Egbert, and K. Tandon (2014) “ModEM: A Modular System for Inversion of Electromagnetic Geophysical Data”, Computers & Geosciences, 66, 440–53, doi: http://dx.doi.org/10.1016/j.cageo.2014.01.010_
 
-
+_[5] A. Tarantola (2005) "Inverse Problem Theory and Methods for Model Parameter Estimation", SIAM, Philadelphia PA, USA_
+  
   
  
