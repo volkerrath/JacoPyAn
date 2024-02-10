@@ -72,7 +72,10 @@ print(MFiles)
 
 # Task = "split"
 SFile = WorkDir+"merged/UBI_ZPT_sp-8_merged"
-Split = "type  site  freq"
+
+
+
+Split = "dtype  site  freq  comp"
 print(SFile)
 print(" The file will be split into components:")
 print(Split)
@@ -209,8 +212,63 @@ if "spl" in Task.lower():
         print(" Used %7.4f s for splitting into frequency bands " % (elapsed))        
         print("\n")
         
+        
+    if "comp" in Split.lower():
+               
+            start = time.perf_counter()
+        
+            """
+            Full_Impedance              =  ZXX, ZYY, ZYX, ZXY
+            Off_Diagonal_Impedance      =  ZYX, ZXY
+            Full_Vertical_Components    = TXR, TYR
+            Full_Interstation_TF        = ?
+            Off_Diagonal_Rho_Phase      = ?
+            Phase_Tensor                =  PTXX, PTYY, PTXY, PTYX
+            """
+            compstr = [
+                "zxy", "zyx", "zxx", "zyy",
+                "txr",  "tyr", "txi", "txr",
+                "ptxy", "ptyx", "ptxx", "ptyy"]
 
-    if "com" in Split.lower():
+
+            ExistComp = np.unique(Comp)
+                    
+            cnum= -1
+            for icmp in ExistComp:
+                cnum =cnum +1
+                
+                
+                indices = np.where(jcmp = icmp)
+                JacTmp = Jac[indices]
+                
+                FreqTmp=Freq[indices]
+                DataTmp=Data[indices,:]
+                SiteTmp=Site[indices]                              
+                CompTmp=Comp[indices]
+                InfoTmp=Info[indices]
+                DTypTmp=DTyp[indices]
+              
+                
+                
+                Name = SFile+"_Comp"+compstr[icmp-1]
+                Head =os.path.basename(Name).replace("_", " | ")
+        
+                np.savez_compressed(Name +"_info.npz", 
+                                    Freq=FreqTmp, Data=DataTmp, Site=SiteTmp, 
+                                    Comp=CompTmp, Info=InfoTmp, DTyp=DTypTmp, 
+                                    Scale=ScalTmp, allow_pickle=True)
+                if scs.issparse(JacTmp):
+                    scs.save_npz( Name +"_jac.npz", matrix=JacTmp) #, compressed=True)
+                else:
+                    np.savez_compressed(Name +"_jac.npz", JacTmp)
+      
+                    
+            elapsed = time.perf_counter() - start
+            print(" Used %7.4f s for splitting into components " % (elapsed))        
+            print("\n")
+            
+
+    if "dtyp" in Split.lower():
            
         start = time.perf_counter()
     
@@ -222,16 +280,16 @@ if "spl" in Task.lower():
         Off_Diagonal_Rho_Phase      = 5
         Phase_Tensor                = 6
         """
-        compstr = ["zfull", "zoff", "tp", "mf", "rpoff", "pt"]
+        typestr = ["zfull", "zoff", "tp", "mf", "rpoff", "pt"]
     
         ExistType = np.unique(DTyp)
                 
-        cnum= -1
-        for icmp in ExistType:
-            cnum =cnum +1
+        tnum= -1
+        for ityp in ExistType:
+            tnum =tnum +1
             
             
-            indices = np.where(jcmp = icmp)
+            indices = np.where(jcmp = ityp)
             JacTmp = Jac[indices]
             
             FreqTmp=Freq[indices]
@@ -240,11 +298,11 @@ if "spl" in Task.lower():
             CompTmp=Comp[indices]
             InfoTmp=Info[indices]
             DTypTmp=DTyp[indices]
-            ScalTmp=Scal[cnum]
+            ScalTmp=Scal[tnum]
             
             
             
-            Name = SFile+"_DType"+compstr[icmp-1]
+            Name = SFile+"_DType"+typestr[ityp-1]
             Head =os.path.basename(Name).replace("_", " | ")
     
             np.savez_compressed(Name +"_info.npz", 

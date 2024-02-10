@@ -275,7 +275,8 @@ SensTot = jac.transform_sensitivity(S=SensTmp, vol=vol,
                           Transform=Transform, OutInfo=False)
 
 SensFile = SensDir+JacName+"_total_"+Type+"_"+"_".join(Transform)
-Header = ("# "+JacName+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
+Header = "# "+SensFile.replace("_", " | ")
+
 S = SensTot.reshape(mdims, order="F")
 
 if "mod" in OutFormat.lower():
@@ -303,7 +304,7 @@ print(" Used %7.4f s for full sensitivities " % (elapsed))
         
 for Split in Splits:
         
-    if "comp" in Split.lower():
+    if "dtyp" in Split.lower():
         
         start = time.perf_counter()
     
@@ -315,12 +316,69 @@ for Split in Splits:
         Off_Diagonal_Rho_Phase      = 5
         Phase_Tensor                = 6
         """
-        compstr = ["zfull", "zoff", "tp", "mf", "rpoff", "pt"]
+        typestr = ["zfull", "zoff", "tp", "mf", "rpoff", "pt"]
     
         ExistType = np.unique(Dtype)
         
-        for icmp in ExistType:
-            indices = np.where(Dtype == icmp)
+        for ityp in ExistType:
+            indices = np.where(Dtype == ityp)
+            JacTmp = Jac[indices]
+            print("Data type: ",ityp)
+            jac.print_stats(jac=JacTmp, jacmask=jacflat)
+            print("\n")
+            
+            SensTmp = jac.calc_sensitivity(JacTmp,
+                         Type = Type, OutInfo=False)
+            SensTmp = jac.transform_sensitivity(S=SensTmp, vol=vol,
+                              Transform=Transform, OutInfo=False)
+            S = np.reshape(SensTmp, mdims, order="F")
+            
+                        
+            SensFile = SensDir+JacName+"_Dtype"+typestr[ityp-1]+"_".join(Transform)
+            Header = "# "+SensFile.replace("_", " | ")
+            
+
+            if "mod" in OutFormat.lower():
+                mod.write_mod(SensFile, ModExt,
+                              dx=dx, dy=dy, dz=dz, mval=S,
+                              reference=refmod, mvalair=Blank, aircells=aircells, header=Header)
+                print(" Component sensitivities (ModEM format) written to "+SensFile)
+                
+            if "ubc" in OutFormat.lower():
+                elev = -refmod[2]
+                refubc =  [MOrig[0], MOrig[1], elev]
+                mod.write_ubc(SensFile, modext="_ubc.sns" ,mshext="_ubc.msh",
+                              dx=dx, dy=dy, dz=dz, mval=S,
+                              reference=refubc, mvalair=Blank, aircells=aircells, header=Header)
+                print(" Component sensitivities (UBC format) written to "+SensFile)
+            
+            if "rlm" in OutFormat.lower():
+                mod.write_rlm(SensFile, modext="_sns.rlm", 
+                              dx=dx, dy=dy, dz=dz, mval=S, reference=refmod, mvalair=Blank, aircells=aircells, comment=Header)
+                print(" Cell volumes (CGG format) written to "+SensFile)
+             
+            
+        elapsed = time.perf_counter() - start
+        print(" Used %7.4f s for data type sensitivities " % (elapsed))        
+        print("\n")
+    
+    if "comp" in Split.lower():
+        
+        start = time.perf_counter()
+        """
+        Full_Impedance              =  ZXX, ZYY, ZYX, ZXY
+        Off_Diagonal_Impedance      =  ZYX, ZXY
+        Full_Vertical_Components    = TXR, TYR
+        Full_Interstation_TF        = ?
+        Off_Diagonal_Rho_Phase      = ?
+        Phase_Tensor                =  PTXX, PTYY, PTXY, PTYX
+        """
+       
+        ExistComp = np.unique(Comp)
+
+        
+        for icmp in ExistComp:
+            indices = np.where(Comp== icmp)
             JacTmp = Jac[indices]
             print("Component: ",icmp)
             jac.print_stats(jac=JacTmp, jacmask=jacflat)
@@ -330,9 +388,11 @@ for Split in Splits:
                          Type = Type, OutInfo=False)
             SensTmp = jac.transform_sensitivity(S=SensTmp, vol=vol,
                               Transform=Transform, OutInfo=False)
-            SensFile = SensDir+JacName+"_"+compstr[icmp-1]+"_"+Type+"_"+"_".join(Transform)
-            Header = ("# "+JacName+"_"+compstr[icmp-1]+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
             S = np.reshape(SensTmp, mdims, order="F")
+                         
+            SensFile = SensDir+JacName+"_"+icmp+"_".join(Transform)
+            Header = "# "+SensFile.replace("_", " | ")
+    
             if "mod" in OutFormat.lower():
                 mod.write_mod(SensFile, ModExt,
                               dx=dx, dy=dy, dz=dz, mval=S,
@@ -356,7 +416,8 @@ for Split in Splits:
         elapsed = time.perf_counter() - start
         print(" Used %7.4f s for comp sensitivities " % (elapsed))        
         print("\n")
-    
+        
+        
     if "site" in Split.lower():
         start = time.perf_counter()
         
@@ -375,9 +436,12 @@ for Split in Splits:
                         Type = Type, OutInfo=False)
            SensTmp = jac.transform_sensitivity(S=SensTmp, vol=vol,
                              Transform=Transform, OutInfo=False)
+           S = np.reshape(SensTmp, mdims, order="F")
+           
            SensFile = SensDir+JacName+"_"+sit.lower()+"_"+Type+"_"+"_".join(Transform)
-           Header = ("# "+JacName+"_"+sit.lower()+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
-           S = np.reshape(SensTmp, mdims, order="F") 
+           Header = "# "+SensFile.replace("_", " | ")
+             
+           
            if "mod" in OutFormat.lower():
                 mod.write_mod(SensFile, modext=ModExt,
                               dx=dx, dy=dy, dz=dz, mval=S,
@@ -426,9 +490,11 @@ for Split in Splits:
                             Type = Type, OutInfo=False)
                SensTmp = jac.transform_sensitivity(S=SensTmp, vol=vol,
                                  Transform=Transform, OutInfo=False)
-               SensFile = SensDir+JacName+"_freqband"+lowstr+"_to_"+uppstr+"_"+Type+"_"+"_".join(Transform)
-               Header = ("# "+JacName+"_freqband"+lowstr+"to"+uppstr+"_"+Type+"_"+"_".join(Transform)).replace("_", " | ")
                S = np.reshape(SensTmp, mdims, order="F") 
+               
+               SensFile = SensDir+JacName+"_freqband"+lowstr+"_to_"+uppstr+"_"+Type+"_"+"_".join(Transform)
+               Header = "# "+SensFile.replace("_", " | ")
+
                if "mod" in OutFormat.lower():
                    mod.write_mod(SensFile, modext=ModExt,
                                  dx=dx, dy=dy, dz=dz, mval=S,
