@@ -569,7 +569,7 @@ def project_model(m=None, U=None, tst_sample= None, nsamp=1, small=1.0e-14, out=
         print("project_model: "+str(nsamp)+" sample models will be generated!")
         if nsamp==0:
            error("project_model: No number of samples given! Exit.") 
-        tst_sample = np.random.default_rng().normal(0., 1. (nsamp, len(m)))
+        tst_sample = np.random.default_rng().normal(0., 1., (nsamp, len(m)))
         
     else:
         nsamp = np.shape(tst_sample)[0]
@@ -615,7 +615,7 @@ def sample_pcovar(cpsqrti=None, m=None, tst_sample = None,
         print("sample_pcovar: "+str(nsamp)+" sample models will be generated!")
         if nsamp==0:
            error("sample_pcovar: No number of samples given! Exit.") 
-        tst_sample = np.random.default_rng().normal(0., 1. (nsamp, len(m)))
+        tst_sample = np.random.default_rng().normal(0., 1., (nsamp, len(m)))
         
     else:
         nsamp = np.shape(tst_sample)[0]
