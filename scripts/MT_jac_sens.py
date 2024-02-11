@@ -100,8 +100,9 @@ if TopoExtract:
     TopoFile = WorkDir + "Misti_Topo.dat"
     TopoFmt = ""
 
-
-Splits = "dtyp site freq comp"
+# Splits = "dtyp site freq comp"
+Splits = "comp"
+NoReIm = True
 
 PerIntervals = [ 
                 [0.0001, 0.001], 
@@ -335,7 +336,8 @@ if "dtyp" in Splits.lower():
     typestr = ["zfull", "zoff", "tp", "mf", "rpoff", "pt"]
 
     ExistType = np.unique(Dtype)
-    
+    print(ExistType)
+
     for ityp in ExistType:
         indices = np.where(Dtype == ityp)
         JacTmp = Jac[indices]
@@ -391,10 +393,15 @@ if "comp" in Splits.lower():
     """
    
     ExistComp = np.unique(Comps)
+    print(ExistComp)
+
+    if NoReIm:
+        ExistComp= np.unique([cmp.replace("R","").replace("I","") for cmp in ExistComp])
+        print(ExistComp)
 
     
     for icmp in ExistComp:
-        indices = np.where(Comp== icmp)
+        indices = np.where(Comps== icmp)
         JacTmp = Jac[indices]
         print("Component: ",icmp)
         jac.print_stats(jac=JacTmp, jacmask=jacflat)
@@ -439,7 +446,7 @@ if "site" in Splits.lower():
     
 
     SiteNames = Sites[np.sort(np.unique(Sites, return_index=True)[1])] 
-
+    print(SiteNames)
     
     for sit in SiteNames:        
        indices = np.where(sit==Sites)
