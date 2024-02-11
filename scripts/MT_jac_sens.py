@@ -187,7 +187,7 @@ if TopoExtract:
     
 if VolExtract or ("size" in Transform):
     vol = mod.get_volumes(dx=dx, dy=dy, dz=dz, mval=rho, out=True)
-    print(np.shape(vol))
+    #print(np.shape(vol))
     Header = "# "+MFile
     
     if "mod" in OutFormat.lower():
@@ -265,10 +265,8 @@ else:
     
     Jac, tmp = mod.read_jac(JFile + ".jac")    
     normalized = False
-    Freqs = tmp[:,0]
-    Comps = tmp[:,1]
-    Sites = tmp[:,2]
-    Data, Site, Freq, Comp, Dtype, Head = mod.read_data_jac(JFile + "_jac.dat")
+
+    Data, Sites, Freqs, Comps, Dtype, Head = mod.read_data_jac(JFile + "_jac.dat")
     dsh = np.shape(Data)
     err = np.reshape(Data[:, 5], (dsh[0], 1))
     Jac = jac.normalize_jac(Jac, err)
@@ -314,7 +312,7 @@ if "ubc" in OutFormat.lower():
 if "rlm" in OutFormat.lower():
     mod.write_rlm(SensFile, modext="_sns.rlm", 
                   dx=dx, dy=dy, dz=dz, mval=S, reference=refmod, mvalair=Blank, aircells=aircells, comment=Header)
-    print(" Cell volumes (CGG format) written to "+SensFile)
+    print(" Sensitivities (CGG format) written to "+SensFile)
   
   
 elapsed = time.perf_counter() - start
@@ -352,7 +350,7 @@ if "dtyp" in Splits.lower():
         S = np.reshape(SensTmp, mdims, order="F")
         
                     
-        SensFile = SensDir+JacName+"_Dtype"+typestr[ityp-1]+"_".join(Transform)
+        SensFile = SensDir+JacName+"_Dtype_"+typestr[ityp-1]+"_".join(Transform)
         Header = "# "+SensFile.replace("_", " | ")
         
 
@@ -360,7 +358,7 @@ if "dtyp" in Splits.lower():
             mod.write_mod(SensFile, ModExt,
                           dx=dx, dy=dy, dz=dz, mval=S,
                           reference=refmod, mvalair=Blank, aircells=aircells, header=Header)
-            print(" Component sensitivities (ModEM format) written to "+SensFile)
+            print(" Data type sensitivities (ModEM format) written to "+SensFile)
             
         if "ubc" in OutFormat.lower():
             elev = -refmod[2]
@@ -368,12 +366,12 @@ if "dtyp" in Splits.lower():
             mod.write_ubc(SensFile, modext="_ubc.sns" ,mshext="_ubc.msh",
                           dx=dx, dy=dy, dz=dz, mval=S,
                           reference=refubc, mvalair=Blank, aircells=aircells, header=Header)
-            print(" Component sensitivities (UBC format) written to "+SensFile)
+            print(" Data type sensitivities (UBC format) written to "+SensFile)
         
         if "rlm" in OutFormat.lower():
             mod.write_rlm(SensFile, modext="_sns.rlm", 
                           dx=dx, dy=dy, dz=dz, mval=S, reference=refmod, mvalair=Blank, aircells=aircells, comment=Header)
-            print(" Cell volumes (CGG format) written to "+SensFile)
+            print(" Data type sensitivities (CGG format) written to "+SensFile)
          
         
     elapsed = time.perf_counter() - start
@@ -392,7 +390,7 @@ if "comp" in Splits.lower():
     Phase_Tensor                =  PTXX, PTYY, PTXY, PTYX
     """
    
-    ExistComp = np.unique(Comp)
+    ExistComp = np.unique(Comps)
 
     
     for icmp in ExistComp:
@@ -428,7 +426,7 @@ if "comp" in Splits.lower():
         if "rlm" in OutFormat.lower():
             mod.write_rlm(SensFile, modext="_sns.rlm", 
                           dx=dx, dy=dy, dz=dz, mval=S, reference=refmod, mvalair=Blank, aircells=aircells, comment=Header)
-            print(" Cell volumes (CGG format) written to "+SensFile)
+            print(" Component sensitivities (CGG format) written to "+SensFile)
          
         
     elapsed = time.perf_counter() - start
@@ -477,7 +475,7 @@ if "site" in Splits.lower():
        if "rlm" in OutFormat.lower():
             mod.write_rlm(SensFile, modext="_sns.rlm", 
                           dx=dx, dy=dy, dz=dz, mval=S, reference=refmod, mvalair=Blank, aircells=aircells, comment=Header)
-            print(" Cell volumes (CGG format) written to "+SensFile)
+            print(" Site sensitivities (CGG format) written to "+SensFile)
            
     
     elapsed = time.perf_counter() - start
