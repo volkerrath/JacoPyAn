@@ -100,8 +100,7 @@ if TopoExtract:
     TopoFile = WorkDir + "Misti_Topo.dat"
     TopoFmt = ""
 
-# Splits = "dtyp site freq comp"
-Splits = "comp"
+Splits = "total dtyp site freq comp"
 NoReIm = True
 
 PerIntervals = [ 
@@ -286,39 +285,40 @@ print("\n")
 
 start = time.perf_counter()
 
+if "tot"in Splits.lower():
 
-SensTmp = jac.calc_sensitivity(Jac,
-                     Type = Type, OutInfo=False)
-SensTot = jac.transform_sensitivity(S=SensTmp, vol=vol, 
-                          Transform=Transform, OutInfo=False)
+    SensTmp = jac.calc_sensitivity(Jac,
+                        Type = Type, OutInfo=False)
+    SensTot = jac.transform_sensitivity(S=SensTmp, vol=vol,
+                            Transform=Transform, OutInfo=False)
 
-SensFile = SensDir+JacName+"_total_"+Type+"_"+"_".join(Transform)
-Header = "# "+SensFile.replace("_", " | ")
+    SensFile = SensDir+JacName+"_total_"+Type+"_"+"_".join(Transform)
+    Header = "# "+SensFile.replace("_", " | ")
 
-S = SensTot.reshape(mdims, order="F")
+    S = SensTot.reshape(mdims, order="F")
 
-if "mod" in OutFormat.lower():
-    mod.write_mod(SensFile, modext=ModExt,
-                  dx=dx, dy=dy, dz=dz, mval=S,
-                  reference=refmod, mvalair=Blank, aircells=aircells, header=Header)
-    print(" Sensitivities (ModEM format) written to "+SensFile)
-    
-if "ubc" in OutFormat.lower():
-    elev = -refmod[2]
-    refubc =  [MOrig[0], MOrig[1], elev]
-    mod.write_ubc(SensFile, modext="_ubc.sns", mshext="_ubc.msh",
-                  dx=dx, dy=dy, dz=dz, mval=S, reference=refubc, mvalair=Blank, aircells=aircells, header=Header)
-    print(" Sensitivities (UBC format) written to "+SensFile)
-    
-if "rlm" in OutFormat.lower():
-    mod.write_rlm(SensFile, modext="_sns.rlm", 
-                  dx=dx, dy=dy, dz=dz, mval=S, reference=refmod, mvalair=Blank, aircells=aircells, comment=Header)
-    print(" Sensitivities (CGG format) written to "+SensFile)
-  
-  
-elapsed = time.perf_counter() - start
-print(" Used %7.4f s for full sensitivities " % (elapsed))
-        
+    if "mod" in OutFormat.lower():
+        mod.write_mod(SensFile, modext=ModExt,
+                    dx=dx, dy=dy, dz=dz, mval=S,
+                    reference=refmod, mvalair=Blank, aircells=aircells, header=Header)
+        print(" Sensitivities (ModEM format) written to "+SensFile)
+
+    if "ubc" in OutFormat.lower():
+        elev = -refmod[2]
+        refubc =  [MOrig[0], MOrig[1], elev]
+        mod.write_ubc(SensFile, modext="_ubc.sns", mshext="_ubc.msh",
+                    dx=dx, dy=dy, dz=dz, mval=S, reference=refubc, mvalair=Blank, aircells=aircells, header=Header)
+        print(" Sensitivities (UBC format) written to "+SensFile)
+
+    if "rlm" in OutFormat.lower():
+        mod.write_rlm(SensFile, modext="_sns.rlm",
+                    dx=dx, dy=dy, dz=dz, mval=S, reference=refmod, mvalair=Blank, aircells=aircells, comment=Header)
+        print(" Sensitivities (CGG format) written to "+SensFile)
+
+
+    elapsed = time.perf_counter() - start
+    print(" Used %7.4f s for total sensitivities " % (elapsed))
+
         
         
 if "dtyp" in Splits.lower():
@@ -393,15 +393,16 @@ if "comp" in Splits.lower():
     """
    
     ExistComp = np.unique(Comps)
-    print(ExistComp)
 
     if NoReIm:
         ExistComp= np.unique([cmp.replace("R","").replace("I","") for cmp in ExistComp])
-        print(ExistComp)
+        Comps = [cmp.replace("R","").replace("I","") for cmp in Comps]
 
+    print(ExistComp)
     
     for icmp in ExistComp:
-        indices = np.where(Comps== icmp)
+
+        indices = np.where(icmp in Comps)
         JacTmp = Jac[indices]
         print("Component: ",icmp)
         jac.print_stats(jac=JacTmp, jacmask=jacflat)
