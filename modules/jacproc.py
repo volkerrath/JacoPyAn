@@ -150,7 +150,7 @@ def transform_sensitivity(S=np.array([]), vol=np.array([]),
     for item in Transform:       
         
         if "siz" in item.lower():
-             print("trans_sensitivity: Transformed by layer thickness.")
+             print("trans_sensitivity: Transformed by volumes/layer thickness.")
              if np.size(vol)==0:
                  error("Transform_sensitivity: no volumes given! Exit.")
 
@@ -193,7 +193,7 @@ def transform_sensitivity(S=np.array([]), vol=np.array([]),
 
     
    
-    return S
+    return S, maxval
 
 def get_scale(d=np.array([]), F=0.1, method = "other", OutInfo = False):
     """
