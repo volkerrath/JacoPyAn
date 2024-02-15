@@ -46,10 +46,10 @@ def calc_sensitivity(Jac=np.array([]),
         return doi, active
 
     T. Guenther
-    Inversion Methods and Resolution Analysis for the 2D/3D Reconstruction
-    of Resistivity Structures from DC Measurements
-    Fakultaet für Geowissenschaften, Geotechnik und Bergbau,
-    Technische Universitaet Bergakademie Freiberg, 2004.
+        Inversion Methods and Resolution Analysis for the 2D/3D Reconstruction
+        of Resistivity Structures from DC Measurements
+        Fakultaet für Geowissenschaften, Geotechnik und Bergbau,
+        Technische Universitaet Bergakademie Freiberg, 2004.
 
     author:VR 9/23
 
@@ -212,8 +212,8 @@ def get_scale(d=np.array([]), F=0.1, method = "other", OutInfo = False):
         Scale value for arcsinh
 
     C. Scholl
-    Die Periodizitaet von Sendesignalen bei Long-Offset Transient Electromagnetics
-    Diploma Thesis, Institut für Geophysik und Meteorologie der Universität zu Koeln, 2001.
+        Die Periodizitaet von Sendesignalen bei Long-Offset Transient Electromagnetics
+        Diploma Thesis, Institut für Geophysik und Meteorologie der Universität zu Koeln, 2001.
 
 
     """
@@ -598,9 +598,9 @@ def sample_pcovar(cpsqrti=None, m=None, tst_sample = None,
     References:
 
     Osypov K, Yang Y, Fournier A, Ivanova N, Bachrach R, 
-    Can EY, You Y, Nichols D, Woodward M (2013)
-    Model-uncertainty quantification in seismic tomography: method and applications 
-    Geophysical Prospecting, 61, pp. 1114–1134, 2013, doi: 10.1111/1365-2478.12058.
+        Can EY, You Y, Nichols D, Woodward M (2013)
+        Model-uncertainty quantification in seismic tomography: method and applications 
+        Geophysical Prospecting, 61, pp. 1114–1134, 2013, doi: 10.1111/1365-2478.12058.
   
 
     """

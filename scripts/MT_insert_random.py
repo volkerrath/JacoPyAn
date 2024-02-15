@@ -58,6 +58,7 @@ import util as utl
 from version import versionstrg
 
 rng = np.random.default_rng()
+
 nan = np.nan  # float("NaN")
 version, _ = versionstrg()
 titstrng = utl.print_title(version=version, fname=__file__, out=False)
@@ -67,78 +68,73 @@ print(titstrng+"\n\n")
 rhoair = 1.e+17
 
 total = 0
-InModDir = r"/home/vrath/Py4MT/JacoPyAn/data/ANN21_Jacobian/"
-OutModDir = InModDir
-ModFil = r"Ann21_Prior100_T_NLCG_033"
-ModFile_out = r"/home/vrath/work/MT/Annecy/ImageProc/Out/ANN20_02_PT_NLCG_016_nse"
+ModDir_in = JACOPYAN_DATA + "/Peru/Misti/"
+ModDir_out = ModDir_in + "/results_shuttle/"
 
-if not os.path.isdir(OutModDir):
-    print("File: %s does not exist, but will be created" % OutModDir)
-    os.mkdir(OutModDir)
+ModFile_in = JACOPYAN_DATA + "Misti10_best"    
+ModFile_out = ModFile_in
+   
+ModOrig = [-16.277300, -71.444397]# Misti
+# JacName = "Misti_best_Z5_nerr_sp-8"
+JacFile = "Misti_best_ZT_extended_nerr_sp-8"
+
+
+if not os.path.isdir(ModDir_out):
+    print("File: %s does not exist, but will be created" % ModDir_out)
+    os.mkdir(ModDir_out)
 
 
 geocenter = [45.938251, 6.084900]
 utm_x, utm_y = utl.project_latlon_to_utm(geocenter[0], geocenter[1], utm_zone=32631)
 utmcenter = [utm_x, utm_y, 0.]
 
-ssamples = 10000
+samples = 10000
+smoother = None  # ["uniform", 3] ["gaussian",0.5]
 
-
-body = [
-    "ellipsoid",
-    "add",
-    0.,
-    0.,
-    0.,
-    3000.,
-    1000.,
-    2000.,
-    1000.,
-    0.,
-    0.,
-    30.]
-
-normalize_err = True
-normalize_max = True
-calcsens = True
-
-JacFile = r"/home/vrath/work/MT/Jacobians/Maurienne/Maur_PT.jac"
-DatFile = r"/home/vrath/work/MT/Jacobians/Maurienne/Maur_PT.dat"
-ModFile = r"/home/vrath/work/MT/Jacobians/Maurienne//Maur_PT_R500_NLCG_016.rho"
-SnsFile = r"/home/vrath/work/MT/Jacobians/Maurienne/Maur_PT_R500_NLCG_016.sns"
+#            geo    act   dlog10rho  position         axes                 angles
+basebody = ["ell", "add", 0.2,      0., 0., 0.,   3000., 1000., 2000.,    0., 0., 30.]
 
 total = 0.
-
-
 start = time.perf_counter()
+
+smoother = None # ["uniform", 1] ['gaussian',0.5]
+total = 0
+start = time.perf_counter()
+
+
+dx, dy, dz, rho, refmod, _ = mod.read_mod(ModFile_in, ".rho",trans="log10", volumes=True)
+aircells = np.where(rho>rhoair/10)
+
+elapsed = time.perf_counter() - start
+total = total + elapsed
+print(" Used %7.4f s for reading model from %s "
+      % (elapsed, ModFile_in + ".rho"))
+
+
 dx, dy, dz, rho, reference = mod.read_mod(ModFile)
 elapsed = (time.perf_counter() - start)
 total = total + elapsed
 print(" Used %7.4f s for reading model from %s " % (elapsed, DatFile))
 
 
-nb = np.shape(body)
-
-# smoother=["gaussian",0.5]
-smoother = ["uniform", 3]
 total = 0
 start = time.perf_counter()
 
-dx, dy, dz, rho, reference = mod.read_mod(ModFile_in + ".rho", out=True)
-# write_model_mod(ModFile_out+".rho", dx, dy, dz, rho,reference,out = True)
+dx, dy, dz, rho, reference = mod.read_mod(ModFile_in, out=True)
 elapsed = (time.perf_counter() - start)
 total = total + elapsed
 print(" Used %7.4f s for reading model from %s " %
       (elapsed, ModFile_in + ".rho"))
 
-air = rho > rhoair / 100.
+aircells = rho > rhoair / 100.
 
 rho = mod.prepare_model(rho, rhoair=rhoair)
 
-for ibody in range(nb[0]):
-    body = bodies[ibody]
-    rhonew = insert_body(dx, dy, dz, rho, body, smooth=smoother)
-    rhonew[air] = rhoair
+for ibody in range(samples):
+    body = basebody.copy()
+
+    rhonew = mod.insert_body(dx, dy, dz, rho, body)
+    rhonew[aircells] = rhoair
     Modout = ModFile_out + "_" + body[0] + \
         str(ibody) + "_" + smoother[0] + ".rho"
     write_model_mod(Modout, dx, dy, dz, rhonew, reference, out=True)

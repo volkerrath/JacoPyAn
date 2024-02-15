@@ -85,8 +85,8 @@ if not WorkDir.endswith("/"):
     WorkDir = WorkDir+"/"
 MFile = WorkDir + "Misti10_best"    
 MOrig = [-16.277300, -71.444397]# Misti
-JacName = "Misti_best_Z5_nerr_sp-8"
-
+# JacName = "Misti_best_Z5_nerr_sp-8"
+JacName = "Misti_best_ZT_extended_nerr_sp-8"
 
 JFile = WorkDir + JacName
 
@@ -116,8 +116,8 @@ PerIntervals = [
 
 
 
-# Type = "raw"
-Type = "euc"
+Type = "raw"
+# Type = "euc"
 """
 Calculate sensitivities.
 Expects that Jacobian is already error-scaled, i.e Jac = C^(-1/2)*J.
@@ -132,8 +132,8 @@ Usesigma:
 """
 
 
-# Transform = [ "max"]
-Transform = [ "sqr","max"]
+Transform = [ "max"]
+# Transform = [ "sqr","max"]
 
 """
 Transform sensitivities. 
@@ -414,7 +414,7 @@ if "comp" in Splits.lower():
                           Transform=Transform, OutInfo=False)
         S = np.reshape(SensTmp, mdims, order="F")
                      
-        SensFile = SensDir+JacName+"_"+icmp+"_".join(Transform)
+        SensFile = SensDir+JacName+"_"+icmp+"_"+"_".join(Transform)
         Header = "# "+SensFile.replace("_", " | ")
 
         if "mod" in OutFormat.lower():
