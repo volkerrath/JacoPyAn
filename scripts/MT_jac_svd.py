@@ -82,11 +82,11 @@ nan = np.nan
 
 
 # Ubinas case
-WorkDir = "/home/vrath/MT_Data/Peru/Ubinas/"
-MFile = WorkDir+"UBI9_best"
-JFile = WorkDir +"UBI9_ZPTss_nerr_sp-8"
+WorkDir =  JACOPYAN_DATA+"/Peru/Misti/"
+MFile = WorkDir+"Misti10_best"
+JFile = WorkDir+"Misti_best_Z5_nerr_sp-8"
 
-MOrig = [-16.345800 -70.908249]
+MOrig = [-16.277300, -71.444397]
 
 OutName = "_run_subsit"
 # NumSingular = [ 100, 200, 300, 400, 500, 1000]
@@ -149,7 +149,7 @@ for noversmp in OverSample:
                     +"_o"+str(noversmp)\
                     +"_s"+str(nsubspit)\
                     +"_"+str(np.around(perc,1))\
-                    +"%.npz"
+                    +"percent.npz"
 
             np.savez_compressed(File, U=U, S=S, V=Vt, Nop=perc)
 

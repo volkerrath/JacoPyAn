@@ -41,6 +41,45 @@ def idctn(x, norm="ortho"):
         x = idct(x, axis=i, norm=norm)
     return x
 
+def indexrange(bb, bl):
+    """
+    From GIBBON toolbox (https://www.gibboncode.org/):
+
+        function i=indexRange(blockSize,s)
+
+        i=repmat(1:blockSize:s,blockSize,1);
+        i=i(:);
+        if numel(i)<s
+            ii=i;
+            i=siz(1)*ones(1,s);
+            i(1:num_i)=ii;
+        else
+            i=i(1:s);
+        end
+        [~,~,i]=unique(i);
+        end
+    """
+    if iseven(bl):
+        bl=bl+1
+        print("block size was even, increased to ", bl)
+
+    if bb <= bl:
+        error("bounding box too small!Exit.")
+
+
+    # import numpy.matlib
+    # jrange = numpy.matlib.repmat(np.arange(0,bbsize,block),block,1)
+
+    irange = np.tile(np.arange(0,bb,bl),(bl,1))
+
+    return irange
+
+def iseven(num):
+    even = False
+    if num % 2 == 0:
+        even= True
+        
+    return even
 
 def wait1d(periods=np.array([]),
            thick=np.array([]), cond=np.array([]), out=False):

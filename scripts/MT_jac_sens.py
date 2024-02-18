@@ -100,8 +100,13 @@ if TopoExtract:
     TopoFile = WorkDir + "Misti_Topo.dat"
     TopoFmt = ""
 
+
 Splits = "total dtyp site freq comp"
 NoReIm = True
+
+NormLocal = True
+if (not NormLocal) and ("tot" not in  Splits.lower()):
+    Splits = "total"+Splits
 
 PerIntervals = [ 
                 [0.0001, 0.001], 
@@ -113,7 +118,6 @@ PerIntervals = [
                 [100., 1000.], 
                 [1000., 10000.]
                 ]
-
 
 
 Type = "raw"
@@ -289,7 +293,7 @@ if "tot"in Splits.lower():
 
     SensTmp = jac.calc_sensitivity(Jac,
                         Type = Type, OutInfo=False)
-    SensTot = jac.transform_sensitivity(S=SensTmp, vol=vol,
+    SensTot, MaxTotal = jac.transform_sensitivity(S=SensTmp, 
                             Transform=Transform, OutInfo=False)
 
     SensFile = SensDir+JacName+"_total_"+Type+"_"+"_".join(Transform)
@@ -345,10 +349,15 @@ if "dtyp" in Splits.lower():
         jac.print_stats(jac=JacTmp, jacmask=jacflat)
         print("\n")
         
+        if NormLocal:
+            maxval = None
+        else:
+            maxval = MaxTotal
+        
         SensTmp = jac.calc_sensitivity(JacTmp,
                      Type = Type, OutInfo=False)
-        SensTmp = jac.transform_sensitivity(S=SensTmp, vol=vol,
-                          Transform=Transform, OutInfo=False)
+        SensTmp, _ = jac.transform_sensitivity(S=SensTmp, vol=vol,
+                          Transform=Transform, MaxVal=maxval, OutInfo=False)
         S = np.reshape(SensTmp, mdims, order="F")
         
                     
@@ -408,10 +417,15 @@ if "comp" in Splits.lower():
         jac.print_stats(jac=JacTmp, jacmask=jacflat)
         print("\n")
         
+        if NormLocal:
+            maxval = None
+        else:
+            maxval = MaxTotal
+            
         SensTmp = jac.calc_sensitivity(JacTmp,
                      Type = Type, OutInfo=False)
-        SensTmp = jac.transform_sensitivity(S=SensTmp, vol=vol,
-                          Transform=Transform, OutInfo=False)
+        SensTmp,  = jac.transform_sensitivity(S=SensTmp, vol=vol,
+                          Transform=Transform, MaxVal=maxval, OutInfo=False)
         S = np.reshape(SensTmp, mdims, order="F")
                      
         SensFile = SensDir+JacName+"_"+icmp+"_"+"_".join(Transform)
@@ -450,40 +464,45 @@ if "site" in Splits.lower():
     print(SiteNames)
     
     for sit in SiteNames:        
-       indices = np.where(sit==Sites)
-       JacTmp = Jac[indices]
-       print("Site: ",sit)
-       jac.print_stats(jac=JacTmp, jacmask=jacflat)
-       print("\n")
-       
-       SensTmp = jac.calc_sensitivity(JacTmp,
-                    Type = Type, OutInfo=False)
-       SensTmp = jac.transform_sensitivity(S=SensTmp, vol=vol,
-                         Transform=Transform, OutInfo=False)
-       S = np.reshape(SensTmp, mdims, order="F")
-       
-       SensFile = SensDir+JacName+"_"+sit.lower()+"_"+Type+"_"+"_".join(Transform)
-       Header = "# "+SensFile.replace("_", " | ")
-         
-       
-       if "mod" in OutFormat.lower():
-            mod.write_mod(SensFile, modext=ModExt,
-                          dx=dx, dy=dy, dz=dz, mval=S,
-                          reference=refmod, mvalair=Blank, aircells=aircells, header=Header)
-            print(" Site sensitivities (ModEM format) written to "+SensFile)
-            
-       if "ubc" in OutFormat.lower():
-            elev = -refmod[2]
-            refubc =  [MOrig[0], MOrig[1], elev]
-            mod.write_ubc(SensFile, modext="_ubc.sns", mshext="_ubc.msh",
-                          dx=dx, dy=dy, dz=dz, mval=S,
-                          reference=refubc, mvalair=Blank, aircells=aircells, header=Header)
-            print(" Site sensitivities (UBC format) written to "+SensFile)           
-                 
-       if "rlm" in OutFormat.lower():
-            mod.write_rlm(SensFile, modext="_sns.rlm", 
-                          dx=dx, dy=dy, dz=dz, mval=S, reference=refmod, mvalair=Blank, aircells=aircells, comment=Header)
-            print(" Site sensitivities (CGG format) written to "+SensFile)
+        indices = np.where(sit==Sites)
+        JacTmp = Jac[indices]
+        print("Site: ",sit)
+        jac.print_stats(jac=JacTmp, jacmask=jacflat)
+        print("\n")
+        
+        if NormLocal:
+             maxval = None
+        else:
+             maxval = MaxTotal
+        
+        SensTmp = jac.calc_sensitivity(JacTmp,
+                     Type = Type, OutInfo=False)
+        SensTmp, _  = jac.transform_sensitivity(S=SensTmp, vol=vol,
+                          Transform=Transform, MaxVal=maxval, OutInfo=False)
+        S = np.reshape(SensTmp, mdims, order="F")
+        
+        SensFile = SensDir+JacName+"_"+sit.lower()+"_"+Type+"_"+"_".join(Transform)
+        Header = "# "+SensFile.replace("_", " | ")
+          
+        
+        if "mod" in OutFormat.lower():
+             mod.write_mod(SensFile, modext=ModExt,
+                           dx=dx, dy=dy, dz=dz, mval=S,
+                           reference=refmod, mvalair=Blank, aircells=aircells, header=Header)
+             print(" Site sensitivities (ModEM format) written to "+SensFile)
+             
+        if "ubc" in OutFormat.lower():
+             elev = -refmod[2]
+             refubc =  [MOrig[0], MOrig[1], elev]
+             mod.write_ubc(SensFile, modext="_ubc.sns", mshext="_ubc.msh",
+                           dx=dx, dy=dy, dz=dz, mval=S,
+                           reference=refubc, mvalair=Blank, aircells=aircells, header=Header)
+             print(" Site sensitivities (UBC format) written to "+SensFile)           
+                  
+        if "rlm" in OutFormat.lower():
+             mod.write_rlm(SensFile, modext="_sns.rlm", 
+                           dx=dx, dy=dy, dz=dz, mval=S, reference=refmod, mvalair=Blank, aircells=aircells, comment=Header)
+             print(" Site sensitivities (CGG format) written to "+SensFile)
            
     
     elapsed = time.perf_counter() - start
@@ -509,11 +528,16 @@ if "freq" in Splits.lower():
            print("Freqband: ", lowstr, "to", uppstr)
            jac.print_stats(jac=JacTmp, jacmask=jacflat)
            print("\n")
+           
+           if NormLocal:
+               maxval = None
+           else:
+               maxval = MaxTotal
 
            SensTmp = jac.calc_sensitivity(JacTmp,
                         Type = Type, OutInfo=False)
-           SensTmp = jac.transform_sensitivity(S=SensTmp, vol=vol,
-                             Transform=Transform, OutInfo=False)
+           SensTmp, _  = jac.transform_sensitivity(S=SensTmp, vol=vol,
+                             Transform=Transform, MaxVal=maxval, OutInfo=False)
            S = np.reshape(SensTmp, mdims, order="F") 
            
            SensFile = SensDir+JacName+"_freqband"+lowstr+"_to_"+uppstr+"_"+Type+"_"+"_".join(Transform)

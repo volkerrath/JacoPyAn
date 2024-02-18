@@ -15,7 +15,7 @@ def calc_sensitivity(Jac=np.array([]),
                      Type = "euclidean", UseSigma = False, OutInfo = False):
     """
     Calculate sensitivities.
-    Expects that Jacobian is already sclaed, i.e Jac = C^(-1/2)*J.
+    Expects that Jacobian is already scaled, i.e Jac = C^(-1/2)*J.
 
     Several options exist for calculating sensiotivities, all of them
     used in the literature.
