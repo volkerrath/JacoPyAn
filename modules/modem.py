@@ -1981,7 +1981,8 @@ def distribute_bodies(model=None,
     Returns
     -------
     template : np.array, float
-        zeros, like input model, with marker values at body centers 
+        zeros, like input model, with marker values at body centers git push
+        
         
     @author: vrath, Feb 2024
 
@@ -2000,15 +2001,18 @@ def distribute_bodies(model=None,
         
         ci = np.arange(bbox[0],bbox[1],step[0])
         cj = np.arange(bbox[2],bbox[3],step[1])
-        cz = np.arange(bbox[4],bbox[5],step[2])      
-        centi, centj, centz = np.meshgrid(ci, cj, cz, indexing='ij')
+        ck = np.arange(bbox[4],bbox[5],step[2])      
+        centi, centj, centk = np.meshgrid(ci, cj, ck, indexing='ij')
         
         bnum = np.shape(centi)
+        print(bnum)
         
         for ibody in np.arange(bnum):
-            template[centi[ibody], centj[ibody], centz[ibody]] = val
+            template[centi[ibody], centj[ibody], centk[ibody]] = val
+            
     elif "ran" in method[0].lower():  
         error("distribute_bodies: method"+method.lower()+"not implemented! Exit.")
+        rng = np.random.default_rng()
         
         bnum = method[1]
         bbox = method[2]
@@ -2020,14 +2024,24 @@ def distribute_bodies(model=None,
 
         ci = np.arange(bbox[0],bbox[1],1)
         cj = np.arange(bbox[2],bbox[3],1)
-        cz = np.arange(bbox[4],bbox[5],1)     
-        for ibody in np.arange(bnum):     
-            
-            
-     
-            
-            
+        ck = np.arange(bbox[4],bbox[5],1)     
+        centers = []
         
+        for ibody in np.arange(bnum):     
+            centi = rng.choice(ci)
+            centj = rng.choice(cj)
+            centk = rng.choice(ck)
+            ctest = np.array([centi, centj,centk])
+            if ibody==0:
+                centers = ctest
+            else:
+                print(np.shape(centers))
+                for itest in np.arange(np.shape(centers)[1]):
+                    test = norm(ctest-centers[itest-1])
+                    if test>=mdist:
+                        template[centi, centj, centk] = val
+                    else:
+                        print("distribute_bodies: too near!")
     else:
         error("distribute_bodies: method"+method.lower()+"not implemented! Exit.")
     
