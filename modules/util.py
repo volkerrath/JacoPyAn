@@ -23,22 +23,22 @@ from sys import exit as error
 
 from scipy.fftpack import dct, idct
 
-def dctn(x, norm="ortho"):
+def dctn(x, mnorm="ortho"):
     """
     Discrete cosine transform (fwd)
     https://stackoverflow.com/questions/13904851/use-pythons-scipy-dct-ii-to-do-2d-or-nd-dct
     """
     for i in range(x.ndim):
-        x = dct(x, axis=i, norm=norm)
+        x = dct(x, axis=i, norm=mnorm)
     return x
 
-def idctn(x, norm="ortho"):
+def idctn(x, mnorm="ortho"):
     """
     Discrete cosine transform (inv)
     https://stackoverflow.com/questions/13904851/use-pythons-scipy-dct-ii-to-do-2d-or-nd-dct
     """
     for i in range(x.ndim):
-        x = idct(x, axis=i, norm=norm)
+        x = idct(x, axis=i, norm=mnorm)
     return x
 
 def indexrange(bb, bl):

@@ -89,8 +89,10 @@ if not os.path.isdir(ModDir_out):
 samples = 100
 smoother = None  # ["uniform", 3] ["gaussian",0.5]
 
-#            geo    act   dlog10rho  position         axes                 angles
-basebody = ["box", "add", 0.2,      0., 0., 0.,   3000., 1000., 2000.,    0., 0., 0.]
+distribution = "regular"  # "random", "regular"
+
+#            geo    act   dlog10rho     axes                  angles
+basebody = ["box", "add", 0.2,       3000., 1000., 2000.,    0., 0., 0.]
 
 
 utm_x, utm_y = utl.proj_latlon_to_utm(ModOrig[0], ModOrig[1], utm_zone=32631)
@@ -144,6 +146,8 @@ rho = mod.prepare_model(rho, rhoair=rhoair)
 for ibody in range(samples):
     body = basebody.copy()
     
+     
+
 
     rho_new = mod.insert_body(dx, dy, dz, rho, body) 
     rho_new[aircells] = rhoair

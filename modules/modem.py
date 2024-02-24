@@ -1958,6 +1958,83 @@ def prepare_model(rho, rhoair=1.0e17):
 
     return rho_new
 
+
+def distribute_bodies(model=None, 
+                      method=["random", 25, "uniform", [1, 1,   1, 1,   1, 1]], 
+                      step = 1, val=1.):
+    """
+    construct templates for  distributing test boduies  within model.
+
+    Parameters
+    ----------
+    model : np.array, float
+        model setup in ModEM format. The default is None.
+    method : list of objects, optional
+       Par rameters  for  generating centers. 
+        Example: ["random", 25, "uniform", [1, 1,   1, 1,   1, 1]].
+    
+        method[0] = "regular": 
+            ['regular', bounding box (cell indices), step (usually 1) , marker value (e.g 1.)]                
+        method[0] = "ramdom": 
+            ['random', number of bodies, bounding box (cell indices), minimum distance, marker value (default 1.)]   
+
+    Returns
+    -------
+    template : np.array, float
+        zeros, like input model, with marker values at body centers 
+        
+    @author: vrath, Feb 2024
+
+    """
+    
+    
+    if model==None:
+        error("distribute_bodies: no model given! Exit.")
+    
+    template = np.zeros_like(model)
+ 
+    if   "reg" in method[0].lower():           
+
+        bbox = method[1]
+        step = method[2]
+        
+        ci = np.arange(bbox[0],bbox[1],step[0])
+        cj = np.arange(bbox[2],bbox[3],step[1])
+        cz = np.arange(bbox[4],bbox[5],step[2])      
+        centi, centj, centz = np.meshgrid(ci, cj, cz, indexing='ij')
+        
+        bnum = np.shape(centi)
+        
+        for ibody in np.arange(bnum):
+            template[centi[ibody], centj[ibody], centz[ibody]] = val
+    elif "ran" in method[0].lower():  
+        error("distribute_bodies: method"+method.lower()+"not implemented! Exit.")
+        
+        bnum = method[1]
+        bbox = method[2]
+        bpdf = method[3]
+        print("distribute_bodies: currently only uniform diributions"\
+              +" implemented! input pdf ignored!")
+        mdist = method[4]       
+
+
+        ci = np.arange(bbox[0],bbox[1],1)
+        cj = np.arange(bbox[2],bbox[3],1)
+        cz = np.arange(bbox[4],bbox[5],1)     
+        for ibody in np.arange(bnum):     
+            
+            
+     
+            
+            
+        
+    else:
+        error("distribute_bodies: method"+method.lower()+"not implemented! Exit.")
+    
+    
+    return template
+    
+
 # def generate_checkerboard(rho=None, 
 #                           pad=[5, 5, 10], mindepth =3, 
 #                           bs = [3, 3, 3], ba=[0.5,0.],
