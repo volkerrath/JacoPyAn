@@ -1357,18 +1357,11 @@ def mt1dfwd(freq, sig, d, inmod="r", out="imp", magfield="b"):
         return Z, rhoa, phase
 
 
-def insert_body(
-    dx=None,
-    dy=None,
-    dz=None,
-    rho_in=None,
-    body=None,
+def insert_body(dx=None, dy=None, dz=None,
+    rho_in=None, body=None,
     pad=[0, 0, 0],
-    smooth=None,
-    scale=1.0,
-    reference = None,
-    Out=True,
-):
+    smooth=None, scale=1.0, reference = None,
+    out=True):
     """
     Insert 3d body (ellipsoid or box) into given model.
 
@@ -1414,7 +1407,7 @@ def insert_body(
     else:
         error("Action" + action + " not implemented! Exit.")
 
-    if Out:
+    if out:
         print(
             "Body type   : " + geom + ", " + action + " rho =",
             str(np.exp(rhoval)) + " Ohm.m",
@@ -1512,8 +1505,7 @@ def in_ellipsoid(
     cent=[0.0, 0.0, 0.0],
     axs=[1.0, 1.0, 1.0],
     ang=[0.0, 0.0, 0.0],
-    find_inside=True,
-):
+    find_inside=True):
     """
     Find points inside arbitrary box.
 
@@ -1959,9 +1951,55 @@ def prepare_model(rho, rhoair=1.0e17):
     return rho_new
 
 
+def insert_body_ijk(template = None, rho_in=None, 
+                    perturb=None, bodymask=None, out=True):
+    """
+    Insert 3d box into given model.
+    
+    @author: vrath
+    """
+    if template==None:
+        error("insert_body_ijk: no template! Exit.")
+        
+    if rho_in==None:
+        error("insert_body_ijk: no base model! Exit.")
+        
+    if perturb==None:
+        error("insert_body_ijk: no perturbation! Exit.")
+        
+    if bodymask==None:  
+        error("insert_body_ijk: no body! Exit.")
+        
+    rho_out = np.log(rho_in.copy())
+
+
+    if out:
+        print("Perturbation amplitude: "+str(perturb) + " log10")
+        
+    centers = np.where(template != 0.)
+    _, nbody = np.shape(centers)
+    
+    bw = bodymask
+
+    for ibody in np.arange(nbody):
+        
+        bc = centers[:,ibody]
+
+        ib = np.arange(bc[0]-bw[0],bc[0]+bw[0]+1)        
+        jb = np.arange(bc[1]-bw[1],bc[1]+bw[1]+1)
+        kb = np.arange(bc[1]-bw[1],bc[1]+bw[1]+1)
+        rho_out[ib, jb, kb] = template[bc]*perturb+rho_in[ib, jb, kb]
+        
+    
+        if out:    
+            print("Body center at: " + str(bc))
+            
+     
+    return rho_out
+
 def distribute_bodies(model=None, 
                       method=["random", 25, "uniform", [1, 1,   1, 1,   1, 1]], 
-                      step = 1, val=1.):
+                      valmark=1, flip="alternate", scale="ijk"):
     """
     construct templates for  distributing test boduies  within model.
 
@@ -1970,13 +2008,25 @@ def distribute_bodies(model=None,
     model : np.array, float
         model setup in ModEM format. The default is None.
     method : list of objects, optional
-       Par rameters  for  generating centers. 
-        Example: ["random", 25, "uniform", [1, 1,   1, 1,   1, 1]].
     
+        Contains parameters  for  generating centers. 
+     
         method[0] = "regular": 
-            ['regular', bounding box (cell indices), step (usually 1) , marker value (e.g 1.)]                
+            ['regular', bounding box (cell indices), step]    
+            Example: method = ["regular", [1, 1,   1, 1,   1, 1], [3, 3, 5], 5.].
+
         method[0] = "ramdom": 
-            ['random', number of bodies, bounding box (cell indices), minimum distance, marker value (default 1.)]   
+            ['random', number of bodies, bounding box (cell indices), 
+             distribution (currently only uniform), minimum distance]   
+            Example: method = ["random", 25, [1, 1,   1, 1,   1, 1], "uniform", ].
+        
+    valmark : float
+            Marker value (e.g 1.),
+            
+    flip : string or None
+         flip = "alt"          sign change modulo 2 
+         flip = "ran"          random sign change  
+
 
     Returns
     -------
@@ -1987,11 +2037,14 @@ def distribute_bodies(model=None,
     @author: vrath, Feb 2024
 
     """
-    
+    if "ijk" not in scale:
+       error("distribute_bodies: currently only index sales possible! Exit.")
+        
     
     if model==None:
         error("distribute_bodies: no model given! Exit.")
-    
+        
+    rng = np.random.default_rng()
     template = np.zeros_like(model)
  
     if   "reg" in method[0].lower():           
@@ -2008,11 +2061,19 @@ def distribute_bodies(model=None,
         print(bnum)
         
         for ibody in np.arange(bnum):
+            val = valmark
+            if "alt" in flip:
+                if  np.mod(ibody,2)==0:
+                    val = -valmark
+            if "ran" in flip:
+                if rng.random()>0.5:
+                    val = -valmark
+            
+                
             template[centi[ibody], centj[ibody], centk[ibody]] = val
             
     elif "ran" in method[0].lower():  
         error("distribute_bodies: method"+method.lower()+"not implemented! Exit.")
-        rng = np.random.default_rng()
         
         bnum = method[1]
         bbox = method[2]
