@@ -564,6 +564,88 @@ def write_mod_ncd(
             % (NCfile, ncout.data_model)
         )
 
+def write_mod_npz(file=None, 
+                    dx=None, dy=None, dz=None, mval=None, reference=None,
+                    compressed=True, trans="LINEAR", 
+                    aircells=None, mvalair=1.e17, blank=1.e-30, header="", 
+                    out=True):
+    """
+    Write ModEM model input.
+
+    Expects mval in physical units (linear).
+
+    author: vrath
+    last changed: Feb 26, 2024
+
+    """
+    
+    
+    
+
+    dims = np.shape(mval)
+    nx, ny, nz = dims
+    
+    if not aircells == None:
+        mval[aircells] = mvalair
+
+    if not blank == None:
+        blanks = np.where(~np.isfinite(mval))
+        mval[blanks] = blank
+
+    if len(header)==0:
+        header ="# 3D MT model written by ModEM in WS format"
+        
+    if header[0] != "#":
+        header = "#"+header 
+        
+    if trans is not None:
+        trans = trans.upper()
+
+        if trans == "LOGE":
+            mval = np.log(mval)
+            mvalair = np.log(mvalair)
+            if out:
+                print("values to " + file + " transformed to: " + trans)
+        elif trans == "LOG10":
+            mval = np.log10(mval)
+            mvalair = np.log10(mvalair)
+            if out:
+                print("values to " + file + " transformed to: " + trans)
+        elif trans == "LINEAR":
+            pass
+    
+        else:
+            print("Transformation: " + trans + " not defined!")
+            sys.exit(1)
+            
+    else:
+        trans == "LINEAR"
+
+    trns = np.array(trans)
+
+    if reference==None:
+        ncorner = -0.5*np.sum(dx)
+        ecorner = -0.5*np.sum(dy)
+        elev = 0.
+        cnt = np.array([ncorner, ecorner, elev])
+    else:
+        cnt = np.asarray(reference)
+        
+    info = np.array([trns], dtype="object")
+    
+    if compressed:
+        modext=".npz"
+        modf = file+modext
+        
+        np.savez_compressed(modf, header=header, info=info,
+                            dx=dx, dy=dy, dz=dz, mval=mval, reference=cnt)
+        print("model written to "+modf)
+    else:
+        modext=".npy"
+        modf = file+modext
+        np.savez(modf, header=header, info=info,
+                            dx=dx, dy=dy, dz=dz, mval=mval, reference=cnt)
+        print("model written to "+modf)
 
 def write_mod(file=None, modext=".rho",
                     dx=None, dy=None, dz=None, mval=None, reference=None,
@@ -590,7 +672,7 @@ def write_mod(file=None, modext=".rho",
     """
     
     
-    modl = file+modext
+    modf = file+modext
 
     dims = np.shape(mval)
 
@@ -645,8 +727,9 @@ def write_mod(file=None, modext=".rho",
         cnt = np.array([ncorner, ecorner, elev])
     else:
         cnt = np.asarray(reference)
+    
         
-    with open(modl, "w") as f:
+    with open(modf, "w") as f:
         np.savetxt(
             f, [header], fmt="%s")
         line = np.array([nx, ny,nz, dummy, trns],dtype="object")
@@ -691,7 +774,7 @@ def write_rlm(file=None, modext=".rlm",
     """
     
     
-    modl = file+modext
+    modf = file+modext
 
     nx, ny, nz  = np.shape(mval)
 
@@ -719,7 +802,7 @@ def write_rlm(file=None, modext=".rlm",
     else:
         cnt = np.asarray(reference)
         
-    with open(modl, "w") as f:
+    with open(modf, "w") as f:
 
         line = np.array([nx, ny,nz],dtype="object")
         np.savetxt(f, line.reshape(1, 3), fmt ="  %i")
@@ -762,7 +845,7 @@ def write_ubc(file=None,  mshext=".mesh", modext=".ubc",
 
     """
     
-    modl = file+modext
+    modf = file+modext
     mesh = file+mshext
 
 
@@ -810,7 +893,7 @@ def write_ubc(file=None,  mshext=".mesh", modext=".ubc",
 
 
 
-    with open(modl , "w") as f:
+    with open(modf , "w") as f:
         np.savetxt(f, val, fmt="%14.5g")
         
         
@@ -826,7 +909,7 @@ def read_ubc(file=None, modext=".mod", mshext=".msh",
 
     """
     
-    modl = file+modext
+    modf = file+modext
     mesh = file+mshext
       
     
@@ -863,7 +946,7 @@ def read_ubc(file=None, modext=".mod", mshext=".msh",
     refubc = np.array([refx, refy, refz, utmz])
 
 
-    with open(modl, "r") as f:
+    with open(modf, "r") as f:
         lines = f.readlines()
         
     val = np.array([])  
@@ -948,9 +1031,9 @@ def read_mod(file=None, modext=".rho",
     """
    
     
-    modl = file+modext
+    modf = file+modext
 
-    with open(modl, "r") as f:
+    with open(modf, "r") as f:
         lines = f.readlines()
 
     lines = [line.split() for line in lines]
