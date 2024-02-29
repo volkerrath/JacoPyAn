@@ -552,15 +552,13 @@ def set_airmask(rho=None, aircells=np.array([]), blank= 1.e-30, flat=False, out=
     return mask
 
 
-
-
 def project_model(m=None, U=None, tst_sample= None, nsamp=1, small=1.0e-14, out=True):
     """
     Project to Nullspace.
 
     (see Munoz & Rath, 2006)
     author: vrath
-    last changed: Sep 25, 2020
+    last changed: Feb 29, 2024
     """
     if m.ndim(m)>1:
         m = m.flatten(order="F")
@@ -569,7 +567,7 @@ def project_model(m=None, U=None, tst_sample= None, nsamp=1, small=1.0e-14, out=
         print("project_model: "+str(nsamp)+" sample models will be generated!")
         if nsamp==0:
            error("project_model: No number of samples given! Exit.") 
-        tst_sample = np.random.default_rng().normal(0., 1., (nsamp, len(m)))
+        tst_sample = m + np.random.default_rng().normal(0., 1., (nsamp, len(m)))
         
     else:
         nsamp = np.shape(tst_sample)[0]

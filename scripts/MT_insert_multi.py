@@ -63,7 +63,7 @@ titstrng = utl.print_title(version=version, fname=__file__, out=False)
 print(titstrng+"\n\n")
 
 
-rhoair = 1.e+17
+
 
 total = 0
 ModDir_in = JACOPYAN_DATA + "/Peru/Misti/"
@@ -75,35 +75,39 @@ ModFormat = "mod rlm" # "ubc"
 ModOrig = [-16.277300, -71.444397]# Misti
 
 
-JacFile = ModDir_in +"Misti_best_Z5_nerr_sp-8"
-JacFormat = "sparse"
+SVDFile = ModDir_in +"Misti_best_Z5_nerr_sp-8"
 
-ModModFormat = "mod rlm" # "ubc"
+
+ModOutSingle = True
+
 
 if not os.path.isdir(ModDir_out):
     print("File: %s does not exist, but will be created" % ModDir_out)
     os.mkdir(ModDir_out)
+    
+    
+padding = [10, 10,   10, 10,   0, 20]
+bodymask = [3, 3, 5]
+bodyval = 0.2
+flip = "alt"
 
+# regular perturbed model (like checkerboard) 
+# model_set = 1
+# method =   ["regular", [1, 1,   1, 1,   1, 1], [4, 4, 6]]
 
+# random perturbed grid 
+model_set = 10 # should be more
+method = [
+    ["random", 25, [1, 1,   1, 1,   1, 1], "uniform", [3, 3, 5], 6]
+       ]
 
-samples = 100
-smoother = None  # ["uniform", 3] ["gaussian",0.5]
-
-distribution = "regular"  # "random", "regular"
-
-#            geo    act   dlog10rho     axes                  angles
-basebody = ["box", "add", 0.2,       3000., 1000., 2000.,    0., 0., 0.]
-
-
-utm_x, utm_y = utl.proj_latlon_to_utm(ModOrig[0], ModOrig[1], utm_zone=32631)
-utmcenter = [utm_x, utm_y, 0.]
 
 total = 0.
 start = time.perf_counter()
-dx, dy, dz, rho, refmod, _ = mod.read_mod(ModFile_in, ".rho",trans="log10")
-mdims = np.shape(rho)
-aircells = np.where(rho>np.log10(rhoair/10.))
-jacmask = jac.set_airmask(rho=rho, aircells=aircells, blank=np.log10(blank), flat = False, out=True)
+dx, dy, dz, base_model, refmod, _ = mod.read_mod(ModFile_in, ".rho",trans="log10")
+mdims = np.shape(base_model)
+aircells = np.where(base_model>np.log10(rhoair/10.))
+jacmask = jac.set_airmask(rho=base_model, aircells=aircells, blank=np.log10(blank), flat = False, out=True)
 jacflat = jacmask.flatten(order="F")
 elapsed = time.perf_counter() - start
 total = total + elapsed
@@ -111,78 +115,35 @@ print(" Used %7.4f s for reading model from %s "
       % (elapsed, ModFile_in + ".rho"))
 
 start = time.perf_counter()
-print("Reading Jacobian from "+JacFile)
-if "sp" in JacFormat:
-    Jac = scs.load_npz(JacFile +"_jac.npz")
-    normalized = True
-    tmp = np.load(JacFile +"_info.npz", allow_pickle=True)
-    Freqs = tmp["Freq"]
-    Comps = tmp["Comp"]
-    Sites = tmp["Site"]
-    Dtype = tmp["DTyp"]
-    print(np.unique(Dtype))
-
-else:  
-    
-    Jac, tmp = mod.read_jac(JacFile + ".jac")    
-    normalized = False
-    Data, Sites, Freqs, Comps, Dtype, Head = mod.read_data_jac(JacFile + "_jac.dat")
-    dsh = np.shape(Data)
-    err = np.reshape(Data[:, 5], (dsh[0], 1))
-    Jac = jac.normalize_jac(Jac, err)
-     
+print("Reading Jacobian SVD from "+SVDFile)
+SVD = np.load(SVDFile) 
+U = SVD["U"]
+S = SVD["S"]
+print(np.shape(U), np.shape(U))
 elapsed = time.perf_counter() - start
-print(" Used %7.4f s for reading Jacobian/data from %s" % (elapsed, JacFile))
+print(" Used %7.4f s for reading Jacobian/data from %s" % (elapsed, SVDFile))
 total = total + elapsed
-print("Full Jacobian")
-jac.print_stats(jac=Jac, jacmask=jacflat)
-print("\n")               
 print("\n")
 
 
 
-rho = mod.prepare_model(rho, rhoair=rhoair)
-
-for ibody in range(samples):
-    body = basebody.copy()
+for ibody in range(model_set):
     
-     
-
-
-    rho_new = mod.insert_body(dx, dy, dz, rho, body) 
-    rho_new[aircells] = rhoair
+    model = base_model.copy()
+    templ = mod.distribute_bodies_ijk(model=model, method=method)
+    new_model = mod.insert_body_ijk(rho_in=model, template=templ, perturb=bodyval, bodymask=bodymask) 
+    new_model[aircells] = rhoair
     
-    ModFile = ModFile_out + "_" + body[0] + \
-        str(ibody) + "_" + smoother[0] + ".rho"
-        
+    ModFile = ModDir_out+ModFile_out+"_"+str(ibody)+"+perturbed.rho"
     Header = "# "+ModFile
-       
-    if "mod" in ModFormat.lower():
-        # for modem_readable files
+    
+    rho_proj = jac.project_model(m=model, U=U, tst_sample=new_model, nsamp=1)
 
-        mod.write_mod(ModFile, modext="_rho_new.rho",
-                      dx=dx, dy=dy, dz=dz, mval=rho_new,
-                      reference=refmod, mvalair=blank, aircells=aircells, header=Header)
-        print(" Cell rho_newumes (ModEM format) written to "+ModFile)
-        
-    if "ubc" in ModFormat.lower():
-        elev = -refmod[2]
-        refubc =  [ModOrig[0], ModOrig[1], elev]
-        mod.write_ubc(ModFile, modext="_ubc.rho_new", mshext="_ubc.msh",
-                      dx=dx, dy=dy, dz=dz, mval=rho_new, reference=refubc, mvalair=blank, aircells=aircells, header=Header)
-        print(" Cell rho_newumes (UBC format) written to "+ModFile)
-  
-    if "rlm" in ModFormat.lower():
-        mod.write_rlm(ModFile, modext="_rho_new.rlm", 
-                      dx=dx, dy=dy, dz=dz, mval=rho_new, reference=refmod, mvalair=blank, aircells=aircells, comment=Header)
-        print(" Cell rho_newumes (UBC format) written to "+ModFile)     
-
-
-    elapsed = (time.perf_counter() - start)
-    print(
-        " Used %7.4f s for processing/writing model to %s " %
-        (elapsed, ModFile))
-    print("\n")
+# mod.write_mod_npz(file=None, 
+                    # dx=None, dy=None, dz=None, mval=None, reference=None,
+                    # compressed=True, trans="LINEAR", 
+                    # aircells=None, mvalair=1.e17, blank=1.e-30, header="", 
+                    # out=True):
 
 
 total = total + elapsed

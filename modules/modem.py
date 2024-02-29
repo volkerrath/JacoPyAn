@@ -564,6 +564,7 @@ def write_mod_ncd(
             % (NCfile, ncout.data_model)
         )
 
+
 def write_mod_npz(file=None, 
                     dx=None, dy=None, dz=None, mval=None, reference=None,
                     compressed=True, trans="LINEAR", 
@@ -583,7 +584,11 @@ def write_mod_npz(file=None,
     
 
     dims = np.shape(mval)
-    nx, ny, nz = dims
+    if mval.dim==3:
+        nx, ny, nz = dims
+    else:
+        nx ,ny ,nz, nset = dims
+    
     
     if not aircells == None:
         mval[aircells] = mvalair
@@ -2080,7 +2085,7 @@ def insert_body_ijk(template = None, rho_in=None,
      
     return rho_out
 
-def distribute_bodies(model=None, 
+def distribute_bodies_ijk(model=None, 
                       method=["random", 25, "uniform", [1, 1,   1, 1,   1, 1]], 
                       valmark=1, flip="alternate", scale="ijk"):
     """
@@ -2095,8 +2100,8 @@ def distribute_bodies(model=None,
         Contains parameters  for  generating centers. 
      
         method[0] = "regular": 
-            ['regular', bounding box (cell indices), step]    
-            Example: method = ["regular", [1, 1,   1, 1,   1, 1], [3, 3, 5], 5.].
+            ['regular', bounding box (cell indices), bodymask, step]    
+            Example: method = ["regular", [1, 1,   1, 1,   1, 1], [4, 4, 6],]
 
         method[0] = "ramdom": 
             ['random', number of bodies, bounding box (cell indices), 
@@ -2193,77 +2198,3 @@ def distribute_bodies(model=None,
     return template
     
 
-# def generate_checkerboard(rho=None, 
-#                           pad=[5, 5, 10], mindepth =3, 
-#                           bs = [3, 3, 3], ba=[0.5,0.],
-#                           out=True):
-#     """
-#     Generates checkerboard model.
-
-#     Parameters
-#     ----------
-#     rho : nparray
-#         model (log10) 
-#     pad : integer list, optional
-#         padding in x,y,z directions
-#     mindepth : integer, optional
-#         minimal depth for checkerboard. The default is 3.
-#         careful with models including topography!
-#     bs : intger list, optional
-#         box size for checkerboard. The default is [3, 3, 3].
-#     ba : list of floats, optional
-#         box perturbation (log10). The default is [0.5,0.].
-#     out : logical, optional
-#         determines screen output. The default is True.
-
-#     Returns
-#     -------
-#     None.
-
-#     """
-#     rcb = rho.copy()
-#     nx, ny, nz = np.shape(rcb)
-#     p0, p1, p2, p3, p4, p5 = [pad[0], nx-pad[0],    
-#                               pad[1], ny-pad[1],   
-#                               mindepth,  nz-pad[2]]
-    
-    
-#     mcore = rcb[p0:p1, p2:p3, p4:p5]
-#     cx, cy, cz = np.shape(mcore)
-    
-#     # def make_checkerboard(n_rows, n_columns, square_size):
-
-#     nx, ny, nz = int(cx/bs[0] + 1), int(cy/bs[1] + 1, int(cz/bs[2] + 1)
-#     rows_grid, columns_grid = np.meshgrid(range(n_rows_), range(n_columns_), indexing='ij')
-#     high_res_checkerboard = np.mod(rows_grid, 2) + np.mod(columns_grid, 2) == 1
-#     square = np.ones((square_size,square_size))
-#     checkerboard = np.kron(high_res_checkerboard, square)[:n_rows,:n_columns]                                       
-#         rows_grid, columns_grid = np.meshgrid(range(n_x_), range(n_columns_), i int(n_columns/square_size + 1ndexing='ij')
-#         high_res_checkerboard = np.mod(rows_grid, 2) + np.mod(columns_grid, 2) == 1
-#         square = np.ones((square_size,square_size))
-#         checkerboard = np.kron(high_res_checkerboard, square)[:n_x,:n_columns]
-
-
-#     for jz in np.arange(0, cz, 2*bs[2]):
-#         for jy in np.arange(0, cy, 2*bs[1]):
-#             for jx in np.arange(0, cx, 2*bs[0]):
-#                 ix = jx
-#                 iy = jy
-#                 iz = jz
-#                 if ix>cx or iy>cy or iz>cz:
-#                     continue
-                
-#                 mcore[ix:ix+bs[0], iy:iy+bs[1], iz:iz+bs[2]]\
-#                     = mcore[ix:ix+bs[0], iy:iy+bs[1], iz:iz+bs[2]] + ba[0]
-                
-#                 ix = jx+bs[0]
-#                 iy = jy+bs[1]
-#                 iz = jz+bs[2]
-#                 if ix>cx or iy>cy or iz>cz:
-#                     continue
-                
-#                 mcore[ix:ix+bs[0], iy:iy+bs[1], iz:iz+bs[2]]\
-#                     = mcore[ix:ix+bs[0], iy:iy+bs[1], iz:iz+bs[2]] + ba[0]   
-                
-
-#     return rcb
