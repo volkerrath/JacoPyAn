@@ -82,10 +82,16 @@ nan = np.nan
 
 
 # Ubinas case
+# WorkDir =  JACOPYAN_DATA+
+WorkDir = "/home/vrath/UBI38_JAC/"
+Orig = [-16.345800 -70.908249] # UBI
+JacName = "Ubi38_ZPT_nerr_sp-8"
+MFile = WorkDir + "Ubi38_ZssPT_Alpha02_NLCG_023"
+
+# Misti case
 WorkDir =  JACOPYAN_DATA+"/Peru/Misti/"
 MFile = WorkDir+"Misti10_best"
 JFile = WorkDir+"Misti_best_Z5_nerr_sp-8"
-
 MOrig = [-16.277300, -71.444397]
 
 OutName = "_run_subsit"

@@ -73,20 +73,19 @@ ModExt = "_sns.rho"
 
 # Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas
 # WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/"
-# if not WorkDir.endswith("/"):
-#     WorkDir = WorkDir+"/"
-# MFile =""
-# MOrig = [-16.345800 -70.908249] UBI
-# JacName = ""
+WorkDir = "/home/vrath/UBI38_JAC/"
+Orig = [-16.345800 -70.908249] # UBI
+JacName = "Ubi38_ZPT_nerr_sp-8"
+MFile = WorkDir + "Ubi38_ZssPT_Alpha02_NLCG_023"
 
 # Misti Misti Misti Misti Misti Misti Misti Misti Misti Misti Misti Misti
-WorkDir = JACOPYAN_DATA+"/Peru/Misti/"
-if not WorkDir.endswith("/"):
-    WorkDir = WorkDir+"/"
-MFile = WorkDir + "Misti10_best"    
-MOrig = [-16.277300, -71.444397]# Misti
-# JacName = "Misti_best_Z5_nerr_sp-8"
-JacName = "Misti_best_ZT_extended_nerr_sp-8"
+#WorkDir = JACOPYAN_DATA+"/Peru/Misti/"
+#if not WorkDir.endswith("/"):
+    #WorkDir = WorkDir+"/"
+#MFile = WorkDir + "Misti10_best"
+#MOrig = [-16.277300, -71.444397]# Misti
+## JacName = "Misti_best_Z5_nerr_sp-8"
+#JacName = "Misti_best_ZT_extended_nerr_sp-8"
 
 JFile = WorkDir + JacName
 
@@ -97,7 +96,7 @@ if VolExtract:
     
 TopoExtract = True
 if TopoExtract:
-    TopoFile = WorkDir + "Misti_Topo.dat"
+    TopoFile = WorkDir + "Ubinas_Topo.dat"
     TopoFmt = ""
 
 
@@ -135,9 +134,9 @@ Usesigma:
     if true, sensitivities with respect to sigma  are calculated.
 """
 
-
-Transform = [ "max"]
-# Transform = [ "sqr","max"]
+#Transform = [ "max"]
+Transform = [ "siz", "max"]
+#Transform = [ "sqr","max"]
 
 """
 Transform sensitivities. 
@@ -424,7 +423,7 @@ if "comp" in Splits.lower():
             
         SensTmp = jac.calc_sensitivity(JacTmp,
                      Type = Type, OutInfo=False)
-        SensTmp, _  = jac.transform_sensitivity(S=SensTmp, vol=vol,
+        SensTmp, _ = jac.transform_sensitivity(S=SensTmp, vol=vol,
                           Transform=Transform, Maxval=maxval, OutInfo=False)
         S = np.reshape(SensTmp, mdims, order="F")
                      

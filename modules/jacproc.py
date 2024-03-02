@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-.
 """
 Created on Sun Sep 27 17:36:08 2020
 
@@ -258,7 +257,8 @@ def sparsmat_to_array(mat=None):
     """
     arr = np.array([])
     
-    data = mat.A1
+    # data = mat.A1
+    arr= np.asarray(mat).ravel()
     
     return arr
 
