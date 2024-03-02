@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+.
 """
 Created on Sun Sep 27 17:36:08 2020
 
@@ -110,7 +110,8 @@ def calc_sensitivity(Jac=np.array([]),
 
         # S = S.reshape[-1,1]
  
-    S=S.A1 
+    # S=S.A1    
+    S = np.asarray(S).ravel()
     return S
 
 
@@ -125,16 +126,18 @@ def transform_sensitivity(S=np.array([]), vol=np.array([]),
 
     Normalize options:
         "siz"       Normalize by the values optional array V ("volume"), 
-                    i.e in our case layer thickness. This should always 
-                    be the first value in Transform list.
+                    i.e in our case layer thickness. 
         "max"       Normalize by maximum value.
         "sur"       Normalize by surface value.
         "sqr"       Take the square root. Only usefull for euc sensitivities. 
         "log"       Take the logaritm. This should always be the 
                     last value in Transform list
-        "asinh"     asinh transform. WARNING: excludes all other options, and should be used
-                    only for raw sensitivities
-        
+                    
+        "asinh"     asinh transform. WARNING: excludes log option, 
+                    and should be used only for raw sensitivities
+                    (C. Scholl, Die Periodizitaet von Sendesignalen 
+                    bei Long-Offset Transient Electromagnetics, 
+                    Diploma Thesis, Universität zu Koeln, 2001).
 
     author:VR 4/23
 

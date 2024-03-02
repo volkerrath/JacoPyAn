@@ -357,7 +357,7 @@ if "dtyp" in Splits.lower():
         SensTmp = jac.calc_sensitivity(JacTmp,
                      Type = Type, OutInfo=False)
         SensTmp, _ = jac.transform_sensitivity(S=SensTmp, vol=vol,
-                          Transform=Transform, MaxVal=maxval, OutInfo=False)
+                          Transform=Transform, Maxval=maxval, OutInfo=False)
         S = np.reshape(SensTmp, mdims, order="F")
         
                     
@@ -424,8 +424,8 @@ if "comp" in Splits.lower():
             
         SensTmp = jac.calc_sensitivity(JacTmp,
                      Type = Type, OutInfo=False)
-        SensTmp,  = jac.transform_sensitivity(S=SensTmp, vol=vol,
-                          Transform=Transform, MaxVal=maxval, OutInfo=False)
+        SensTmp, _  = jac.transform_sensitivity(S=SensTmp, vol=vol,
+                          Transform=Transform, Maxval=maxval, OutInfo=False)
         S = np.reshape(SensTmp, mdims, order="F")
                      
         SensFile = SensDir+JacName+"_"+icmp+"_"+"_".join(Transform)
@@ -478,7 +478,7 @@ if "site" in Splits.lower():
         SensTmp = jac.calc_sensitivity(JacTmp,
                      Type = Type, OutInfo=False)
         SensTmp, _  = jac.transform_sensitivity(S=SensTmp, vol=vol,
-                          Transform=Transform, MaxVal=maxval, OutInfo=False)
+                          Transform=Transform, Maxval=maxval, OutInfo=False)
         S = np.reshape(SensTmp, mdims, order="F")
         
         SensFile = SensDir+JacName+"_"+sit.lower()+"_"+Type+"_"+"_".join(Transform)
@@ -537,7 +537,7 @@ if "freq" in Splits.lower():
            SensTmp = jac.calc_sensitivity(JacTmp,
                         Type = Type, OutInfo=False)
            SensTmp, _  = jac.transform_sensitivity(S=SensTmp, vol=vol,
-                             Transform=Transform, MaxVal=maxval, OutInfo=False)
+                             Transform=Transform, Maxval=maxval, OutInfo=False)
            S = np.reshape(SensTmp, mdims, order="F") 
            
            SensFile = SensDir+JacName+"_freqband"+lowstr+"_to_"+uppstr+"_"+Type+"_"+"_".join(Transform)

@@ -127,6 +127,7 @@ print("\n")
 
 
 
+
 for ibody in range(model_set):
     
     model = base_model.copy()
@@ -138,6 +139,12 @@ for ibody in range(model_set):
     Header = "# "+ModFile
     
     rho_proj = jac.project_model(m=model, U=U, tst_sample=new_model, nsamp=1)
+    
+    if ibody = 0:
+        nix = 0
+    else:
+        nix = 0
+        
 
 # mod.write_mod_npz(file=None, 
                     # dx=None, dy=None, dz=None, mval=None, reference=None,
