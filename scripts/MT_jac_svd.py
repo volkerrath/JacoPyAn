@@ -23,6 +23,12 @@ Reads ModEM's Jacobian, does fancy things.
 # Import required modules
 
 import os
+# from https://stackoverflow.com/questions/73391779/setting-number-of-threads-in-python
+nthreads = 8  # tinney  62
+os.environ["OMP_NUM_THREADS"] = str(nthreads) 
+os.environ["OPENBLAS_NUM_THREADS"] = str(nthreads) 
+os.environ["MKL_NUM_THREADS"] = str(nthreads)
+
 import sys
 
 # import struct
@@ -31,6 +37,8 @@ from datetime import datetime
 import warnings
 import gc
 
+import jax.numpy as nj
+import jax.scipy as sj
 
 import numpy as np
 import numpy.linalg as npl
@@ -88,12 +96,14 @@ Orig = [-16.345800 -70.908249] # UBI
 JacName = "Ubi38_ZPT_nerr_sp-8"
 MFile = WorkDir + "Ubi38_ZssPT_Alpha02_NLCG_023"
 
-# Misti case
-WorkDir =  JACOPYAN_DATA+"/Peru/Misti/"
-MFile = WorkDir+"Misti10_best"
-JFile = WorkDir+"Misti_best_Z5_nerr_sp-8"
-MOrig = [-16.277300, -71.444397]
+# # Misti case
+# WorkDir =  JACOPYAN_DATA+"/Peru/Misti/"
+# MFile = WorkDir+"Misti10_best"
+# JFile = WorkDir+"Misti_best_Z5_nerr_sp-8"
+# MOrig = [-16.277300, -71.444397]
 
+
+JFile = WorkDir+JacName
 OutName = "_run_subsit"
 # NumSingular = [ 100, 200, 300, 400, 500, 1000]
 NumSingular = [ 500]
