@@ -46,6 +46,7 @@ import scipy.linalg as spl
 import scipy.sparse as scs
 import netCDF4 as nc
 
+from sklearn.utils.extmath import randomized_svd
 
 JACOPYAN_DATA = os.environ["JACOPYAN_DATA"]
 JACOPYAN_ROOT = os.environ["JACOPYAN_ROOT"]
@@ -139,6 +140,7 @@ info = []
 for noversmp in OverSample:
     for nsubspit in SubspaceIt:
         for nsingval in NumSingular:
+            
             start = time.perf_counter()
             U, S, Vt = jac.rsvd(Jac.T,
                                 rank=nsingval,
@@ -156,18 +158,42 @@ for noversmp in OverSample:
             perc = 100. - n_op*100./j_op
             tmp = [nsingval, noversmp, nsubspit, perc, elapsed]
             info.append(tmp)
-
-            print(" Op-norm J_k = "+str(n_op)+", explains "
-                +str(perc)+"% of variations")
-            print("")
-
+            
             File = JFile+"_SVD_k"+str(nsingval)\
                     +"_o"+str(noversmp)\
                     +"_s"+str(nsubspit)\
                     +"_"+str(np.around(perc,1))\
                     +"percent.npz"
-
             np.savez_compressed(File, U=U, S=S, V=Vt, Nop=perc)
+            
+            
+            # start = time.perf_counter()
+            # U, S, Vt = randomized_svd(M=Jac,
+            #                     n_components=nsingval,
+            #                     n_oversamples=noversmp*nsingval)
+            # elapsed = time.perf_counter() - start
+            # print("Used %7.4f s for calculating k = %i SVD " % (elapsed, nsingval))
+            # print("Oversamplinng factor =  ", str(noversmp))
+            # print("Subspace iterations  =  ", str(nsubspit))
+
+            # D = U@scs.diags(S[:])@Vt - Jac.T
+            # x_op = np.random.default_rng().normal(size=np.shape(D)[1])
+            # n_op = npl.norm(D@x_op)/npl.norm(x_op)
+            # j_op = npl.norm(Jac.T@x_op)/npl.norm(x_op)
+            # perc = 100. - n_op*100./j_op
+            # tmp = [nsingval, noversmp, nsubspit, perc, elapsed]
+            # info.append(tmp)
+            # print(" Op-norm J_k = "+str(n_op)+", explains "
+            #     +str(perc)+"% of variations")
+            # print("")
+
+            # File = JFile+"_SVD_k"+str(nsingval)\
+            #         +"_o"+str(noversmp)\
+            #         +"_s"+str(nsubspit)\
+            #         +"_"+str(np.around(perc,1))\
+            #         +"percent.npz"
+
+            # np.savez_compressed(File, U=U, S=S, V=Vt, Nop=perc)
 
 np.savetxt(JFile+OutName+".dat",  np.vstack(info),
                 fmt="%6i, %6i, %6i, %4.6g, %4.6g")

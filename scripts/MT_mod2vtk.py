@@ -5,66 +5,83 @@ Created on Sun Jan 21 18:34:38 2024
 
 @author: vrath
 """
-import numpy as np
+# Import required modules
+
 import os
-from evtk.hl import rectilinearToVTK, pointsToVTK, pointsToVTKAsTIN
+import sys
+from sys import exit as error
+# import struct
+import time
+from datetime import datetime
+import warnings
+import gc
 
-print("Running rectilinear...")
+import numpy as np
+import numpy.linalg as npl
+import scipy.linalg as scl
+import scipy.sparse as scs
+import netCDF4 as nc
 
-# Dimensions
-nx, ny, nz = 6, 6, 2
-lx, ly, lz = 1.0, 1.0, 1.0
-dx, dy, dz = lx/nx, ly/ny, lz/nz
-
-ncells = nx * ny * nz
-npoints = (nx + 1) * (ny + 1) * (nz + 1)
-
-# Coordinates
-x = np.arange(0, lx + 0.1*dx, dx, dtype='float64')
-y = np.arange(0, ly + 0.1*dy, dy, dtype='float64')
-z = np.arange(0, lz + 0.1*dz, dz, dtype='float64')
-
-# Variables
-pressure = np.random.rand(ncells).reshape( (nx, ny, nz))
-temp = np.random.rand(npoints).reshape( (nx + 1, ny + 1, nz + 1))
-
-comments = [ "comment 1", "comment 2" ]
-rectilinearToVTK(FILE_PATH, x, y, z, cellData = {"pressure" : pressure}, pointData = {"temp" : temp}, comments = comments)
+import pyevtk.hl as vtx
+# from pyevtk.hl import rectilinearToVTK, pointsToVTK, pointsToVTKAsTIN
 
 
-print("Running points...")
+JACOPYAN_DATA = os.environ["JACOPYAN_DATA"]
+JACOPYAN_ROOT = os.environ["JACOPYAN_ROOT"]
 
-# Example 1: Random points
-npoints = 100
-x = np.random.rand(npoints)
-y = np.random.rand(npoints)
-z = np.random.rand(npoints)
-pressure = np.random.rand(npoints)
-temp = np.random.rand(npoints)
-comments = [ "comment 1", "comment 2" ]
+mypath = [JACOPYAN_ROOT+"/modules/", JACOPYAN_ROOT+"/scripts/"]
+for pth in mypath:
+    if pth not in sys.path:
+        sys.path.insert(0,pth)
 
-# keys are sorted before exporting, hence it is useful to prefix a number to determine an order
-pointsToVTK(FILE_PATH1, x, y, z, data = {"1_temp" : temp, "2_pressure" : pressure}, comments = comments) 
 
-# Example 2: Export as TIN
-ndim = 2 #only consider x, y coordinates to create the triangulation
-pointsToVTKAsTIN(FILE_PATH2, x, y, z, ndim = ndim, data = {"1_temp" : temp, "2_pressure" : pressure}, comments = comments)
+import jacproc as jac
+import modem as mod
+from version import versionstrg
+import util as utl
 
-# Example 3: Regular point set
-x = np.arange(1.0,10.0,0.1)
-y = np.arange(1.0,10.0,0.1)
-z = np.arange(1.0,10.0,0.1)
+version, _ = versionstrg()
+titstrng = utl.print_title(version=version, fname=__file__, out=False)
+print(titstrng+"\n\n")
 
-comments = [ "comment 1", "comment 2" ]
-pointsToVTK(FILE_PATH3, x, y, z, data = {"elev" : z}, comments = comments)
 
-# Example 4: Point set of 5 points
-x = [0.0, 1.0, 0.5, 0.368, 0.4]
-y = [0.3, 2.0, 0.7, 0.1, 0.6]
-z = [1.0, 1.0, 0.3, 0.75, 0.9]
-pressure = [1.0, 2.0, 3.0, 4.0, 5.0]
-temp = [1.0, 2.0, 3.0, 4.0, 5.0]
-comments = [ "comment 1", "comment 2" ]
 
-# keys are sorted before exporting, hence it is useful to prefix a number to determine an order
-pointsToVTK(FILE_PATH4, x, y, z, data = {"1_temp" : temp, "2_pressure" : pressure}, comments = comments) 
+rng = np.random.default_rng()
+blank = 1.e-30 # np.nan
+rhoair = 1.e17
+
+modExt = ".rho"
+
+# Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas
+# WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/"
+WorkDir = "/home/vrath/UBI38_JAC/"
+ModFiles = ["Ubi38_ZssPT_Alpha02_NLCG_023"]
+DatFiles = ["Ubi38_ZssPT_Alpha02_NLCG_023"]
+SnsFiles = []
+
+nfiles = len(ModFiles)
+
+fcount =0
+for ifile in np.arange(nfiles):
+    infile = WorkDir+ModFiles[ifile]
+    outfile = infile+".vtk"
+
+
+    dx, dy, dz, rho, refmod, _ = mod.read_mod(infile, ".rho",trans="linear", volumes=True)
+    
+    aircells = np.where(rho>rhoair/10)
+    rho = np.log10(rho)
+    xm = utl.set_mesh(dx=dx, center=True)   
+    ym = utl.set_mesh(dy=dy, center=True) 
+    zm = - utl.set_mesh(dz=dz, center=False) 
+    
+    sites = np.array([])    
+    
+    comments = [ "", "" ]
+    vtx.rectilinearToVTK(outfile, xm, ym, zm, cellData = {"rho" : rho})
+    
+    
+    # rectilinearToVTK(outfile, xs, ys, zs, pointData = {"sites" : sites})
+
+    
+
