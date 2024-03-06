@@ -112,6 +112,8 @@ if "dat" in Task.lower():
        z = z[siteindex]
        
        sites = sites.astype('<U4')
+       sites= np.array([ii for ii in np.arange(len(z))])
+       
        comments = [ "", "" ]
        f= vtx.pointsToVTK(outfile, x, y, z, data = {"sites" : sites})
        print("sites written to ", f)   
