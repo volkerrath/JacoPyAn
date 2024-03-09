@@ -14,7 +14,6 @@ from sys import exit as error
 import time
 from datetime import datetime
 import warnings
-import gc
 
 import numpy as np
 import numpy.linalg as npl
@@ -23,8 +22,6 @@ import scipy.sparse as scs
 import netCDF4 as nc
 
 import pyevtk.hl as vtx
-# from pyevtk.hl import rectilinearToVTK, pointsToVTK, pointsToVTKAsTIN
-# import uvw
 
 JACOPYAN_DATA = os.environ["JACOPYAN_DATA"]
 JACOPYAN_ROOT = os.environ["JACOPYAN_ROOT"]
@@ -47,7 +44,7 @@ print(titstrng+"\n\n")
 
 
 rng = np.random.default_rng()
-blank = 1.e-30 # np.nan
+blank =  np.nan
 rhoair = 1.e17
 
 
@@ -55,11 +52,12 @@ rhoair = 1.e17
 WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/"
 # WorkDir = "/home/vrath/UBI38_JAC/"
 
-Task =  "data" #"modlike"   
+Task =  "mod" #"modlike"   
 files = ["Ubi38_ZssPT_Alpha02_NLCG_023"]
 nfiles = len(files)
 
 Scale = 1000.  # 1 = m 1000.=km
+PadMask = [10, 10, 10, 10, 0, 32] 
 
 if "mod" in Task.lower():
 
@@ -73,9 +71,9 @@ if "mod" in Task.lower():
         
         aircells = np.where(rho>rhoair/10)
         rho = np.log10(rho)
-        x, _ = utl.set_mesh(d=dx, center=True)
-        y, _ = utl.set_mesh(d=dy, center=True)      
-        z, _ = utl.set_mesh(d=dz, center=False)
+        x, _ = mod.set_mesh(d=dx, center=True)
+        y, _ = mod.set_mesh(d=dy, center=True)      
+        z, _ = mod.set_mesh(d=dz, center=False)
         z = -z
         
         if Scale > 0.:
@@ -83,7 +81,13 @@ if "mod" in Task.lower():
             y =  y/Scale
             z =  z/Scale 
         
+        rho[aircells]=blank
+        print(np.shape(rho))
+        print(np.shape(x))
+       
+        x, y, z, rho = mod.mask_mesh(x, y, z, mod=rho, mask=PadMask)
         
+        print(np.shape(rho))
         comments = [ "", "" ]
         f= vtx.gridToVTK(outfile, x, y, z, cellData = {"rho" : rho})
         print("model written to ", f)   

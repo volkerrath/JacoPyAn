@@ -74,7 +74,7 @@ ModExt = "_sns.rho"
 # Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas
 # WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/"
 WorkDir = "/home/vrath/UBI38_JAC/"
-Orig = [-16.345800 -70.908249] # UBI
+MOrig = [-16.345800 -70.908249] # UBI
 JacName = "Ubi38_ZPT_nerr_sp-8"
 MFile = WorkDir + "Ubi38_ZssPT_Alpha02_NLCG_023"
 
@@ -360,7 +360,7 @@ if "dtyp" in Splits.lower():
         S = np.reshape(SensTmp, mdims, order="F")
         
                     
-        SensFile = SensDir+JacName+"_Dtype_"+typestr[ityp-1]+"_".join(Transform)
+        SensFile = SensDir+JacName+"_Dtype_"+typestr[ityp-1]+"_"+"_".join(Transform)
         Header = "# "+SensFile.replace("_", " | ")
         
 

@@ -22,9 +22,8 @@ import scipy.linalg as scl
 import scipy.sparse as scs
 import netCDF4 as nc
 
-import pyevtk.hl as vtx
-# from pyevtk.hl import rectilinearToVTK, pointsToVTK, pointsToVTKAsTIN
-# import uvw
+import pyvista as pv
+
 
 JACOPYAN_DATA = os.environ["JACOPYAN_DATA"]
 JACOPYAN_ROOT = os.environ["JACOPYAN_ROOT"]

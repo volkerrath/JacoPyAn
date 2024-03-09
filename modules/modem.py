@@ -2198,3 +2198,39 @@ def distribute_bodies_ijk(model=None,
     return template
     
 
+def set_mesh(d=None, center=False):
+    """
+    Define cell geometry.
+
+    VR Jan 2024
+
+    """
+    ncell = np.shape(d)[0]
+    xn = np.append(0.0, np.cumsum(d))
+    xc = 0.5 * (xn[0:ncell] + xn[1:ncell+1])
+
+    if center:
+        c = 0.5*(xn[ncell] - xn[0])
+        xn = xn -c
+        
+    return xn, xc
+
+def mask_mesh(x=None, y=None, z=None, mod=None, mask=None):  
+    """
+    mask model-like parameters and mesh
+    
+    VR Jan 2024
+    """     
+    
+    mdims = np.shape(mod)
+    mod_out = mod.copy()
+    mod_out = mod_out[
+        mask[0]:mdims[0]-mask[1],
+        mask[2]:mdims[1]-mask[3],
+        mask[4]:mdims[2]-mask[5]]
+    
+    x_out = x[mask[0]:mdims[0]-mask[1]]
+    y_out = y[mask[2]:mdims[1]-mask[3]]
+    z_out = z[mask[4]:mdims[2]-mask[5]]
+        
+    return x_out, y_out, z_out, mod_out

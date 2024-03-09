@@ -725,24 +725,7 @@ def calc_resnorm(data_obs=None, data_calc=None, data_std=None, p=2):
     #    return {'rnorm':rnorm, 'resid':resid }
     return rnorm, resid
 
-def set_mesh(d=None, center=False):
-    """
-    Define cell geometry.
-
-    VR Jan 2024
-
-    """
-    ncell = np.shape(d)[0]
-    xn = np.append(0.0, np.cumsum(d))
-    xc = 0.5 * (xn[0:ncell] + xn[1:ncell+1])
-
-    if center:
-        c = 0.5*(xn[ncell] - xn[0])
-        xn = xn -c
-        
-    return xn, xc
-
-
+    
 def calc_rms(dcalc=None, dobs=None, Wd=1.0):
     """
     Calculate the NRMS ans SRMS.
