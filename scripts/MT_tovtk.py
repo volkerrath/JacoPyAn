@@ -55,7 +55,7 @@ rhoair = 1.e17
 WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/"
 # WorkDir = "/home/vrath/UBI38_JAC/"
 
-Task =  "data" #"modlike"   
+Task =  "mod" #"modlike"   
 files = ["Ubi38_ZssPT_Alpha02_NLCG_023"]
 nfiles = len(files)
 
@@ -83,9 +83,10 @@ if "mod" in Task.lower():
             y =  y/Scale
             z =  z/Scale 
         
+        X, Y, Z = np.meshgrid(y,x,z)
         
         comments = [ "", "" ]
-        f= vtx.gridToVTK(outfile, x, y, z, cellData = {"rho" : rho})
+        f= vtx.gridToVTK(outfile, X, Y, Z, cellData = {"rho" : rho})
         print("model written to ", f)   
 
 if "dat" in Task.lower(): 
