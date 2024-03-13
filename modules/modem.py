@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 import sys
 from sys import exit as error
@@ -1023,8 +1022,7 @@ def get_topo(dx=None, dy=None, dz=None, mval=None, ref= [0., 0., 0.],
             
         return xcnt, ycnt, topo
 
-def read_mod(file=None, modext=".rho", 
-                   trans="LINEAR", volumes=False, topo = False,  out=True):
+def read_mod(file=None, modext=".rho", trans="LINEAR", out=True):
     """
     Read ModEM model input.
 
@@ -1081,6 +1079,7 @@ def read_mod(file=None, modext=".rho",
         pass
 
     mval = mval.reshape(dims, order="F")
+    
 
     reference = [float(sub) for sub in lines[-2][0:3]]
 
@@ -1584,7 +1583,7 @@ def cells3d(dx, dy, dz, center=False, reference=[0., 0., 0.]):
         return xc, yc, zc
 
     else:
-        print("cells3d returning node coordinates.")
+        print("cells3d returning raw node coordinates.")
         return x, y, z
 
 
