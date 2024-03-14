@@ -1091,11 +1091,19 @@ def read_mod(file=None, modext=".rho", trans="LINEAR", out=True):
 
     return dx, dy, dz, mval, reference, trans
     
-
+        # if trim:
+        #     for ix in range(trim[0]):
+        #         model.dx_delete(0)
+        #         model.dx_delete(model.nx)
+        #     for ix in range(trim[1]):
+        #         model.dy_delete(0)
+        #         model.dy_delete(model.ny)
+        #     for ix in range(trim[2]):
+        #         model.dz_delete(model.nz)
     
 def write_mod_vtk(file=None, dx=None, dy=None, dz=None, rho=None, 
-                    reference=None, scale = [1., 1., -1.], trans="LINEAR",
-                    out=True):
+                  trim=[0, 0, 0], reference=None, scale = [1., 1., -1.], 
+                  trans="LINEAR", out=True):
     """
     write ModEM model input in 
 
@@ -1108,13 +1116,22 @@ def write_mod_vtk(file=None, dx=None, dy=None, dz=None, rho=None,
     """
     from evtk.hl import gridToVTK
     
-   
-    N =  np.append(0.0, np.cumsum(dx))*scale[0] 
-    E =  np.append(0.0, np.cumsum(dy))*scale[1]
-    D =  np.append(0.0, np.cumsum(dz))*scale[2]
+    if trim!=None:
+     for ix in range(trim[0]):
+         dx  = np.delete(dx, (0,-1))
+     for ix in range(trim[1]):
+         dy  = np.delete(dy, (0,-1))
+     for ix in range(trim[2]):
+         dz  = np.delete(dz, (-1))
+
+         
+    X =  np.append(0.0, np.cumsum(dy))*scale[1] 
+    Y =  np.append(0.0, np.cumsum(dx))*scale[1]
+    Z =  np.append(0.0, np.cumsum(dz))*scale[2]
     
-   
-    gridToVTK(file, N, E, D, cellData = {'resistivity (in Ohm)' : rho})
+    
+
+    gridToVTK(file, X, Y, -Z , cellData = {'resistivity (in Ohm)' : rho})
     print("model-like parameter written to %s" % (file))
     
 

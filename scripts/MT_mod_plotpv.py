@@ -62,12 +62,12 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
 Bounds = [-5.,5., -5.,5., -1. ,3.]
-Pads = [12, 12, 36]
+Pads = [12, 12, 45]
 Scale = 1.e-3
 Center = False
-MaxLogRes = 3.
+MaxLogRes = 5.
 MinLOgSns = -4.
-Cmap = "viridis"
+Cmap = "jet"
 
 
 
@@ -77,7 +77,7 @@ WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/"
 ModFile = WorkDir + "Ubi38_ZssPT_Alpha02_NLCG_023"
 SnsFile = WorkDir+"/sens_euc/Ubi38_ZPT_nerr_sp-8_total_euc_sqr_max_sns"
 
-
+Plotfile = WorkDir + "Ubi38_ZssPT_Alpha02_NLCG_023.png"
 
 # WorkDir = JACOPYAN_DATA+"Annecy/Jacobians/"
 # if not WorkDir.endswith("/"):
@@ -103,14 +103,16 @@ print("Min/max rho = "+str(np.min(rho))+"/"+str(np.max(rho)))
 
 
 x, y, z = mod.cells3d(dx, dy, dz)
-z = -z
+
 
 if Center: 
     x = x - 0.5*(x[-1]-x[0])
     y = y - 0.5*(y[-1]-y[0])
+
 else:
     x =  x + reference[0]
     y =  y + reference[1]
+    z =  z + reference[2]
     
 if Scale !=None:
     x, y, z  = Scale*x, Scale*y, Scale*z
@@ -139,10 +141,10 @@ p = pv.Plotter(window_size=[2*1024, 2*768])
 _ = p.add_mesh(model.outline(), color="k")
 # _ = p.add_mesh(contours, opacity=0.25, clim=[1.4, 2.6])
 p.show_grid()
-slices = model.slice_orthogonal(x=0., y=0, z=-3.)
+slices = model.slice_orthogonal(x=0., y=0., z=0.)
 # _ = p.add_mesh(mod, scalars="resistivity")
 _ = p.add_mesh(slices, scalars="resistivity", **dargs)
-p.add_title("Annecy")
+p.add_title("Ubinas")
 p.add_axes()
 p.show(screenshot='my_image.png',auto_close=True)
 p.close()
