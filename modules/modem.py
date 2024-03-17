@@ -1028,7 +1028,7 @@ def get_topo(dx=None, dy=None, dz=None, mval=None, ref= [0., 0., 0.],
             
         return xcnt, ycnt, topo
 
-def read_mod(file=None, modext=".rho", trans="LINEAR", out=True):
+def read_mod(file=None, modext=".rho", trans="LINEAR", blank=1.e-30, out=True):
     """
     Read ModEM model input.
 
@@ -1057,9 +1057,12 @@ def read_mod(file=None, modext=".rho", trans="LINEAR", out=True):
     for line in lines[5:-2]:
         line = np.flipud(line) #  np.fliplr(line)
         mval = np.append(mval, np.array([float(sub) for sub in line]))
+        
+    
 
     if out:
         print("values in " + file + " are: " + trns)
+        
     if trns == "LOGE":
         mval = np.exp(mval)
     elif trns == "LOG10":
@@ -1069,8 +1072,12 @@ def read_mod(file=None, modext=".rho", trans="LINEAR", out=True):
     else:
         print("Transformation: " + trns + " not defined!")
         sys.exit(1)
+        
+        
+    # here mval should be in physical units, not log...    
+    mval[np.where(np.abs(mval)<blank)]=blank
 
-    # here mval should be in physical units, not log...
+
     if "loge" in trans.lower() or "ln" in trans.lower():
         mval = np.log(mval)
         if out:
