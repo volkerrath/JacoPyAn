@@ -162,7 +162,7 @@ if not os.path.isdir(SensDir):
 total = 0.0
 
 start = time.perf_counter()
-dx, dy, dz, rho, refmod, _ = mod.read_mod(MFile, trans="linear", volumes=True)
+dx, dy, dz, rho, refmod, _ = mod.read_mod(MFile, trans="linear")
 elapsed = time.perf_counter() - start
 total = total + elapsed
 print(" Used %7.4f s for reading model from %s " % (elapsed, MFile))

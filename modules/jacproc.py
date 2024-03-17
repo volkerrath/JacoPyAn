@@ -11,7 +11,7 @@ import numpy.linalg as npl
 
 
 def calc_sensitivity(Jac=np.array([]),
-                     Type = "euclidean", UseSigma = False, OutInfo = False):
+                     Type = "euclidean", UseSigma = False, Small = 1.e-30, OutInfo = False):
     """
     Calculate sensitivities.
     Expects that Jacobian is already scaled, i.e Jac = C^(-1/2)*J.
@@ -109,6 +109,7 @@ def calc_sensitivity(Jac=np.array([]),
 
         # S = S.reshape[-1,1]
  
+    S[np.where(np.abs(S)<Small)]=Small
     print("calc: ", np.any(S==0))
     # S=S.A1    
     S = np.asarray(S).ravel()
@@ -117,7 +118,7 @@ def calc_sensitivity(Jac=np.array([]),
 
 def transform_sensitivity(S=np.array([]), vol=np.array([]),
                           Transform=["size","max", "sqrt"],
-                          asinhpar=[0.], Maxval=None, OutInfo=False):
+                          asinhpar=[0.], Maxval=None, Small= 1.e30, OutInfo=False):
     """
     Transform sensitivities.
 
@@ -195,7 +196,8 @@ def transform_sensitivity(S=np.array([]), vol=np.array([]),
                     S = np.arcsinh(S/scale)
 
         print("scal: ",np.any(S==0))
-   
+        S[np.where(np.abs(S)<Small)]=Small
+        print("scal post: ",np.any(S==0))
     return S, maxval
 
 def get_scale(d=np.array([]), f=0.1, method = "other", OutInfo = False):
