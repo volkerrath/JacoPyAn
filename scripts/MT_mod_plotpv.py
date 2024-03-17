@@ -26,7 +26,9 @@ import scipy as sc
 import vtk
 import pyvista as pv
 from pyvista import themes
-from pyvistaqt import BackgroundPlotter
+
+import PVGeo as pg
+
 import discretize
 import tarfile
 import pylab as pl
@@ -58,26 +60,36 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
 
-Task = "ortho"
-Task = "slices"
-#Task = "con"
-# Task = "lines"
-#
-
 Bounds = [-5.,5., -5.,5., -1. ,3.]
-Pads = [13, 13, 40]
+Pads = [14, 14, 42]
+
 Scale = 1.e-3
+LimlogSns = [-5., 0.]
 LimLogRes = [-1, 4.]
+StepContrs = 0.5
+
+
+PlotModl = True
+PlotSens = False
+PlotComb = False
+PlotData = True
+
 StepContrs=0.5
-UseSens  = True 
-MinLOgSns = -4.
-UseData = False
+
+
+PlotType = "ortho"
+#PlotType = "slice"
+# PlotType = "lines"
+# PlotType = "iso"
 
 Cmap = "jet"
 
-if "ortho" in Task.lower():
-    posx, posy, posz = 0., 0., -8.
-
+if "ortho" in PlotType.lower():
+    position = (0., -3., -8.)
+    
+if "slice" in PlotType.lower():
+    position = (0., 0., -1.)
+    normal = (0., 1., 0.)
 
 # Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas
 Title = "Ubinas Volcano, Peru"
@@ -92,32 +104,55 @@ Plotfile = WorkDir + "Ubi38_ZssPT_Alpha02_NLCG_023"
 
 
 
-dx, dy, dz, rho, reference, _ = mod.read_mod(ModFile, ".rho",trans="log10")
-aircells = np.where(rho>15.)
-rho[aircells]=np.NaN
-print("Reading model from %s " % (ModFile))
-print("ModEM reference is "+str(reference))
-print("Min/max rho = "+str(np.nanmin(rho))+"/"+str(np.nanmax(rho)))
-x, y, z, vals = mod.model_to_pv(dx=dx, dy=dy, dz=dz, rho=rho, 
-                                reference=reference, scale=Scale, pad=Pads)
-
-if UseSens:
+if PlotModl:
+    dx, dy, dz, rho, reference, _ = mod.read_mod(ModFile, ".rho",trans="log10")
+    aircells = np.where(rho>15.)
+    rho[aircells]=np.NaN
+    print("Reading model from %s " % (ModFile))
+    print("ModEM reference is "+str(reference))
+    print("Min/max rho = "+str(np.nanmin(rho))+"/"+str(np.nanmax(rho)))
+    x, y, z, vals = mod.model_to_pv(dx=dx, dy=dy, dz=dz, rho=rho, 
+                                    reference=reference, scale=Scale, pad=Pads)
+    model = pv.RectilinearGrid(y, x, z)
+    model.cell_data["resistivity"] = vals
+    
+if PlotSens:
     dx, dy, dz, sns, reference, _ = mod.read_mod(SnsFile,".rho",trans="log10")
-    print("Reading senitivity from %s " % (SnsFile))
+    print("Reading sensitivity from %s " % (SnsFile))
     _, _, _, sens = mod.model_to_pv(dx=dx, dy=dy, dz=dz, rho=rho, 
                                     reference=reference, scale=Scale, pad=Pads)
-
-if UseData:
+    sensi = pv.RectilinearGrid(y, x, z)
+    sensi.cell_data["sensitivity"] = sens
     
+if PlotComb:
+    dx, dy, dz, rho, reference, _ = mod.read_mod(ModFile, ".rho",trans="log10")
+    aircells = np.where(rho>15.)
+    rho[aircells]=np.NaN
+    print("Reading model from %s " % (ModFile))
+    print("ModEM reference is "+str(reference))
+    print("Min/max rho = "+str(np.nanmin(rho))+"/"+str(np.nanmax(rho)))
+    x, y, z, vals = mod.model_to_pv(dx=dx, dy=dy, dz=dz, rho=rho, 
+                                    reference=reference, scale=Scale, pad=Pads)
+    model = pv.RectilinearGrid(y, x, z)
+    model.cell_data["resistivity"] = vals
+    
+    dx, dy, dz, sns, reference, _ = mod.read_mod(SnsFile,".rho",trans="log10")
+    print("Reading sensitivity from %s " % (SnsFile))
+    _, _, _, sens = mod.model_to_pv(dx=dx, dy=dy, dz=dz, rho=rho, 
+
+                              reference=reference, scale=Scale, pad=Pads)
+    sensi = pv.RectilinearGrid(y, x, z)
+    sensi.cell_data["sensitivity"] = sens   
+
+if PlotData:
+    if (not PlotSens) and (not PlotModl) and (not PlotComb):
+        error("No mesh given, data cannot be plotted! Exit.")
     site, _, data, _ = mod.read_data(Datfile=Datfile)
-
-
-    xdat, ydat, z, sites, siten = mod.data_to_pv(data=data, site=site, 
-                                                reference=reference, scale=1.)
-
-# comments = [ "", "" ]
-# f= vtx.pointsToVTK(outfile, x, y, z, data = {"sites" : sites})
-# print("sites written to ", f)   
+    xdat, ydat, zdat, sitenam, sitenum = mod.data_to_pv(data=data, site=site, 
+                                                scale=Scale)
+    sdata = np.column_stack(( xdat, ydat, zdat))
+    sitep = pv.PolyData(sdata)
+    sitel = sitenam
 
 cmap = mpl.colormaps[Cmap]
 
@@ -143,6 +178,7 @@ pv.global_theme.load_theme(mtheme)
 
 lut = pv.LookupTable()
 lut.apply_cmap(cmap, n_values=128, flip=True)
+
 lut.scalar_range = LimLogRes
 lut.above_range_color = None
 lut.nan_color = None
@@ -150,61 +186,141 @@ lut.nan_color = None
 
 
 
-model = pv.RectilinearGrid(y, x, z)
-
-# RectilinearGrid.cast_to_structured_grid()
-model.cell_data["resistivity"] = vals
-
-# contours = mod.contour(np.linspace(1.5, 2.5, 6))
 
 
 p = pv.Plotter(window_size=[1600, 1300], theme=mtheme, notebook=False, off_screen=False)
-p.disable_shadows()
-# p.viewport = (0.05, 0.05, 0.95, 0.95)
+
 p.add_title(Title)
 _ = p.add_mesh(model.outline(), color="k")
 grid_labels = dict(ztitle="elev (km)", xtitle="w-e (km)", ytitle="s-n (km)")
 p.show_grid(**grid_labels)
 
-if "ortho" in Task.lower():
+if "ortho" in PlotType.lower():
     slicepars = dict(clim=LimLogRes, 
                      cmap=lut,
                      above_color=None, 
                      nan_color="white",
                      nan_opacity=1.,
                      show_scalar_bar=False,
+                     use_transparency=True,
+                     lighting="none",
                      interpolate_before_map=True,
                      log_scale=False)
-    slices = model.slice_orthogonal(x=posx, y=posy, z=posz)
+    if PlotModl:
+        slices = model.slice_orthogonal(position[0], position[1], position[2])
+        _ = p.add_mesh(slices, scalars="resistivity", **slicepars)
+    if PlotSens:
+        slices = sensi.slice_orthogonal(position[0], position[1], position[2])
+        _ = p.add_mesh(slices, scalars="resistivity", **slicepars)
+    
+    if PlotData:
+        p_actor = p.add_point_labels(sitep, sitel,render=True,
+                         point_size=100, show_points=True,always_visible=True,
+                         render_points_as_spheres=True,shape_opacity=0.0,
+                         point_color="red")
+
+    
+elif"slice" in PlotType.lower():
+    slicepars = dict(clim=LimLogRes, 
+                 cmap=lut,
+                 above_color=None, 
+                 nan_color="white",
+                 nan_opacity=1.,
+                 # opacity=1.,
+                 use_transparency=True,
+                 interpolate_before_map=True,
+                 show_scalar_bar=False,
+                 log_scale=False)
+    
+
+    if PlotModl:
+        slices = model.slice(normal=normal, origin=position)
+        _ = p.add_mesh(slices, scalars="resistivity", **slicepars)
+    if PlotSens:
+        slices = sensi.slice(normal=normal, origin=position)
+        _ = p.add_mesh(slices, scalars="resistivity", **slicepars)
+    
+    # if PlotData:
+    #     _ = p.add_points(sitep, 
+    #                      point_size=100.0, 
+    #                      render_points_as_spheres=True,
+    #                      color="red")
+    #     _ = p.add_point_labels(sitep, sitel)
+    
+# ###############################################################################
+# # Opacity by Array
+# # ++++++++++++++++
+# #
+# # You can also use a scalar array associated with the mesh to give each cell
+# # its own opacity/transparency value derived from a scalar field. For example,
+# # an uncertainty array from a modelling result could be used to hide regions of
+# # a mesh that are uncertain and highlight regions that are well resolved.
+# #
+# # The following is a demonstration of plotting a mesh with colored values and
+# # using a second array to control the transparency of the mesh
+
+# model = examples.download_model_with_variance()
+# contours = model.contour(10, scalars="Temperature")
+# contours.array_names
+
+# ###############################################################################
+# # Make sure to flag ``use_transparency=True`` since we want areas of high
+# # variance to have high transparency.
+# #
+# # Also, since the opacity array must be between 0 and 1, we normalize
+# # the temperature variance array by the maximum value.  That way high
+# # variance will be completely transparent.
+
+# contours["Temperature_var"] /= contours["Temperature_var"].max()
+
+# p = pv.Plotter(shape=(1, 2))
+
+# p.subplot(0, 0)
+# p.add_text("Opacity by Array")
+# p.add_mesh(
+#     contours.copy(),
+#     scalars="Temperature",
+#     opacity="Temperature_var",
+#     use_transparency=True,
+#     cmap="bwr",
+# )
+
+# p.subplot(0, 1)
+# p.add_text("No Opacity")
+# p.add_mesh(contours, scalars="Temperature", cmap="bwr")
+# p.show()
+
+elif"spread" in PlotType.lower():
+    slices = model.slice_orthogonal(x=0., y=0., z=-5.)
     _ = p.add_mesh(slices, scalars="resistivity", **slicepars)
-    
-    
-elif"slice" in Task.lower():
     slicepars = dict(clim=LimLogRes, 
                  cmap=lut,
                  above_color=None, 
                  nan_color="white",
                  nan_opacity=1.,
                  opacity=1.,
+                 #use_transparency=True,
                  interpolate_before_map=True,
                  show_scalar_bar=False,
                  log_scale=False)
-    # slices = model.slice(x=0., y=0., z=-5.)
-    slices= model.slice(normal=[1, 1, 0])
-    _ = p.add_mesh(slices, scalars="resistivity", **slicepars)
-    
-    
-elif"spread" in Task.lower():
-    slices = model.slice_orthogonal(x=0., y=0., z=-5.)
-    _ = p.add_mesh(slices, scalars="resistivity", **slicepars)
       
-elif "cont" in Task.lower():
+elif "cont" in PlotType.lower():
     
     cntrs = np.arange(LimLogRes[0], LimLogRes[1],0.5)
     modiso = model.contour(cntrs, scalars="resistivity")
     _ = p.add_mesh(modiso, scalars="resistivity", **slicepars)
 
-elif "line" in Task.lower():
+elif "line" in PlotType.lower():
+    slicepars = dict(clim=LimLogRes, 
+                 cmap=lut,
+                 above_color=None, 
+                 nan_color="white",
+                 nan_opacity=1.,
+                 opacity=1.,
+                 #use_transparency=True,
+                 interpolate_before_map=True,
+                 show_scalar_bar=False,
+                 log_scale=False)
     slices = model.slice_orthogonal(x=0., y=0., z=-5.)
     
     
@@ -217,22 +333,22 @@ _ = p.add_scalar_bar(title="log res",
                          label_font_size=16,
                          bold=False,
                          n_labels = 6,
-                         fmt='%3.1f')
+                         fmt="%3.1f")
 
 
 p.add_axes()
-p.save_graphic("img.pdf")
+
+p.save_graphic("test_save.pdf")
 p.show()
-p.save_graphic("img2.pdf") 
-p.close()
+
  
 plt.box(False)
-plt.imshow(p.image)
-
 fig = plt.imshow(p.image)
-fig. frameon=False
+fig.frameon=False
 fig.axes.get_xaxis().set_visible(False)
 fig.axes.get_yaxis().set_visible(False)
 plt.savefig("test.pdf", dpi=600, edgecolor=None)
 plt.savefig("test.png", dpi=600, transparent=True, edgecolor=None)
 plt.savefig("test.svg", dpi=600, transparent=True, edgecolor=None)
+
+p.close()

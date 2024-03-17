@@ -1364,11 +1364,14 @@ def data_to_pv(data=None, site=None, reference=None, scale=1.):
 
     x =  data[:, 3]
     y =  data[:, 4]
-    z = -data[:, 5]    
-        
-    x =  (x + reference[0])/scale
-    y =  (y + reference[1])/scale
-    z =  (z + reference[2])/scale
+    z =  data[:, 5]    
+
+    if reference!=None:
+        x =  x + reference[0]
+        y =  y + reference[1]
+        z =  z + reference[2]
+    
+    x, y, z  = scale*x, scale*y, scale*z
     
       
     sites, siteindex = np.unique(site, return_index=True)
@@ -1378,6 +1381,9 @@ def data_to_pv(data=None, site=None, reference=None, scale=1.):
 
     sites = sites.astype('<U4')
     siten= np.array([ii for ii in np.arange(len(z))])    
+    
+    z = -z
+    
     return x, y, z, sites, siten
     
 
