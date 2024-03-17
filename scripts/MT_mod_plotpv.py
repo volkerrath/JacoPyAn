@@ -7,7 +7,7 @@
 #     text_representation:
 #       extension: .py
 #       format_name: light
-#       format_version: '1.5'
+#       format_version: "1.5"
 #       jupytext_version: 1.11.3
 # ---
 
@@ -22,13 +22,15 @@ from datetime import datetime
 import numpy as np
 from osgeo import gdal
 import scipy as sc
+
 import vtk
 import pyvista as pv
-# import pyvistaqt as pvqt
+from pyvista import themes
+from pyvistaqt import BackgroundPlotter
 import discretize
 import tarfile
 import pylab as pl
-from time import sleep
+
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -47,12 +49,6 @@ import modem as mod
 import util as utl
 from version import versionstrg
 
-rng = np.random.default_rng()
-blank = 1.e-30 # np.nan
-rhoair = 1.e17
-nan = np.nan  # float("NaN")
-
-
 version, _ = versionstrg()
 titstrng = utl.print_title(version=version, fname=__file__, out=False)
 print(titstrng+"\n\n")
@@ -61,94 +57,182 @@ print(titstrng+"\n\n")
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
+
+Task = "ortho"
+Task = "slices"
+#Task = "con"
+# Task = "lines"
+#
+
 Bounds = [-5.,5., -5.,5., -1. ,3.]
-Pads = [12, 12, 45]
+Pads = [13, 13, 40]
 Scale = 1.e-3
-Center = False
-MaxLogRes = 5.
+LimLogRes = [-1, 4.]
+StepContrs=0.5
+UseSens  = True 
 MinLOgSns = -4.
+UseData = False
+
 Cmap = "jet"
 
+if "ortho" in Task.lower():
+    posx, posy, posz = 0., 0., -8.
 
 
 # Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas
+Title = "Ubinas Volcano, Peru"
 WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/"
-# WorkDir = "/home/vrath/UBI38_JAC/"
+if not WorkDir.endswith("/"):
+    WorkDir = WorkDir+"/"
+Datfile = WorkDir + "U38_ZPTss1"
 ModFile = WorkDir + "Ubi38_ZssPT_Alpha02_NLCG_023"
 SnsFile = WorkDir+"/sens_euc/Ubi38_ZPT_nerr_sp-8_total_euc_sqr_max_sns"
 
-Plotfile = WorkDir + "Ubi38_ZssPT_Alpha02_NLCG_023.png"
+Plotfile = WorkDir + "Ubi38_ZssPT_Alpha02_NLCG_023"
 
-# WorkDir = JACOPYAN_DATA+"Annecy/Jacobians/"
-# if not WorkDir.endswith("/"):
-#     WorkDir = WorkDir+"/" 
-# ModFile = WorkDir+"ANN_best"
-# SnsFile = WorkDir+"/sens_euc/"
 
-total = 0
-start = time.perf_counter()
+
 dx, dy, dz, rho, reference, _ = mod.read_mod(ModFile, ".rho",trans="log10")
-
-elapsed = time.perf_counter() - start
-total = total + elapsed
-print("Used %7.4f s for reading model from %s " % (elapsed, ModFile))
+aircells = np.where(rho>15.)
+rho[aircells]=np.NaN
+print("Reading model from %s " % (ModFile))
 print("ModEM reference is "+str(reference))
-print("Min/max rho = "+str(np.min(rho))+"/"+str(np.max(rho)))
+print("Min/max rho = "+str(np.nanmin(rho))+"/"+str(np.nanmax(rho)))
+x, y, z, vals = mod.model_to_pv(dx=dx, dy=dy, dz=dz, rho=rho, 
+                                reference=reference, scale=Scale, pad=Pads)
 
-# start = time.perf_counter()
-# dx, dy, dz, sns, reference, _ = mod.read_mod(SnsFile,".rho",trans="log10")
-# elapsed = time.perf_counter() - start
-# total = total + elapsed
-# print("Used %7.4f s for reading model from %s " % (elapsed, SnsFile))
+if UseSens:
+    dx, dy, dz, sns, reference, _ = mod.read_mod(SnsFile,".rho",trans="log10")
+    print("Reading senitivity from %s " % (SnsFile))
+    _, _, _, sens = mod.model_to_pv(dx=dx, dy=dy, dz=dz, rho=rho, 
+                                    reference=reference, scale=Scale, pad=Pads)
 
-
-x, y, z = mod.cells3d(dx, dy, dz)
-
-
-if Center: 
-    x = x - 0.5*(x[-1]-x[0])
-    y = y - 0.5*(y[-1]-y[0])
-
-else:
-    x =  x + reference[0]
-    y =  y + reference[1]
-    z =  z + reference[2]
+if UseData:
     
-if Scale !=None:
-    x, y, z  = Scale*x, Scale*y, Scale*z
+    site, _, data, _ = mod.read_data(Datfile=Datfile)
 
 
-   
-rho[rho>MaxLogRes] = np.nan 
-x, y, z, rho = mod.clip_model(x, y, z, rho, pad = Pads)
-vals = np.swapaxes(np.flip(rho, 2), 0, 1).flatten(order="F")
+    xdat, ydat, z, sites, siten = mod.data_to_pv(data=data, site=site, 
+                                                reference=reference, scale=1.)
 
-
-
+# comments = [ "", "" ]
+# f= vtx.pointsToVTK(outfile, x, y, z, data = {"sites" : sites})
+# print("sites written to ", f)   
 
 cmap = mpl.colormaps[Cmap]
-dargs = dict(cmap=cmap, clim=[-1., 3.])
 
-pv.set_plot_theme("document")
-model = pv.RectilinearGrid(y, x, -z)
+pv.set_jupyter_backend("trame")
+mtheme = pv.themes.DocumentTheme()
+mtheme.nan_color = "white"
+mtheme.above_range_color ="white"
+# my_theme.lighting = False
+# my_theme.show_edges = True
+# my_theme.axes.box = True
+
+# mtheme.colorbar_orientation = "vertical"
+# mtheme.colorbar_vertical.height=0.6
+# mtheme.colorbar_vertical.position_y=0.2
+# mtheme.colorbar_vertical.title="log resistivity"
+mtheme.font.size=14
+mtheme.font.title_size=16
+mtheme.font.label_size=14
+
+
+pv.global_theme.load_theme(mtheme)
+
+
+lut = pv.LookupTable()
+lut.apply_cmap(cmap, n_values=128, flip=True)
+lut.scalar_range = LimLogRes
+lut.above_range_color = None
+lut.nan_color = None
+
+
+
+
+model = pv.RectilinearGrid(y, x, z)
 
 # RectilinearGrid.cast_to_structured_grid()
 model.cell_data["resistivity"] = vals
 
 # contours = mod.contour(np.linspace(1.5, 2.5, 6))
 
-p = pv.Plotter(window_size=[2*1024, 2*768])
+
+p = pv.Plotter(window_size=[1600, 1300], theme=mtheme, notebook=False, off_screen=False)
+p.disable_shadows()
+# p.viewport = (0.05, 0.05, 0.95, 0.95)
+p.add_title(Title)
 _ = p.add_mesh(model.outline(), color="k")
-# _ = p.add_mesh(contours, opacity=0.25, clim=[1.4, 2.6])
-p.show_grid()
-slices = model.slice_orthogonal(x=0., y=0., z=0.)
-# _ = p.add_mesh(mod, scalars="resistivity")
-_ = p.add_mesh(slices, scalars="resistivity", **dargs)
-p.add_title("Ubinas")
+grid_labels = dict(ztitle="elev (km)", xtitle="w-e (km)", ytitle="s-n (km)")
+p.show_grid(**grid_labels)
+
+if "ortho" in Task.lower():
+    slicepars = dict(clim=LimLogRes, 
+                     cmap=lut,
+                     above_color=None, 
+                     nan_color="white",
+                     nan_opacity=1.,
+                     show_scalar_bar=False,
+                     interpolate_before_map=True,
+                     log_scale=False)
+    slices = model.slice_orthogonal(x=posx, y=posy, z=posz)
+    _ = p.add_mesh(slices, scalars="resistivity", **slicepars)
+    
+    
+elif"slice" in Task.lower():
+    slicepars = dict(clim=LimLogRes, 
+                 cmap=lut,
+                 above_color=None, 
+                 nan_color="white",
+                 nan_opacity=1.,
+                 opacity=1.,
+                 interpolate_before_map=True,
+                 show_scalar_bar=False,
+                 log_scale=False)
+    # slices = model.slice(x=0., y=0., z=-5.)
+    slices= model.slice(normal=[1, 1, 0])
+    _ = p.add_mesh(slices, scalars="resistivity", **slicepars)
+    
+    
+elif"spread" in Task.lower():
+    slices = model.slice_orthogonal(x=0., y=0., z=-5.)
+    _ = p.add_mesh(slices, scalars="resistivity", **slicepars)
+      
+elif "cont" in Task.lower():
+    
+    cntrs = np.arange(LimLogRes[0], LimLogRes[1],0.5)
+    modiso = model.contour(cntrs, scalars="resistivity")
+    _ = p.add_mesh(modiso, scalars="resistivity", **slicepars)
+
+elif "line" in Task.lower():
+    slices = model.slice_orthogonal(x=0., y=0., z=-5.)
+    
+    
+_ = p.add_scalar_bar(title="log res", 
+                         vertical=True, 
+                         position_y=0.2,
+                         position_x=0.9,
+                         height=0.6,
+                         title_font_size=26, 
+                         label_font_size=16,
+                         bold=False,
+                         n_labels = 6,
+                         fmt='%3.1f')
+
+
 p.add_axes()
-p.show(screenshot='my_image.png',auto_close=True)
+p.save_graphic("img.pdf")
+p.show()
+p.save_graphic("img2.pdf") 
 p.close()
+ 
+plt.box(False)
+plt.imshow(p.image)
 
-# slices = mod.slice_orthogonal()
-
-# slices.plot(cmap=cmap)
+fig = plt.imshow(p.image)
+fig. frameon=False
+fig.axes.get_xaxis().set_visible(False)
+fig.axes.get_yaxis().set_visible(False)
+plt.savefig("test.pdf", dpi=600, edgecolor=None)
+plt.savefig("test.png", dpi=600, transparent=True, edgecolor=None)
+plt.savefig("test.svg", dpi=600, transparent=True, edgecolor=None)

@@ -119,7 +119,7 @@ PerIntervals = [
                 ]
 
 
-Type = "raw"
+Type = "euc"
 # Type = "euc"
 """
 Calculate sensitivities.
@@ -134,9 +134,9 @@ Usesigma:
     if true, sensitivities with respect to sigma  are calculated.
 """
 
-#Transform = [ "max"]
-Transform = [ "siz", "max"]
-#Transform = [ "sqr","max"]
+# Transform = [ "max"]
+# Transform = [ "siz", "max"]
+Transform = [ "sqr","max"]
 
 """
 Transform sensitivities. 

@@ -46,7 +46,7 @@ print(titstrng+"\n\n")
 rng = np.random.default_rng()
 blank =  np.nan
 rhoair = 1.e17
-
+rhoair = np.log10(rhoair)
 
 # Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas
 WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/"
@@ -56,8 +56,11 @@ Task =  "mod" #"modlike"
 files = ["Ubi38_ZssPT_Alpha02_NLCG_023"]
 nfiles = len(files)
 
-Scale = 1000.  # 1 = m 1000.=km
 PadMask = [10, 10, 10, 10, 0, 32] 
+Scale = 1000.  # 1 = m 1000.=km
+DstMask = [-20., 20.,   -20., 20.,  0., 15.]
+
+mask = PadMask
 
 if "mod" in Task.lower():
 
@@ -67,15 +70,13 @@ if "mod" in Task.lower():
         outfile = infile+"_tovtk"
     
     
-        dx, dy, dz, rho, refmod, _ = mod.read_mod(infile, ".rho",trans="linear", volumes=True)
+        dx, dy, dz, rho, refmod, _ = mod.read_mod(infile, ".rho",trans="log10")
         
-        aircells = np.where(rho>rhoair/10)
-        rho = np.log10(rho)
+        aircells = np.where(rho>rhoair-1.0)
         x, _ = mod.set_mesh(d=dx, center=True)
         y, _ = mod.set_mesh(d=dy, center=True)      
         z, _ = mod.set_mesh(d=dz, center=False)
-        z = -z
-        
+                
         if Scale > 0.:
             x =  x/Scale
             y =  y/Scale
@@ -85,11 +86,11 @@ if "mod" in Task.lower():
         print(np.shape(rho))
         print(np.shape(x))
        
-        x, y, z, rho = mod.mask_mesh(x, y, z, mod=rho, mask=PadMask)
+        x, y, z, rho = mod.mask_mesh(x, y, z, mod=rho, mask=mask)
         
         print(np.shape(rho))
         comments = [ "", "" ]
-        f= vtx.gridToVTK(outfile, x, y, z, cellData = {"rho" : rho})
+        f= vtx.gridToVTK(outfile, x, y, -z, cellData = {"rho" : rho})
         print("model written to ", f)   
 
 if "dat" in Task.lower(): 

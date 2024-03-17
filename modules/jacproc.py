@@ -109,6 +109,7 @@ def calc_sensitivity(Jac=np.array([]),
 
         # S = S.reshape[-1,1]
  
+    print("calc: ", np.any(S==0))
     # S=S.A1    
     S = np.asarray(S).ravel()
     return S
@@ -193,11 +194,11 @@ def transform_sensitivity(S=np.array([]), vol=np.array([]),
 
                     S = np.arcsinh(S/scale)
 
-    
+        print("scal: ",np.any(S==0))
    
     return S, maxval
 
-def get_scale(d=np.array([]), F=0.1, method = "other", OutInfo = False):
+def get_scale(d=np.array([]), f=0.1, method = "other", OutInfo = False):
     """
     Get optimal Scale for arcsin transformation.
 
@@ -224,12 +225,12 @@ def get_scale(d=np.array([]), F=0.1, method = "other", OutInfo = False):
         error("get_S: No data given! Exit.")
 
     if "s2007" in method.lower():
-        scale = F * np.nanmax(np.abs(d))
+        scale = f * np.nanmax(np.abs(d))
 
     else:
         dmax = np.nanmax(np.abs(d))
         dmin = np.nanmin(np.abs(d))
-        denom =F *(np.log(dmax)-np.log(dmin))
+        denom =f *(np.log(dmax)-np.log(dmin))
         scale = np.abs(dmax/denom)
 
     if OutInfo:

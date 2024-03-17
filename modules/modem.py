@@ -2,6 +2,7 @@ import os
 import sys
 from sys import exit as error
 import string
+import time
 
 import numpy as np
 from numpy.linalg import norm
@@ -278,19 +279,24 @@ def write_jac_ncd(NCfile=None, Jac=None, Dat=None, Site=None, Comp=None,
 
 
 
-def read_data(Datfile=None, out=True):
+def read_data(Datfile=None,  modext=".dat", out=True):
     """
     Read ModEM input data.
 
     author: vrath
-    last changed: Feb 10, 2021
+    last changed: Feb 10, 2024
+    
+    
     """
+    
+    file = Datfile+modext
+    
     Data = []
     Site = []
     Comp = []
     Head = []
 
-    with open(Datfile) as fd:
+    with open(file) as fd:
         for line in fd:
             if line.startswith("#") or line.startswith(">"):
                 Head.append(line)
@@ -328,7 +334,7 @@ def read_data(Datfile=None, out=True):
 
     nD = np.shape(Data)
     if out:
-        print("readDat: %i data read from %s" % (nD[0], Datfile))
+        print("readDat: %i data read from %s" % (nD[0], file))
 
     return Site, Comp, Data, Head
 
@@ -976,7 +982,7 @@ def read_ubc(file=None, modext=".mod", mshext=".msh",
 
     if out:
         print(
-            "read_model: %i x %i x %i model read from %s" % (nx, ny, nz, file))
+            "read_model: %i x %i x %i model-like read from %s" % (nx, ny, nz, file))
     
     return dx, dy, dz, val, refubc, trans
 
@@ -1102,27 +1108,31 @@ def read_mod(file=None, modext=".rho", trans="LINEAR", out=True):
         #         model.dz_delete(model.nz)
     
 def write_mod_vtk(file=None, dx=None, dy=None, dz=None, rho=None, 
-                  trim=[0, 0, 0], reference=None, scale = [1., 1., -1.], 
+                  trim=[10, 10, 30], reference=None, scale = [1., 1., -1.], 
                   trans="LINEAR", out=True):
     """
     write ModEM model input in 
 
 
-    Expects rho in physical units
-
     author: vrath
-    last changed: Mar 13, 2021
+    last changed: Mar 13, 2024
 
     """
     from evtk.hl import gridToVTK
     
     if trim!=None:
-     for ix in range(trim[0]):
-         dx  = np.delete(dx, (0,-1))
-     for ix in range(trim[1]):
-         dy  = np.delete(dy, (0,-1))
-     for ix in range(trim[2]):
-         dz  = np.delete(dz, (-1))
+        print("model trimmed"
+              +", x="+str(trim[0])
+              +", y="+str(trim[1])
+              +", z="+str(trim[2]) 
+              )
+        
+        for ix in range(trim[0]):
+            dx  = np.delete(dx, (0,-1))
+        for ix in range(trim[1]):
+            dy  = np.delete(dy, (0,-1))
+        for ix in range(trim[2]):
+            dz  = np.delete(dz, (-1))
 
          
     X =  np.append(0.0, np.cumsum(dy))*scale[1] 
@@ -1341,6 +1351,54 @@ def linear_interpolation(p1, p2, x0):
     return y0
 
 
+
+
+def data_to_pv(data=None, site=None, reference=None, scale=1.):
+
+    x =  data[:, 3]
+    y =  data[:, 4]
+    z = -data[:, 5]    
+        
+    x =  (x + reference[0])/scale
+    y =  (y + reference[1])/scale
+    z =  (z + reference[2])/scale
+    
+      
+    sites, siteindex = np.unique(site, return_index=True)
+    x = x[siteindex]
+    y = y[siteindex]
+    z = z[siteindex]
+
+    sites = sites.astype('<U4')
+    siten= np.array([ii for ii in np.arange(len(z))])    
+    return x, y, z, sites, siten
+    
+
+def model_to_pv(dx=None, dy=None,dz=None, rho=None, reference=None, 
+                scale=1., pad = [12, 12, 30.]):
+    
+    
+    x, y, z = cells3d(dx, dy, dz)
+    
+    
+    x =  x + reference[0]
+    y =  y + reference[1]
+    z =  z + reference[2]
+        
+    x, y, z  = scale*x, scale*y, scale*z
+    
+    x, y, z, rho = clip_model(x, y, z, rho, pad = pad)
+    
+    # vals = np.swapaxes(np.flip(rho, 2), 0, 1).flatten(order="F")
+    vals = rho.copy()
+    vals = np.swapaxes(vals, 0, 1)
+    # vals = np.flip(rho.copy(), 2)
+    vals = vals.flatten(order="F")
+    
+    z = -z
+    return x, y, z, vals
+
+    
 def clip_model(x, y, z, rho,
                pad=[0, 0, 0], centers=False, scale=[1., 1., 1.]):
     """
