@@ -118,7 +118,7 @@ def calc_sensitivity(Jac=np.array([]),
 
 def transform_sensitivity(S=np.array([]), vol=np.array([]),
                           Transform=["size","max", "sqrt"],
-                          asinhpar=[0.], Maxval=None, Small= 1.e30, OutInfo=False):
+                          asinhpar=[0.], Maxval=None, Small= 1.e-30, OutInfo=False):
     """
     Transform sensitivities.
 
@@ -196,6 +196,7 @@ def transform_sensitivity(S=np.array([]), vol=np.array([]),
                     S = np.arcsinh(S/scale)
 
         print("scal: ",np.any(S==0))
+        
         S[np.where(np.abs(S)<Small)]=Small
         print("scal post: ",np.any(S==0))
     return S, maxval
