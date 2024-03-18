@@ -158,8 +158,8 @@ cmap = mpl.colormaps[Cmap]
 
 pv.set_jupyter_backend("trame")
 mtheme = pv.themes.DocumentTheme()
-mtheme.nan_color = "white"
-mtheme.above_range_color ="white"
+mtheme.nan_color = pv.Color("darkgray", opacity=0)
+mtheme.above_range_color = pv.Color("darkgrey", opacity=0)
 # my_theme.lighting = False
 # my_theme.show_edges = True
 # my_theme.axes.box = True
@@ -214,7 +214,8 @@ if "ortho" in PlotType.lower():
         _ = p.add_mesh(slices, scalars="resistivity", **slicepars)
     
     if PlotData:
-        p_actor = p.add_point_labels(sitep, sitel,render=True,
+        points = p.add_points(sitep, point_size=10, color="red")
+        labels = p.add_point_labels(sitep, sitel, render=True,
                          point_size=100, show_points=True,always_visible=True,
                          render_points_as_spheres=True,shape_opacity=0.0,
                          point_color="red")
