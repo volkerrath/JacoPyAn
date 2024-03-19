@@ -1371,7 +1371,8 @@ def data_to_pv(data=None, site=None, reference=None, scale=1.):
         y =  y + reference[1]
         z =  z + reference[2]
     
-    x, y, z  = scale*x, scale*y, scale*z
+    y, x, z  = scale*x, scale*y, -scale*z
+    
     
       
     sites, siteindex = np.unique(site, return_index=True)
@@ -1382,7 +1383,7 @@ def data_to_pv(data=None, site=None, reference=None, scale=1.):
     sites = sites.astype('<U4')
     siten= np.array([ii for ii in np.arange(len(z))])    
     
-    z = -z
+    # z = -z
     
     return x, y, z, sites, siten
     
@@ -1717,8 +1718,7 @@ def in_box(
     cent=[0.0, 0.0, 0.0],
     axs=[1.0, 1.0, 1.0],
     ang=[0.0, 0.0, 0.0],
-    find_inside=True,
-):
+    find_inside=True,):
     """
     Find points inside arbitrary ellipsoid.
 
@@ -2302,22 +2302,56 @@ def set_mesh(d=None, center=False):
         
     return xn, xc
 
-def mask_mesh(x=None, y=None, z=None, mod=None, mask=None):  
+def mask_mesh(x=None, y=None, z=None, mod=None, ref = None,
+              method="index", 
+              mask=None, scale =1.):  
     """
     mask model-like parameters and mesh
     
     VR Jan 2024
     """     
-    
-    mdims = np.shape(mod)
+    msh = np.shape(mod)
     mod_out = mod.copy()
-    mod_out = mod_out[
-        mask[0]:mdims[0]-mask[1],
-        mask[2]:mdims[1]-mask[3],
-        mask[4]:mdims[2]-mask[5]]
     
-    x_out = x[mask[0]:mdims[0]-mask[1]]
-    y_out = y[mask[2]:mdims[1]-mask[3]]
-    z_out = z[mask[4]:mdims[2]-mask[5]]
+    x, y, z  = scale*x, scale*y, scale*z
+    
+    if ("ind" in method.lower()) or ("ijk" in method.lower()):
+        
+        ijk = mask
+        
+        x_out = x[ijk[0]:msh[0]-ijk[1]]
+        y_out = y[ijk[2]:msh[1]-ijk[3]]
+        z_out = z[ijk[4]:msh[2]-ijk[5]]
+        
+        mod_out = mod_out[
+            ijk[0]:msh[0]-ijk[1],
+            ijk[2]:msh[1]-ijk[3],
+            ijk[4]:msh[2]-ijk[5]]
+             
+    elif "dis" in method.lower():
+        
+        x =  x + ref[0]
+        y =  y + ref[1]
+        z =  z + ref[2]
+        
+        xc = 0.5 * (x[0:msh[0]] + x[1:msh[0]+1])
+        yc = 0.5 * (y[0:msh[1]] + y[1:msh[1]+1])
+        zc = 0.5 * (z[0:msh[2]] + z[1:msh[2]+1])
+    
+        ix =np.where(np.logical_and(xc>=ref[0]+mask[0], xc<=ref[0]+mask[1]))
+        iy =np.where(np.logical_and(yc>=ref[1]+mask[2], yc<=ref[1]+mask[3]))
+        iz =np.where(np.logical_and(zc>=ref[2]+mask[4], zc<=ref[2]+mask[5]))
+        
+       
+        mod_out = mod_out[ix,iy, iz]
+
+        x_out = x[np.append[ix,ix[-1]+1]]
+        y_out = y[np.append[iy,iy[-1]+1]]
+        z_out = z[np.append[iz,iz[-1]+1]]
+
+    else:
+        
+        error("mask_mesh: method "+method.lower()+"not implemented! Exit.")
+    
         
     return x_out, y_out, z_out, mod_out

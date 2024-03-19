@@ -71,7 +71,7 @@ StepContrs = 0.5
 
 PlotModl = True
 PlotSens = False
-PlotComb = False
+PlotUnct = False
 PlotData = True
 
 StepContrs=0.5
@@ -124,7 +124,7 @@ if PlotSens:
     sensi = pv.RectilinearGrid(y, x, z)
     sensi.cell_data["sensitivity"] = sens
     
-if PlotComb:
+if PlotUnct:
     dx, dy, dz, rho, reference, _ = mod.read_mod(ModFile, ".rho",trans="log10")
     aircells = np.where(rho>15.)
     rho[aircells]=np.NaN
@@ -145,7 +145,7 @@ if PlotComb:
     sensi.cell_data["sensitivity"] = sens   
 
 if PlotData:
-    if (not PlotSens) and (not PlotModl) and (not PlotComb):
+    if (not PlotSens) and (not PlotModl) and (not PlotUnct):
         error("No mesh given, data cannot be plotted! Exit.")
     site, _, data, _ = mod.read_data(Datfile=Datfile)
     xdat, ydat, zdat, sitenam, sitenum = mod.data_to_pv(data=data, site=site, 
@@ -170,7 +170,7 @@ mtheme.above_range_color = pv.Color("darkgrey", opacity=0)
 # mtheme.colorbar_vertical.title="log resistivity"
 mtheme.font.size=14
 mtheme.font.title_size=16
-mtheme.font.label_size=14
+mtheme.font.label_size=16
 
 
 pv.global_theme.load_theme(mtheme)
@@ -192,15 +192,15 @@ p = pv.Plotter(window_size=[1600, 1300], theme=mtheme, notebook=False, off_scree
 
 p.add_title(Title)
 _ = p.add_mesh(model.outline(), color="k")
-grid_labels = dict(ztitle="elev (km)", xtitle="w-e (km)", ytitle="s-n (km)")
+grid_labels = dict(ztitle="elev (km)", xtitle="E-W (km)", ytitle="S-N (km)")
 p.show_grid(**grid_labels)
-
+#p.view_xy()
 if "ortho" in PlotType.lower():
     slicepars = dict(clim=LimLogRes, 
                      cmap=lut,
-                     above_color=None, 
+                     above_color=pv.Color("darkgrey", opacity=0), 
                      nan_color="white",
-                     nan_opacity=1.,
+                     nan_opacity=0.,
                      show_scalar_bar=False,
                      use_transparency=True,
                      lighting="none",
@@ -218,7 +218,16 @@ if "ortho" in PlotType.lower():
         labels = p.add_point_labels(sitep, sitel, render=True,
                          point_size=100, show_points=True,always_visible=True,
                          render_points_as_spheres=True,shape_opacity=0.0,
-                         point_color="red")
+                         point_color="red")        
+
+    if PlotUnct:
+        slices = model.slice_orthogonal(position[0], position[1], position[2])
+        _ = p.add_mesh(slices, scalars="resistivity",  **slicepars)
+        points = p.add_points(sitep, point_size=10, color="red")
+        labels = p.add_point_labels(sitep, sitel, render=True,
+                         point_size=100, show_points=True,always_visible=True,
+                         render_points_as_spheres=True,shape_opacity=0.0,
+                         point_color="red")        
 
     
 elif"slice" in PlotType.lower():
@@ -340,6 +349,7 @@ _ = p.add_scalar_bar(title="log res",
 p.add_axes()
 
 p.save_graphic("test_save.pdf")
+p
 p.show()
 
  
