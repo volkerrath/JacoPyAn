@@ -2338,9 +2338,9 @@ def mask_mesh(x=None, y=None, z=None, mod=None, ref = None,
         yc = 0.5 * (y[0:msh[1]] + y[1:msh[1]+1])
         zc = 0.5 * (z[0:msh[2]] + z[1:msh[2]+1])
     
-        ix =np.where(np.logical_and(xc>=ref[0]+mask[0], xc<=ref[0]+mask[1]))
-        iy =np.where(np.logical_and(yc>=ref[1]+mask[2], yc<=ref[1]+mask[3]))
-        iz =np.where(np.logical_and(zc>=ref[2]+mask[4], zc<=ref[2]+mask[5]))
+        ix =np.where(np.logical_and(xc>=mask[0], xc<=mask[1]))
+        iy =np.where(np.logical_and(yc>=mask[2], yc<=mask[3]))
+        iz =np.where(np.logical_and(zc>=mask[4], zc<=mask[5]))
         
        
         mod_out = mod_out[ix,iy, iz]
