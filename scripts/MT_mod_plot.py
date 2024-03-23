@@ -31,7 +31,7 @@ import tarfile
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-
+from matplotlib.patches import Rectangle, Patch
 
 
 
@@ -73,6 +73,9 @@ Slices = [("xz", 0.), ("xz", -8.), ("xz", 8.),
           ("yz", 0.), ("yz", -8.), ("yz", 8.),
           ("xy", 0.), ("xy", 4.), ("xy", -9.),]
 DistMask = [-15., 15.,   -15., 15.,  0., 25.]
+OpZones = [(-1., 1.), (-2., 0.8), (-3, 0.6), (-4., 0.2), (-5.,0.1 )]
+
+
 mask = DistMask
 
 infile = WorkDir+ModFile
@@ -102,17 +105,25 @@ if UseSens:
     
 nslices = np.shape(Slices)[0]
 for sl in np.arange(nslices):
+    
+    
     s = Slices[sl]
     print("\nSlice "+str(sl))
     print("Direction: "+s[0])
     print("Position: "+str(s[1]))
+    
     z = -z
+    
+    
     pos = s[1]
     if "xz" in s[0]:
         nearest = np.array(pos - yc).argmin()
         slicr = rho[nearest, :, :]
         if UseSens:
             slics = sns[nearest, :, :]
+            opac = utl.set_opacity(mesh=slics, zones=OpZones)
+        else:
+            slics = np.ones_like(slicr) 
             
         X, Y = np.meshgrid(y, z)
                 
@@ -120,12 +131,32 @@ for sl in np.arange(nslices):
         nearest = np.array(pos - xc).argmin()
         slicr = rho[:, nearest, :]
         if UseSens:
-            slics = sns[:, nearest, :]
+            slics = sns[:, nearest, :]            
+            opac = utl.set_opacity(mesh=slics, zones=OpZones)
+        else: 
+            slics = np.ones_like(slicr)   
             
-            X, Y = np.meshgrid(x, z)
+        X, Y = np.meshgrid(x, z)
         
     if "xy" in s[0]:
-        nearest = np.array(pos - zc.argmin()
+        nearest = np.array(pos - zc).argmin()
         slicr = rho[:, :, nearest]
         if UseSens:
             slics = sns[:, nearest, :]
+            opac = utl.set_opacity(mesh=slics, zones=OpZones)
+        else: 
+            slics = np.ones_like(slicr)
+            
+        X, Y = np.meshgrid(x, y)
+    
+    cmap = plt.get_cmap('inferno')
+    norm = plt.Normalize(z.min(), z.max())
+    
+    fig, ax  = plt.subplots(ncols=1, nrows=1)
+    ax.pcolormesh(X, Y, slicr, cmap=cmap)
+    for ii in range(len(X) - 1):
+        for jj in range(len(Y) - 1):
+            rect = Rectangle((X[ii], Y[jj]), X[ii + 1] - X[ii], Y[jj + 1] - Y[jj],
+                             facecolor=cmap(slicr[jj, ii]), alpha=slics[jj, ii], edgecolor='none')
+            ax.add_patch(rect)
+        

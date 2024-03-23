@@ -861,3 +861,17 @@ def KLD(P=np.array([]), Q=np.array([]), epsilon= 1.e-8):
     distance = np.sum(PP*np.log(PP/QQ))
     
     return distance
+
+def set_opacity(mesh=None, zones=[(-1., 1.), (-2., 0.8), (-3, 0.6), (-4., 0.2), (-5.,0.1 )]):
+    
+    dims = mesh.shape
+    zons = zones.size
+    
+    opac = np.zeros_like(mesh)
+    
+    for izon in np.arange(zons):
+        which = np.where(mesh>zones[izon][0])
+        opac[which] = zones[izon][1]
+        
+    return opac
+    
