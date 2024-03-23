@@ -2302,9 +2302,10 @@ def set_mesh(d=None, center=False):
         
     return xn, xc
 
-def mask_mesh(x=None, y=None, z=None, mod=None, ref = None,
-              method="index", 
-              mask=None, scale =1.):  
+def mask_mesh(x=None, y=None, z=None, mod=None, 
+              mask=None, 
+              ref = [0., 0., 0.],
+              method="index"):  
     """
     mask model-like parameters and mesh
     
@@ -2312,9 +2313,11 @@ def mask_mesh(x=None, y=None, z=None, mod=None, ref = None,
     """     
     msh = np.shape(mod)
     mod_out = mod.copy()
+    x_out = x.copy()
+    y_out = y.copy()
+    z_out = z.copy()
     
-    x, y, z  = scale*x, scale*y, scale*z
-    
+  
     if ("ind" in method.lower()) or ("ijk" in method.lower()):
         
         ijk = mask
@@ -2337,21 +2340,37 @@ def mask_mesh(x=None, y=None, z=None, mod=None, ref = None,
         xc = 0.5 * (x[0:msh[0]] + x[1:msh[0]+1])
         yc = 0.5 * (y[0:msh[1]] + y[1:msh[1]+1])
         zc = 0.5 * (z[0:msh[2]] + z[1:msh[2]+1])
-    
-        ix =np.where(np.logical_and(xc>=mask[0], xc<=mask[1]))
-        iy =np.where(np.logical_and(yc>=mask[2], yc<=mask[3]))
-        iz =np.where(np.logical_and(zc>=mask[4], zc<=mask[5]))
         
-       
-        mod_out = mod_out[ix,iy, iz]
-
-        x_out = x[np.append[ix,ix[-1]+1]]
-        y_out = y[np.append[iy,iy[-1]+1]]
-        z_out = z[np.append[iz,iz[-1]+1]]
-
-    else:
+        ix = []
+        for ii in np.arange(len(xc)):
+            if np.logical_and(xc[ii]>=mask[0], xc[ii]<=mask[1]):  
+                 ix.append(ii)
+        aixt = tuple(np.array(ix).T)
+         
+        iy = []
+        for ii in np.arange(len(yc)):
+            if np.logical_and(yc[ii]>=mask[2], yc[ii]<=mask[3]):  
+                 iy.append(ii)
+        aiyt = tuple(np.array(iy).T)
         
-        error("mask_mesh: method "+method.lower()+"not implemented! Exit.")
-    
+        iz = []
+        for ii in np.arange(len(zc)):
+            if np.logical_and(zc[ii]>=mask[2], zc[ii]<=mask[3]):  
+                 iz.append(ii)
+        aizt = tuple(np.array(iz).T)             
+                 
+        x_out = x_out[ix.append(ix[-1]+1)]
+        y_out = y_out[iy.append(iy[-1]+1)]
+        z_out = z_out[iz.append(iz[-1]+1)]                
+        # np.append(ix,ix[-1]+1)               
+        print("x ",x_out)
+        print("y ",y_out)       
+        print("x ",z_out)
         
-    return x_out, y_out, z_out, mod_out
+        mod_out =mod_out[aixt,:,:]
+        mod_out =mod_out[:,aiyt,:]        
+        mod_out =mod_out[:,:,aizt]
+        print(np.shape(mod_out)) 
+        print(np.shape(ix),np.shape(iy),np.shape(iz))
+        
+        return x_out, y_out, z_out, mod_out
