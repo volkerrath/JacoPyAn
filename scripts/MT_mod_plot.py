@@ -49,10 +49,36 @@ import modem as mod
 from version import versionstrg
 import util as utl
 
+
 version, _ = versionstrg()
 titstrng = utl.print_title(version=version, fname=__file__, out=False)
 print(titstrng+"\n\n")
 
+# general plottin parameters
+cm = 1/2.54
+
+mpl.use("cairo")
+"""
+Determine graphical parameter.
+=> print(matplotlib.pyplot.style.available)
+"""
+mpl.pyplot.style.use("seaborn-v0_8-paper")
+mpl.rcParams["figure.dpi"] = 600
+mpl.rcParams["axes.linewidth"] = 0.5
+mpl.rcParams["savefig.facecolor"] = "none"
+mpl.rcParams["savefig.transparent"] = True
+mpl.rcParams["savefig.bbox"] = "tight" 
+Fontsize = 6
+Labelsize = Fontsize
+Titlesize = 6
+Fontsizes = [Fontsize, Labelsize, Titlesize]
+# Markersize = 4
+"""
+https://matplotlib.org/stable/tutorials/colors/colormaps.html
+"""
+ColorMapRes="jet"
+Grey20 = (0.2, 0.2, 0.2)
+Grey50 = (0.5, 0.5, 0.5)
 
 
 rng = np.random.default_rng()
@@ -62,8 +88,14 @@ rhoair = np.log10(rhoair)
 
 # Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas
 WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/"
-# WorkDir = "/home/vrath/UBI38_JAC/"
-
+PlotDir = WorkDir
+print("Plots written to dir: %s " % PlotDir)
+if not os.path.isdir(PlotDir):
+    print("File: %s does not exist, but will be created" % PlotDir)
+    os.mkdir(PlotDir)
+    
+    
+    
 UseSens = True 
 ModFile = "Ubi38_ZssPT_Alpha02_NLCG_023"
 SnsFile = "/sens_euc/Ubi38_ZPT_nerr_sp-8_total_euc_sqr_max_sns"
@@ -102,7 +134,20 @@ zc = 0.5 * (z0[0:msh[2]] + z0[1:msh[2]+1])
 x, y, z, rho = mod.mask_mesh(x0, y0, z0, mod=rho, mask=mask, method="dist")
 if UseSens: 
     _, _, _, sns = mod.mask_mesh(x, y, z, mod=rho, mask=mask, method="dist")
-    
+
+
+
+nhorz = 1
+nvert = 2
+FigSize = [8.5*cm, 8.5*cm]
+"""
+"Plot formats are "".png", ".pdf", or any other
+format matplotlib allows.
+"""
+PlotFormats = [".pdf", ".png"] #".svg"
+
+
+pdf_list = []
 nslices = np.shape(Slices)[0]
 for sl in np.arange(nslices):
     
@@ -159,4 +204,15 @@ for sl in np.arange(nslices):
             rect = Rectangle((X[ii], Y[jj]), X[ii + 1] - X[ii], Y[jj + 1] - Y[jj],
                              facecolor=cmap(slicr[jj, ii]), alpha=slics[jj, ii], edgecolor='none')
             ax.add_patch(rect)
-        
+            
+            
+    for F in PlotFormats:
+        mpl.pyplot.savefig(PlotDir+PlotFile+F)
+    
+    if "pdf" in PlotFormats:
+        pdf_list.append(PlotDir+PlotFile+".pdf")    
+
+
+if "pdf" in PlotFormats and pdf_list.size>1:
+    viz.make_pdf_catalog(PDFList=pdf_list, FileName=PlotDir+PDFCatName)
+    # print(str(len(pdf_list))+" collected to "+PlotDir+PDFCName)

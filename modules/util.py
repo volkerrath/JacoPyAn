@@ -875,3 +875,34 @@ def set_opacity(mesh=None, zones=[(-1., 1.), (-2., 0.8), (-3, 0.6), (-4., 0.2), 
         
     return opac
     
+def make_pdf_catalog(PDFList= None, FileName="Catalog.pdf"):
+    """
+    Make pdf catalog from list of pdf plots
+
+    Parameters
+    ----------
+    PDFList : List of strings
+        List of Filenames
+    Filename : string
+        Catalog file
+
+
+    Returns
+    -------
+    None.
+
+    """
+    # error("not in 3.9! Exit")
+
+    import fitz
+
+    catalog = fitz.open()
+
+    for pdf in PDFList:
+        with fitz.open(pdf) as mfile:
+            catalog.insert_pdf(mfile)
+
+    catalog.save(FileName, garbage=4, clean = True, deflate=True)
+    catalog.close()
+
+    print("\n"+str(np.size(PDFList))+" files collected to "+FileName)
