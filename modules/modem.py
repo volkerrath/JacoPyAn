@@ -9,6 +9,7 @@ from numpy.linalg import norm
 from scipy.io import FortranFile
 from scipy.ndimage import laplace, convolve
 from scipy.ndimage import uniform_filter, gaussian_filter, median_filter
+from numba import jit
 
 import util as utl
 
