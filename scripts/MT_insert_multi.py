@@ -37,6 +37,8 @@ import scipy.linalg as scl
 import scipy.sparse as scs
 import netCDF4 as nc
 
+from numba import njit
+
 JACOPYAN_DATA = os.environ["JACOPYAN_DATA"]
 JACOPYAN_ROOT = os.environ["JACOPYAN_ROOT"]
 

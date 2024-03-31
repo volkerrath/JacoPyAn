@@ -45,7 +45,8 @@ import scipy.linalg as spl
 import scipy.sparse as scs
 import netCDF4 as nc
 
-from sklearn.utils.extmath import randomized_svd
+# from sklearn.utils.extmath import randomized_svd
+from numba import njit
 
 JACOPYAN_DATA = os.environ["JACOPYAN_DATA"]
 JACOPYAN_ROOT = os.environ["JACOPYAN_ROOT"]

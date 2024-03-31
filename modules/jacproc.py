@@ -8,6 +8,7 @@ import numpy as np
 import scipy.sparse as scs
 import numpy.linalg as npl
 
+from numba import jit
 
 
 def calc_sensitivity(Jac=np.array([]),
@@ -559,7 +560,31 @@ def set_airmask(rho=None, aircells=np.array([]), blank= 1.e-30, flat=False, out=
     return mask
 
 
-def project_model(m=None, U=None, tst_sample= None, nsamp=1, small=1.0e-14, out=True):
+def project_nullspace(U=np.array([]), m_test=np.array([])):
+    """
+    Calculates nullspace projection of a vector
+
+    Parameters
+    ----------
+    U : numpy array, float
+         npar*npar matrix from SAVD oj Jacobian.
+    m_test : numpy array, float
+         npar*vector to be projected.
+
+    Returns
+    -------
+    m: numpy array, float
+        projected model
+
+    """
+    if np.size(U) == 0:
+        error("project_nullspace: V not defined! Exit.")
+
+    m_proj = m_test - U@(U.T@m_test)
+
+    return m_proj
+
+def project_models(m=None, U=None, tst_sample= None, nsamp=1, small=1.0e-14, out=True):
     """
     Project to Nullspace.
 
