@@ -93,7 +93,7 @@ nF = len(JFiles)
 
 total = 0.0
 start = time.perf_counter()
-dx, dy, dz, rho, reference, _ = mod.read_mod(MFile, trans="linear", volumes=True)
+dx, dy, dz, rho, reference, _ = mod.read_mod(MFile, trans="linear")
 dims = np.shape(rho)
 
 rhoair = 1.e17
