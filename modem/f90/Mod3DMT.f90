@@ -137,7 +137,7 @@ program Mod3DMT
 #ifdef JAC
         call write_sensMatrixMTX(sens,sigma0,allData,cUserDef%wFile_Sens, cUserDef%rFile_Cov)
 #else
-        call write_sensMatrixMTX(sens,allData,cUserDef%wFile_Sens)
+        call write_sensMatrixMTX(sens,cUserDef%wFile_Sens)
 #endif
 
 
