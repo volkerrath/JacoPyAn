@@ -1,16 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: py:light,ipynb
-#     text_representation:
-#       extension: .py
-#       format_name: light
-#       format_version: '1.5'
-#       jupytext_version: 1.11.3
-# ---
 
 """
 Reads ModEM's Jacobian, does fancy things.
@@ -24,8 +12,8 @@ Reads ModEM's Jacobian, does fancy things.
 import os
 # from https://stackoverflow.com/questions/73391779/setting-number-of-threads-in-python
 nthreads = 8  # tinney  62
-os.environ["OMP_NUM_THREADS"] = str(nthreads) 
-os.environ["OPENBLAS_NUM_THREADS"] = str(nthreads) 
+os.environ["OMP_NUM_THREADS"] = str(nthreads)
+os.environ["OPENBLAS_NUM_THREADS"] = str(nthreads)
 os.environ["MKL_NUM_THREADS"] = str(nthreads)
 
 import sys
@@ -140,7 +128,7 @@ info = []
 for noversmp in OverSample:
     for nsubspit in SubspaceIt:
         for nsingval in NumSingular:
-            
+
             start = time.perf_counter()
             U, S, Vt = jac.rsvd(Jac.T,
                                 rank=nsingval,
@@ -158,15 +146,15 @@ for noversmp in OverSample:
             perc = 100. - n_op*100./j_op
             tmp = [nsingval, noversmp, nsubspit, perc, elapsed]
             info.append(tmp)
-            
+
             File = JFile+"_SVD_k"+str(nsingval)\
                     +"_o"+str(noversmp)\
                     +"_s"+str(nsubspit)\
                     +"_"+str(np.around(perc,1))\
                     +"percent.npz"
             np.savez_compressed(File, U=U, S=S, V=Vt, Nop=perc)
-            
-            
+
+
             # start = time.perf_counter()
             # U, S, Vt = randomized_svd(M=Jac,
             #                     n_components=nsingval,

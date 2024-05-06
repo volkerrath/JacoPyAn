@@ -167,7 +167,7 @@ def transform_sensitivity(S=np.array([]), vol=np.array([]),
                  
         if "max" in item.lower():
              print("trans_sensitivity: Transformed by maximum value.")
-             if Maxval==None:
+             if Maxval is None:
                  maxval = np.amax(np.abs(S))
              else:
                  maxval = Maxval
@@ -595,7 +595,7 @@ def project_models(m=None, U=None, tst_sample= None, nsamp=1, small=1.0e-14, out
     if m.ndim(m)>1:
         m = m.flatten(order="F")
     
-    if tst_sample == None:
+    if tst_sample  is None:
         print("project_model: "+str(nsamp)+" sample models will be generated!")
         if nsamp==0:
            error("project_model: No number of samples given! Exit.") 
@@ -636,12 +636,12 @@ def sample_pcovar(cpsqrti=None, m=None, tst_sample = None,
     """
     error("sample_pcovar: Not yet fully implemented! Exit.")
     
-    if (cpsqrti==None) or  (m==None):
+    if (cpsqrti is None) or  (m is None):
         error("sample_pcovar: No covarince or ref model given! Exit.")
     
 
     
-    if tst_sample == None:
+    if tst_sample is None:
         print("sample_pcovar: "+str(nsamp)+" sample models will be generated!")
         if nsamp==0:
            error("sample_pcovar: No number of samples given! Exit.") 
@@ -835,7 +835,7 @@ def print_stats(jac=np.array([]), jacmask=np.array([]), outfile=None):
     
     jdims = np.shape(jac)
     print("stats: Jacobian dimensions are:", jdims)
-    if not  outfile==None: 
+    if outfile is not None:
         outfile.write("Jacobian dimensions are:"+str(jdims))
     
     if jdims[0]==0:
@@ -844,22 +844,22 @@ def print_stats(jac=np.array([]), jacmask=np.array([]), outfile=None):
     mx = np.amax(jac)
     mn = np.amin(jac)
     print("stats: minimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))  
-    if not  outfile==None: 
+    if outfile is not None:
         outfile.write("Mminimum/maximum Jacobian value is "+str(mn)+"/"+str(mx))
     mn = np.amin(np.abs(jac))
     mx = np.amax(np.abs(jac))
     print("stats: minimum/maximum abs Jacobian value is "+str(mn)+"/"+str(mx))
-    if not  outfile==None: 
+    if outfile is not None:
         outfile.write("Minimum/maximum abs Jacobian value is "+str(mn)+"/"+str(mx))
   
     mjac = jac*scs.diags(jacmask,0)
     mx = np.amax(mjac)
     mn = np.amin(mjac)
     print("stats: minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx))
-    if not  outfile==None: 
+    if outfile is not None:
         outfile.write("Minimum/maximum masked Jacobian value is "+str(mn)+"/"+str(mx))
     mx = np.amax(np.abs(mjac))
     mn = np.amin(np.abs(mjac))
     print("stats: minimum/maximum masked abs Jacobian value is "+str(mn)+"/"+str(mx))
-    if not  outfile==None: outfile.write("Minimum/maximum masked abs Jacobian value is "+str(mn)+"/"+str(mx)+"\n")
+    if outfile is not None: outfile.write("Minimum/maximum masked abs Jacobian value is "+str(mn)+"/"+str(mx)+"\n")
     print("\n")
