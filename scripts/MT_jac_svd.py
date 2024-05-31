@@ -58,7 +58,7 @@ from version import versionstrg
 #     if pth not in sys.path:
 #         sys.path.insert(0,pth)
 
-gc.enable()
+
 
 
 version, _ = versionstrg()
