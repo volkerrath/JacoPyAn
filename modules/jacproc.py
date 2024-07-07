@@ -154,16 +154,7 @@ def transform_sensitivity(S=np.array([]), vol=np.array([]),
 
     for item in Transform:       
         
-        if "siz" in item.lower():
-             print("trans_sensitivity: Transformed by volumes/layer thickness.")
-             if np.size(vol)==0:
-                 error("Transform_sensitivity: no volumes given! Exit.")
 
-             else:
-                 sS= np.sum(1./vol)
-                 S = sS*S/vol
-                 # print("S0v", np.shape(S))
-                 # print("S0v", np.shape(V))
                  
         if "max" in item.lower():
              print("trans_sensitivity: Transformed by maximum value.")
@@ -195,11 +186,33 @@ def transform_sensitivity(S=np.array([]), vol=np.array([]),
                     scale = get_scale(S, method=asinhpar[0])
 
                     S = np.arcsinh(S/scale)
-
-        print("scal: ",np.any(S==0))
         
+        if "siz" in item.lower():
+             print("trans_sensitivity: Transformed by volumes/layer thickness.")
+             if np.size(vol)==0:
+                 error("Transform_sensitivity: no volumes given! Exit.")
+
+             else:
+                 sS= np.sum(1./vol)
+                 S = sS*S/vol
+                 # print("S0v", np.shape(S))
+                 # print("S0v", np.shape(V))
+        
+        
+        if "max" in item.lower():
+             print("trans_sensitivity: Transformed by maximum value.")
+             if Maxval is None:
+                 maxval = np.amax(np.abs(S))
+             else:
+                 maxval = Maxval
+             print("maximum value: ", maxval)
+             S = S/maxval
+             # print("S0m", np.shape(S))
+             
+             
         S[np.where(np.abs(S)<Small)]=Small
-        print("scal post: ",np.any(S==0))
+
+        
     return S, maxval
 
 def get_scale(d=np.array([]), f=0.1, method = "other", OutInfo = False):

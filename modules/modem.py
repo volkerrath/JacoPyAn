@@ -1577,12 +1577,18 @@ def insert_body(dx=None, dy=None, dz=None,
 
     rhoval = np.log(rhoval) 
     
-    if action[0:3] == "rep":
+    if "rep" in action:
         actstring = "rhoval"
-    elif action[0:3] == "add":
-        actstring = "rho_out[ii,jj,kk] + rhoval"
+    elif "add"  in action:
+        
+        if "avg" in action:            
+            actstring = "rho_avg + rhoval"
+        else:
+            actstring = "rho_out[inside_points] + rhoval"
+            
     else:
         error("Action" + action + " not implemented! Exit.")
+        
 
     if out:
         print(
@@ -1592,10 +1598,12 @@ def insert_body(dx=None, dy=None, dz=None,
         print("Body center : " + str(bcent))
         print("Body axes   : " + str(baxes))
         print("Body angles : " + str(bangl))
+        print("Action is "+action)
         print("Smoothed with " + smooth[0] + " filter")
-
+ 
+    inside_points = []
     if "ell" in geom.lower():
-
+        
         for kk in np.arange(0, nz - zpad - 1):
             zpoint = zc[kk]
             for jj in np.arange(ypad + 1, ny - ypad - 1):
@@ -1607,10 +1615,13 @@ def insert_body(dx=None, dy=None, dz=None,
                     # print('position')
                     # print(position)
                     # print( bcent)
+                    
                     if in_ellipsoid(position, bcent, baxes, bangl):
-                        rho_out[ii, jj, kk] = eval(actstring)
-                        # if Out:
-                        #     print("cell %i %i %i" % (ii, jj, kk))
+                        inside_points.append(position)
+                        
+                        
+
+
 
     if "box" in geom.lower():
         for kk in np.arange(0, nz - zpad - 1):
@@ -1626,9 +1637,14 @@ def insert_body(dx=None, dy=None, dz=None,
                     # print( bcent)
 
                     if in_box(position, bcent, baxes, bangl):
-                        rho_out[ii, jj, kk] = eval(actstring)
-                        # if Out:
-                        #     print("cell %i %i %i" % (ii, jj, kk))
+                        inside_points.append(position)
+                        
+                        
+    if "avg" in actstring:
+        rho_avg = np.mean(rho_out(inside_points))
+        
+        
+    rho_out[inside_points] = eval(actstring)
 
     if smooth is not None:
         if smooth[0][0:3] == "uni":

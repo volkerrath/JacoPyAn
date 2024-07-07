@@ -34,13 +34,17 @@ version, _ = versionstrg()
 titstrng = utl.print_title(version=version, fname=__file__, out=False)
 print(titstrng+"\n\n")
 
-debug = False
+# # FOGO
+# rhosea = 0.333
+# rhoair = 1.e10
+# FillVal = 100.
+# InMod =  "/home/vrath/MT_Data/Fogo/FOG_best"
+# OutMod =  "/home/vrath/MT_Data/Fogo/FOG_prior"+str(int(FillVal))
 
-rhosea = 0.333
-rhoair = 1.e10
-
+# UBI
+rhosea = 0.3
+rhoair = 1.e17
 FillVal = 100.
-
 InMod =  "/home/vrath/MT_Data/Fogo/FOG_best"
 OutMod =  "/home/vrath/MT_Data/Fogo/FOG_prior"+str(int(FillVal))
 
