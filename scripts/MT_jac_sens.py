@@ -74,10 +74,10 @@ ModExt = "_sns.rho"
 
 # Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas
 # WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/"
-WorkDir = "/home/vrath/UBI38_JAC/"
-MOrig = [-16.345800 -70.908249] # UBI
-JacName = "Ubi38_ZPT_nerr_sp-8"
-MFile = WorkDir + "Ubi38_ZssPT_Alpha02_NLCG_023"
+#WorkDir = "/home/vrath/UBI38_JAC/"
+#MOrig = [-16.345800 -70.908249] # UBI
+#JacName = "Ubi38_ZPT_nerr_sp-8"
+#MFile = WorkDir + "Ubi38_ZssPT_Alpha02_NLCG_023"
 
 # Misti Misti Misti Misti Misti Misti Misti Misti Misti Misti Misti Misti
 #WorkDir = JACOPYAN_DATA+"/Peru/Misti/"
@@ -88,16 +88,21 @@ MFile = WorkDir + "Ubi38_ZssPT_Alpha02_NLCG_023"
 ## JacName = "Misti_best_Z5_nerr_sp-8"
 #JacName = "Misti_best_ZT_extended_nerr_sp-8"
 
+WorkDir = JACOPYAN_DATA+"/Ubaye/"
+JacName = "Ub_P_nerr_sp-8"
+MFile = WorkDir + "Ub_best"
+MOrig = [0., 0.]
+
 JFile = WorkDir + JacName
 
-VolExtract = False
+VolExtract = True
 if VolExtract:
     VolFile = MFile
     VolFmt = ""
     
 TopoExtract = True
 if TopoExtract:
-    TopoFile = WorkDir + "Ubinas_Topo.dat"
+    TopoFile = WorkDir + "Ubaye_Topo.dat"
     TopoFmt = ""
 
 
@@ -136,13 +141,13 @@ Usesigma:
 """
 
 # Transform = [ "max"]
-# Transform = [ "siz", "max"]
-Transform = [ "sqr","max"]
+# Transform = [ "sqr", "max"]
+Transform = [ "sqr","siz","max"]
 
 """
 Transform sensitivities. 
 Options:
-    Transform = "vol"           Normalize by the values optional array vol ("volume"), 
+    Transform = "vol", "siz"    Normalize by the values optional array vol ("volume"),
                                 i.e in our case layer thickness. This should always 
                                 be the first value in Transform list.
     Transform = "max"           Normalize by maximum (absolute) value.
@@ -212,7 +217,7 @@ if VolExtract or ("size" in Transform):
     if "rlm" in OutFormat.lower():
         mod.write_rlm(VolFile, modext="_vol.rlm", 
                       dx=dx, dy=dy, dz=dz, mval=vol, reference=refmod, mvalair=Blank, aircells=aircells, comment=Header)
-        print(" Cell volumes (UBC format) written to "+VolFile)
+        print(" Cell volumes (CGG format) written to "+VolFile)
 
 else:
     vol = np.array([])
@@ -293,7 +298,7 @@ if "tot"in Splits.lower():
 
     SensTmp = jac.calc_sensitivity(Jac,
                         Type = Type, OutInfo=False)
-    SensTot, MaxTotal = jac.transform_sensitivity(S=SensTmp, 
+    SensTot, MaxTotal = jac.transform_sensitivity(S=SensTmp, Vol=vol,
                             Transform=Transform, OutInfo=False)
 
     SensFile = SensDir+JacName+"_total_"+Type+"_"+"_".join(Transform)
@@ -356,7 +361,7 @@ if "dtyp" in Splits.lower():
         
         SensTmp = jac.calc_sensitivity(JacTmp,
                      Type = Type, OutInfo=False)
-        SensTmp, _ = jac.transform_sensitivity(S=SensTmp, vol=vol,
+        SensTmp, _ = jac.transform_sensitivity(S=SensTmp, Vol=vol,
                           Transform=Transform, Maxval=maxval, OutInfo=False)
         S = np.reshape(SensTmp, mdims, order="F")
         
@@ -424,7 +429,7 @@ if "comp" in Splits.lower():
             
         SensTmp = jac.calc_sensitivity(JacTmp,
                      Type = Type, OutInfo=False)
-        SensTmp, _ = jac.transform_sensitivity(S=SensTmp, vol=vol,
+        SensTmp, _ = jac.transform_sensitivity(S=SensTmp, Vol=vol,
                           Transform=Transform, Maxval=maxval, OutInfo=False)
         S = np.reshape(SensTmp, mdims, order="F")
                      
@@ -477,7 +482,7 @@ if "site" in Splits.lower():
         
         SensTmp = jac.calc_sensitivity(JacTmp,
                      Type = Type, OutInfo=False)
-        SensTmp, _  = jac.transform_sensitivity(S=SensTmp, vol=vol,
+        SensTmp, _  = jac.transform_sensitivity(S=SensTmp, Vol=vol,
                           Transform=Transform, Maxval=maxval, OutInfo=False)
         S = np.reshape(SensTmp, mdims, order="F")
         
@@ -536,7 +541,7 @@ if "freq" in Splits.lower():
 
            SensTmp = jac.calc_sensitivity(JacTmp,
                         Type = Type, OutInfo=False)
-           SensTmp, _  = jac.transform_sensitivity(S=SensTmp, vol=vol,
+           SensTmp, _  = jac.transform_sensitivity(S=SensTmp, Vol=vol,
                              Transform=Transform, Maxval=maxval, OutInfo=False)
            S = np.reshape(SensTmp, mdims, order="F") 
            

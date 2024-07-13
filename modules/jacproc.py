@@ -117,8 +117,8 @@ def calc_sensitivity(Jac=np.array([]),
     return S
 
 
-def transform_sensitivity(S=np.array([]), vol=np.array([]),
-                          Transform=["size","max", "sqrt"],
+def transform_sensitivity(S=np.array([]), Vol=np.array([]),
+                          Transform=["sqrt", "size","max", ],
                           asinhpar=[0.], Maxval=None, Small= 1.e-30, OutInfo=False):
     """
     Transform sensitivities.
@@ -148,8 +148,8 @@ def transform_sensitivity(S=np.array([]), vol=np.array([]),
     if np.size(S)==0:
         error("transform_sensitivity: Sensitivity size is 0! Exit.")
     
-    # ns = np.shape(S)
-    
+    ns = np.shape(S)
+    print("transform_sensitivity: Shape = ", ns)
     
 
     for item in Transform:       
@@ -157,7 +157,7 @@ def transform_sensitivity(S=np.array([]), vol=np.array([]),
 
                  
         if "max" in item.lower():
-             print("trans_sensitivity: Transformed by maximum value.")
+             print("transform_sensitivity: Transformed by maximum value.")
              if Maxval is None:
                  maxval = np.amax(np.abs(S))
              else:
@@ -187,18 +187,21 @@ def transform_sensitivity(S=np.array([]), vol=np.array([]),
 
                     S = np.arcsinh(S/scale)
         
-        if "siz" in item.lower():
-             print("trans_sensitivity: Transformed by volumes/layer thickness.")
-             if np.size(vol)==0:
+        if ("siz" in item.lower()) or ("vol" in item.lower()):
+             print("transformed_sensitivity: Transformed by volumes/layer thickness.")
+             if np.size(Vol)==0:
                  error("Transform_sensitivity: no volumes given! Exit.")
 
              else:
-                 sS= np.sum(1./vol)
-                 S = sS*S/vol
-                 # print("S0v", np.shape(S))
-                 # print("S0v", np.shape(V))
-        
-        
+                 maxval = np.amax(S)
+                 minval = np.amin(S)
+                 print("before volume:",minval, maxval)
+                 print("volume:", np.amax(Vol),np.amax(Vol) )
+                 S = S/Vol.ravel()
+                 maxval = np.amax(S)
+                 minval = np.amin(S)
+                 print("after volume:",minval, maxval)
+
         if "max" in item.lower():
              print("trans_sensitivity: Transformed by maximum value.")
              if Maxval is None:
