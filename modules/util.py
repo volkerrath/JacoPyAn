@@ -21,7 +21,16 @@ from pyproj import CRS, Transformer
 
 from sys import exit as error
 
+
+
 from scipy.fftpack import dct, idct
+
+#def error(out_string="Unknown error occured! Exit.")
+        #exit(out_string)
+
+def warn(out_string=None):
+        if out_string is not None:
+            print("Warning: "+out_string)
 
 def dctn(x, mnorm="ortho"):
     """

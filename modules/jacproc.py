@@ -10,21 +10,6 @@ import numpy.linalg as npl
 
 from numba import jit
 
-def sminmax(S=None, aircells=None, seacells=None, out=True):
-    
-    tmp = S.copy()
-    tmp[aircells] = np.nan
-    tmp[seacells] = np.nan
-    
-    s_min = np.amin(tmp)
-    s_max = np.amax(tmp)
-    
-    if out:
-        print("S min =", s_min," S max =", s_max)
-    
-    return s_min, s_max
-
-
 
 def calc_sensitivity(Jac=np.array([]),
                      Type = "euclidean", UseSigma = False, Small = 1.e-30, OutInfo = False):
@@ -131,8 +116,8 @@ def calc_sensitivity(Jac=np.array([]),
     return S
 
 
-def transform_sensitivity(S=np.array([]), vol=np.array([]),
-                          Transform=["size","max", "sqrt"],
+def transform_sensitivity(S=np.array([]), Vol=np.array([]),
+                          Transform=["sqrt", "size","max", ],
                           asinhpar=[0.], Maxval=None, Small= 1.e-30, OutInfo=False):
     """
     Transform sensitivities.
@@ -162,8 +147,8 @@ def transform_sensitivity(S=np.array([]), vol=np.array([]),
     if np.size(S)==0:
         error("transform_sensitivity: Sensitivity size is 0! Exit.")
     
-    # ns = np.shape(S)
-    
+    ns = np.shape(S)
+    print("transform_sensitivity: Shape = ", ns)
     
 
     for item in Transform:       
@@ -190,18 +175,21 @@ def transform_sensitivity(S=np.array([]), vol=np.array([]),
 
                     S = np.arcsinh(S/scale)
         
-        if "siz" in item.lower():
-             print("trans_sensitivity: Transformed by volumes/layer thickness.")
-             if np.size(vol)==0:
+        if ("siz" in item.lower()) or ("vol" in item.lower()):
+             print("transformed_sensitivity: Transformed by volumes/layer thickness.")
+             if np.size(Vol)==0:
                  error("Transform_sensitivity: no volumes given! Exit.")
 
              else:
-                 sS= np.sum(1./vol)
-                 S = sS*S/vol
-                 # print("S0v", np.shape(S))
-                 # print("S0v", np.shape(V))
-        
-        
+                 maxval = np.amax(S)
+                 minval = np.amin(S)
+                 print("before volume:",minval, maxval)
+                 print("volume:", np.amax(Vol),np.amax(Vol) )
+                 S = S/Vol.ravel()
+                 maxval = np.amax(S)
+                 minval = np.amin(S)
+                 print("after volume:",minval, maxval)
+
         if "max" in item.lower():
              print("trans_sensitivity: Transformed by maximum value.")
              if Maxval is None:
@@ -879,3 +867,23 @@ def print_stats(jac=np.array([]), jacmask=np.array([]), outfile=None):
     print("stats: minimum/maximum masked abs Jacobian value is "+str(mn)+"/"+str(mx))
     if outfile is not None: outfile.write("Minimum/maximum masked abs Jacobian value is "+str(mn)+"/"+str(mx)+"\n")
     print("\n")
+
+
+def sminmax(S=None, aircells=None, seacells=None, out=True):
+    """
+    Calculates min/max for regular subsurface cells
+    """
+
+    tmp = S.copy()
+    tmp[aircells] = np.nan
+    tmp[seacells] = np.nan
+
+    s_min = np.nanmin(tmp)
+    s_max = np.nanmax(tmp)
+
+    if out:
+        print("S min =", s_min," S max =", s_max)
+
+    return s_min, s_max
+
+

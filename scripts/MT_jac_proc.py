@@ -83,9 +83,16 @@ Scale = 1.
 # JFiles = [WorkDir+"NewJacTest_P.jac",WorkDir+"NewJacTest_T.jac",WorkDir+"NewJacTest_Z.jac"]
 # MFile = WorkDir + "JacTest.rho"
 
-WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/"
-JFiles = [WorkDir+"UBI9_ZPTss.jac"] # WorkDir+"SABA8_Z.jac",]
-MFile = WorkDir + "UBI9_best"
+#WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/"
+#JFiles = [WorkDir+"UBI9_ZPTss.jac"] # WorkDir+"SABA8_Z.jac",]
+#MFile = WorkDir + "UBI9_best"
+
+
+WorkDir = JACOPYAN_DATA+"/Ubaye/"
+JFiles = [WorkDir+"Ub_Z.jac"]
+MFile = WorkDir + "Ub_best"
+
+
 
 if not WorkDir.endswith("/"):
     WorkDir = WorkDir+"/"
