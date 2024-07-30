@@ -10,6 +10,21 @@ import numpy.linalg as npl
 
 from numba import jit
 
+def sminmax(S=None, aircells=None, seacells=None, out=True):
+    
+    tmp = S.copy()
+    tmp[aircells] = np.nan
+    tmp[seacells] = np.nan
+    
+    s_min = np.amin(tmp)
+    s_max = np.amax(tmp)
+    
+    if out:
+        print("S min =", s_min," S max =", s_max)
+    
+    return s_min, s_max
+
+
 
 def calc_sensitivity(Jac=np.array([]),
                      Type = "euclidean", UseSigma = False, Small = 1.e-30, OutInfo = False):
@@ -60,7 +75,6 @@ def calc_sensitivity(Jac=np.array([]),
 
     if UseSigma:
         Jac = -Jac
-
 
 
     if "raw" in  Type.lower():
@@ -154,17 +168,6 @@ def transform_sensitivity(S=np.array([]), vol=np.array([]),
 
     for item in Transform:       
         
-
-                 
-        if "max" in item.lower():
-             print("trans_sensitivity: Transformed by maximum value.")
-             if Maxval is None:
-                 maxval = np.amax(np.abs(S))
-             else:
-                 maxval = Maxval
-             print("maximum value: ", maxval)
-             S = S/maxval
-             # print("S0m", np.shape(S))
             
         if "sqr" in item.lower():
             S = np.sqrt(S)
@@ -202,7 +205,7 @@ def transform_sensitivity(S=np.array([]), vol=np.array([]),
         if "max" in item.lower():
              print("trans_sensitivity: Transformed by maximum value.")
              if Maxval is None:
-                 maxval = np.amax(np.abs(S))
+                 _, maxval = sminmax(np.abs(S))
              else:
                  maxval = Maxval
              print("maximum value: ", maxval)
