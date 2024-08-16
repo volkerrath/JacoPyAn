@@ -72,13 +72,13 @@ StepContrs = 0.5
 PlotModl = True
 PlotSens = False
 PlotUnct = False
-PlotData = True
+PlotData = False
 
 StepContrs=0.5
 
 
 PlotType = "ortho"
-#PlotType = "slice"
+PlotType = "slice"
 # PlotType = "lines"
 # PlotType = "iso"
 
@@ -89,13 +89,13 @@ if "ortho" in PlotType.lower():
     
 if "slice" in PlotType.lower():
     position = (0., 0., -1.)
-    normal = (0., 1., 0.)
+    normal = (1., 1., 0.)
 
 # Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas Ubinas
 Title = "Ubinas Volcano, Peru"
 WorkDir = JACOPYAN_DATA+"/Peru/Ubinas/"
-if not WorkDir.endswith("/"):
-    WorkDir = WorkDir+"/"
+if not WorkDir.endswith("/"): WorkDir = WorkDir+"/"
+
 Datfile = WorkDir + "U38_ZPTss1"
 ModFile = WorkDir + "Ubi38_ZssPT_Alpha02_NLCG_023"
 SnsFile = WorkDir+"/sens_euc/Ubi38_ZPT_nerr_sp-8_total_euc_sqr_max_sns"
@@ -154,9 +154,9 @@ if PlotData:
     sitep = pv.PolyData(sdata)
     sitel = sitenam
 
-cmap = mpl.colormaps[Cmap]
+cmap = mpl.colormaps[Cmap] 
 
-pv.set_jupyter_backend("trame")
+#pv.set_jupyter_backend("trame")
 mtheme = pv.themes.DocumentTheme()
 mtheme.nan_color = pv.Color("darkgray", opacity=0)
 mtheme.above_range_color = pv.Color("darkgrey", opacity=0)
@@ -186,9 +186,7 @@ lut.nan_color = None
 
 
 
-
-
-p = pv.Plotter(window_size=[1600, 1300], theme=mtheme, notebook=False, off_screen=False)
+p = pv.Plotter(window_size=[1600, 1300], theme=mtheme, notebook=False, off_screen=True)
 
 p.add_title(Title)
 _ = p.add_mesh(model.outline(), color="k")
@@ -233,10 +231,10 @@ if "ortho" in PlotType.lower():
 elif"slice" in PlotType.lower():
     slicepars = dict(clim=LimLogRes, 
                  cmap=lut,
-                 above_color=None, 
+                 above_color="white", 
                  nan_color="white",
-                 nan_opacity=1.,
-                 # opacity=1.,
+                 nan_opacity=0.8,
+                 opacity=0.,
                  use_transparency=True,
                  interpolate_before_map=True,
                  show_scalar_bar=False,
@@ -246,6 +244,7 @@ elif"slice" in PlotType.lower():
     if PlotModl:
         slices = model.slice(normal=normal, origin=position)
         _ = p.add_mesh(slices, scalars="resistivity", **slicepars)
+        
     if PlotSens:
         slices = sensi.slice(normal=normal, origin=position)
         _ = p.add_mesh(slices, scalars="resistivity", **slicepars)
@@ -300,38 +299,38 @@ elif"slice" in PlotType.lower():
 # p.add_mesh(contours, scalars="Temperature", cmap="bwr")
 # p.show()
 
-elif"spread" in PlotType.lower():
-    slices = model.slice_orthogonal(x=0., y=0., z=-5.)
-    _ = p.add_mesh(slices, scalars="resistivity", **slicepars)
-    slicepars = dict(clim=LimLogRes, 
-                 cmap=lut,
-                 above_color=None, 
-                 nan_color="white",
-                 nan_opacity=1.,
-                 opacity=1.,
-                 #use_transparency=True,
-                 interpolate_before_map=True,
-                 show_scalar_bar=False,
-                 log_scale=False)
+# elif"spread" in PlotType.lower():
+#     slices = model.slice_orthogonal(x=0., y=0., z=-5.)
+#     _ = p.add_mesh(slices, scalars="resistivity", **slicepars)
+#     slicepars = dict(clim=LimLogRes, 
+#                  cmap=lut,
+#                  above_color=None, 
+#                  nan_color="white",
+#                  nan_opacity=1.,
+#                  opacity=1.,
+#                  #use_transparency=True,
+#                  interpolate_before_map=True,
+#                  show_scalar_bar=False,
+#                  log_scale=False)
       
-elif "cont" in PlotType.lower():
+# elif "cont" in PlotType.lower():
     
-    cntrs = np.arange(LimLogRes[0], LimLogRes[1],0.5)
-    modiso = model.contour(cntrs, scalars="resistivity")
-    _ = p.add_mesh(modiso, scalars="resistivity", **slicepars)
+#     cntrs = np.arange(LimLogRes[0], LimLogRes[1],0.5)
+#     modiso = model.contour(cntrs, scalars="resistivity")
+#     _ = p.add_mesh(modiso, scalars="resistivity", **slicepars)
 
-elif "line" in PlotType.lower():
-    slicepars = dict(clim=LimLogRes, 
-                 cmap=lut,
-                 above_color=None, 
-                 nan_color="white",
-                 nan_opacity=1.,
-                 opacity=1.,
-                 #use_transparency=True,
-                 interpolate_before_map=True,
-                 show_scalar_bar=False,
-                 log_scale=False)
-    slices = model.slice_orthogonal(x=0., y=0., z=-5.)
+# elif "line" in PlotType.lower():
+#     slicepars = dict(clim=LimLogRes, 
+#                  cmap=lut,
+#                  above_color=None, 
+#                  nan_color="white",
+#                  nan_opacity=1.,
+#                  opacity=1.,
+#                  #use_transparency=True,
+#                  interpolate_before_map=True,
+#                  show_scalar_bar=False,
+#                  log_scale=False)
+#     slices = model.slice_orthogonal(x=0., y=0., z=-5.)
     
     
 _ = p.add_scalar_bar(title="log res", 
@@ -347,19 +346,17 @@ _ = p.add_scalar_bar(title="log res",
 
 
 p.add_axes()
-
 p.save_graphic("test_save.pdf")
-p
 p.show()
 
  
-plt.box(False)
-fig = plt.imshow(p.image)
-fig.frameon=False
-fig.axes.get_xaxis().set_visible(False)
-fig.axes.get_yaxis().set_visible(False)
-plt.savefig("test.pdf", dpi=600, edgecolor=None)
-plt.savefig("test.png", dpi=600, transparent=True, edgecolor=None)
-plt.savefig("test.svg", dpi=600, transparent=True, edgecolor=None)
+# plt.box(False)
+# fig = plt.imshow(p.image)
+# fig.frameon=False
+# fig.axes.get_xaxis().set_visible(False)
+# fig.axes.get_yaxis().set_visible(False)
+# plt.savefig("test.pdf", dpi=600, edgecolor=None)
+# plt.savefig("test.png", dpi=600, transparent=True, edgecolor=None)
+# plt.savefig("test.svg", dpi=600, transparent=True, edgecolor=None)
 
 p.close()

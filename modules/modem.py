@@ -2391,3 +2391,40 @@ def mask_mesh(x=None, y=None, z=None, mod=None,
         print(np.shape(ix),np.shape(iy),np.shape(iz))
         
         return x_out, y_out, z_out, mod_out
+
+
+def generate_alphas(dims=None, astart=[0, 0, 0.1], aend=[999, 999, 0.8]):
+    """
+    Generates linspace depth-dependent horizontal alphas 
+
+    Parameters
+    ----------
+    dims : tuple
+        Dimensions of the ModEM model mesh. The default is None.
+    astart : tuple
+        Start nx, ny for depth-dependent alphas, andd starting value. The default is [0, 0, 0.1].
+    nend : tuple
+        End nx, ny for depth-dependent alphas, andd starting value. The default is [999, 999, 0.8].
+
+    Returns
+    -------
+    a_x, a_y : np.arrays
+        Linspace depth-dependent horizontal alphas 
+        
+        
+    
+    VR Aug 2024
+
+    """
+    if dims is None:
+        sys.exit("generate_alphas: no deis given! Exit.")    
+        
+        
+    nx, ny, nz = dims
+    
+    a_x = astart[0]*np.ones((nz,1))
+    a_y = astart[1]*np.ones((nz,1))
+    
+    aend[0] = aend[1] = np.amin([aend[0], nz]) 
+    
+    return a_x, a_y
