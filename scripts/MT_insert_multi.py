@@ -71,9 +71,9 @@ total = 0
 ModDir_in = JACOPYAN_DATA + "/Peru/Misti/"
 ModDir_out = ModDir_in + "/results_shuttle/"
 
-ModFile_in = ModDir_in + "Misti10_best"    
+ModFile_in = ModDir_in + "Misti10_best"
 ModFile_out = ModFile_in
-ModFormat = "mod rlm" # "ubc"   
+ModFormat = "mod rlm" # "ubc"
 ModOrig = [-16.277300, -71.444397]# Misti
 
 
@@ -86,18 +86,18 @@ ModOutSingle = True
 if not os.path.isdir(ModDir_out):
     print("File: %s does not exist, but will be created" % ModDir_out)
     os.mkdir(ModDir_out)
-    
-    
+
+
 padding = [10, 10,   10, 10,   0, 20]
 bodymask = [3, 3, 5]
 bodyval = 0.2
 flip = "alt"
 
-# regular perturbed model (like checkerboard) 
+# regular perturbed model (like checkerboard)
 # model_set = 1
 # method =   ["regular", [1, 1,   1, 1,   1, 1], [4, 4, 6]]
 
-# random perturbed grid 
+# random perturbed grid
 model_set = 10 # should be more
 method = [
     ["random", 25, [1, 1,   1, 1,   1, 1], "uniform", [3, 3, 5], 6]
@@ -118,7 +118,7 @@ print(" Used %7.4f s for reading model from %s "
 
 start = time.perf_counter()
 print("Reading Jacobian SVD from "+SVDFile)
-SVD = np.load(SVDFile) 
+SVD = np.load(SVDFile)
 U = SVD["U"]
 S = SVD["S"]
 print(np.shape(U), np.shape(U))
@@ -131,27 +131,27 @@ print("\n")
 
 
 for ibody in range(model_set):
-    
+
     model = base_model.copy()
     templ = mod.distribute_bodies_ijk(model=model, method=method)
-    new_model = mod.insert_body_ijk(rho_in=model, template=templ, perturb=bodyval, bodymask=bodymask) 
+    new_model = mod.insert_body_ijk(rho_in=model, template=templ, perturb=bodyval, bodymask=bodymask)
     new_model[aircells] = rhoair
-    
+
     ModFile = ModDir_out+ModFile_out+"_"+str(ibody)+"+perturbed.rho"
     Header = "# "+ModFile
-    
+
     rho_proj = jac.project_model(m=model, U=U, tst_sample=new_model, nsamp=1)
-    
-    if ibody = 0:
+
+    if ibody == 0:
         nix = 0
     else:
         nix = 0
-        
 
-# mod.write_mod_npz(file=None, 
+
+# mod.write_mod_npz(file=None,
                     # dx=None, dy=None, dz=None, mval=None, reference=None,
-                    # compressed=True, trans="LINEAR", 
-                    # aircells=None, mvalair=1.e17, blank=1.e-30, header="", 
+                    # compressed=True, trans="LINEAR",
+                    # aircells=None, mvalair=1.e17, blank=1.e-30, header="",
                     # out=True):
 
 

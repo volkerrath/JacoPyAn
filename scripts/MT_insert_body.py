@@ -65,7 +65,7 @@ print(titstrng+"\n\n")
 
 rhoair = 1.e17
 
-ModFile_in = JACOPYAN_DATA +"/1_feb_ell/TAC_100"
+ModFile_in = JACOPYAN_DATA +"/Peru/1_feb_ell/TAC_100"
 ModFile_out = ModFile_in
 
 geocenter = [-17.489, -70.031]
@@ -78,13 +78,15 @@ ell = ["ell", "rep", 10000., 0., 0., 10000., 30000., 30000., 2000., 0., 0.,0.]
 
 bodies = [ell]
 nb = np.shape(bodies)
+
+
 # smoother=['gaussian',0.5]
 smoother = ["uniform", 1]
 total = 0
 start = time.perf_counter()
 
 
-dx, dy, dz, rho, refmod, _ = mod.read_mod(ModFile_in, ".rho",trans="linear", volumes=True)
+dx, dy, dz, rho, refmod, _ = mod.read_mod(ModFile_in, ".rho",trans="linear")
 aircells = np.where(rho>rhoair/10)
 
 elapsed = time.perf_counter() - start
