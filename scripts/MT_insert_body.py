@@ -68,16 +68,19 @@ rhoair = 1.e17
 ModFile_in = JACOPYAN_DATA +"/Peru/1_feb_ell/TAC_100"
 ModFile_out = ModFile_in
 
-geocenter = [-17.489, -70.031]
-utm_x, utm_y = utl.proj_latlon_to_utm(geocenter[0], geocenter[1], utm_zone=32719)
-utmcenter = [utm_x, utm_y, 0.0]
+# geocenter = [-17.489, -70.031]
+# utm_x, utm_y = utl.proj_latlon_to_utm(geocenter[0], geocenter[1], utm_zone=32719)
+# utmcenter = [utm_x, utm_y, 0.0]
 
-ell = ["ell", "rep", 10000., 0., 0., 10000., 30000., 30000., 2000., 0., 0.,0.]
-#box = ["box", "rep", 10., 0., 0., 0., 1000., 2000., 1000., 1000., 0., 0., 30.]
+
+#                    rho           center            axes                angles
+ell = ["ell", "rep", 10000.,    0., 0., 10000.,    30000., 30000., 5000.,     0., 0.,0.]
+box = ["box", "rep", 10.,       0., 0., 35000,     10000., 20000., 10000.,    45., -45., 30.]
 #cyl = []
 
-bodies = [ell]
-nb = np.shape(bodies)
+bodies = [ell, box]
+additive = False
+nb = len(bodies)
 
 
 # smoother=['gaussian',0.5]
@@ -95,22 +98,32 @@ print(" Used %7.4f s for reading model from %s "
       % (elapsed, ModFile_in + ".rho"))
 
 
-rho = mod.prepare_model(rho, rhoair=rhoair)
+rho_in = mod.prepare_model(rho, rhoair=rhoair)
 
-for ibody in range(nb[0]):
+for ibody in range(nb):
     body = bodies[ibody]
-    rhonew = mod.insert_body(dx, dy, dz, rho, body, smooth=smoother, reference= refmod)
-    #rhonew[air] = rhoair
-    Modout = ModFile_out+"_"+body[0]+str(ibody)+"_"+smoother[0]
-    mod.write_mod(Modout, modext="_new.rho",trans = "LOGE",
-                  dx=dx, dy=dy, dz=dz, mval=rhonew,
-                  reference=refmod, mvalair=1E+17, aircells=aircells, header="")
+    if not additive:
+        rho_out = mod.insert_body(dx, dy, dz, rho_in,
+                                  body, smooth=smoother, reference= refmod)
+
+        Modout = ModFile_out+"_"+body[0]+str(ibody)+"_"+smoother[0]
+        mod.write_mod(Modout, modext="_new.rho",trans = "LOGE",
+                      dx=dx, dy=dy, dz=dz, mval=rho_out,
+                      reference=refmod, mvalair=1E+17, aircells=aircells, header="")
+    elif ibody>0:
+        rho_in = rho_out.copy()
+        rho_out = mod.insert_body(dx, dy, dz, rho_in,
+                                  body, smooth=smoother, reference= refmod)
 
     elapsed = time.perf_counter() - start
     print(" Used %7.4f s for processing/writing model to %s"
           % (elapsed, Modout))
     print("\n")
 
-
+if additive:
+        Modout = ModFile_out+"_final"
+        mod.write_mod(Modout, modext="_new.rho",trans = "LOGE",
+                  dx=dx, dy=dy, dz=dz, mval=rho_out,
+                  reference=refmod, mvalair=1E+17, aircells=aircells, header="")
 total = total + elapsed
 print(" Total time used:  %f s " % (total))
