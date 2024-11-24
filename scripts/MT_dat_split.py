@@ -1,14 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri May 31 17:01:14 2024
 
-@author: vrath
-"""
-
-#!/usr/bin/env python3
-
-"""
 Reads ModEM's Jacobian, does fancy things.
 
 @author: vrath   Feb 2021
@@ -70,38 +63,38 @@ rng = np.random.default_rng()
 nan = np.nan
 
 DatDir_in = JACOPYAN_DATA + "/Fogo/"
-DatDir_out = DatDir_in 
+DatDir_out = DatDir_in
 
 if not os.path.isdir(DatDir_out):
     print("File: %s does not exist, but will be created" % DatDir_out)
     os.mkdir(DatDir_out)
-    
-    
-DatFiles_in = ["FOG_Z_in.dat", "FOG_P_in.dat", "FOG_T_in.dat"] 
 
 
-PerIntervals = [ [0.0001, 0.001], 
-              [0.001, 0.01], 
-              [0.01, 0.1], 
-              [0.1, 1.], 
-              [1., 10.], 
-              [10., 100.], 
-              [100., 1000.], 
+DatFiles_in = ["FOG_Z_in.dat", "FOG_P_in.dat", "FOG_T_in.dat"]
+
+
+PerIntervals = [ [0.0001, 0.001],
+              [0.001, 0.01],
+              [0.01, 0.1],
+              [0.1, 1.],
+              [1., 10.],
+              [10., 100.],
+              [100., 1000.],
               [1000., 10000.]]
 
 PerNumMin = 1
 
 NumBands = len(PerIntervals)
 
-    
+
 for datfile in DatFiles_in:
-    
+
     for ibnd in np.arange(NumBands):
-        
-        lowstr=str(1./PerIntervals[ibnd][0])+"Hz"            
-        uppstr=str(1./PerIntervals[ibnd][1])+"Hz"                   
-        
-        
+
+        lowstr=str(1./PerIntervals[ibnd][0])+"Hz"
+        uppstr=str(1./PerIntervals[ibnd][1])+"Hz"
+
+
         with open(DatDir_in+datfile) as fd:
             head = []
             data = []
@@ -111,15 +104,15 @@ for datfile in DatFiles_in:
                 if line.startswith("#") or line.startswith(">"):
                     head.append(line)
                     continue
-                
+
 
                 per = float(line.split()[0])
                 sit = line.split()[1]
                 if (per>=PerIntervals[ibnd][0]) & (per<PerIntervals[ibnd][1]):
                    data.append(line)
-                   site.append(sit) 
+                   site.append(sit)
                    perd.append(per)
-        
+
         nper = len(np.unique(perd))
         nsit = len(np.unique(site))
         print(nper, "periods from",nsit,"sites")
@@ -136,6 +129,3 @@ for datfile in DatFiles_in:
             for ilin in np.arange(len(data)):
                 fo.write(data[ilin])
             fo.close()
-        
-                   
-                
