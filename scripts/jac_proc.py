@@ -87,10 +87,11 @@ Scale = 1.
 #JFiles = [WorkDir+"UBI9_ZPTss.jac"] # WorkDir+"SABA8_Z.jac",]
 #MFile = WorkDir + "UBI9_best"
 
+WorkDir = "/home/vrath/Ubaye/"
+# WorkDir = JACOPYAN_DATA+"/Ubaye/"
+JFiles = [WorkDir+"Ubaye26_Z.jac", WorkDir+"Ubaye26_P.jac",  WorkDir+"Ubaye26_T.jac"]
 
-WorkDir = JACOPYAN_DATA+"/Ubaye/"
-JFiles = [WorkDir+"Ub_Z.jac"]
-MFile = WorkDir + "Ub_best"
+MFile = WorkDir + "Ub26_ZPT_T200_NLCG_014"
 
 
 
@@ -104,11 +105,14 @@ dx, dy, dz, rho, reference, _ = mod.read_mod(MFile, trans="linear")
 dims = np.shape(rho)
 
 rhoair = 1.e17
-aircells = np.where(rho > rhoair/10)
-#blank = 1.e-30 #np.nan
+rhosea = 0.3
 
+aircells = np.where(rho > rhoair/10)
+#seacells = np.where(np.isclose((rho, rhosea*np.ones_like(rho)), [1.e-8,1.e-8]))
+seacells = np.where(rho == rhosea)
 airmask = jac.set_airmask(rho=rho, aircells=aircells, flat = False, out=True)
 
+#blank = 1.e-30 #np.nan
 elapsed = time.perf_counter() - start
 total = total + elapsed
 
