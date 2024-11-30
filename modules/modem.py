@@ -2424,18 +2424,16 @@ def mask_mesh(x=None, y=None, z=None, mod=None,
         return x_out, y_out, z_out, mod_out
 
 
-def generate_alphas(dims=None, astart=[0, 0, 0.1], aend=[999, 999, 0.8]):
+def generate_alphas(dz, beg_lin=[0., 0.1, 0.1], end_lin =[999., 0.9, 0.9]):
     """
     Generates linspace depth-dependent horizontal alphas
 
     Parameters
     ----------
-    dims : tuple
-        Dimensions of the ModEM model mesh. The default is None.
-    astart : tuple
-        Start nx, ny for depth-dependent alphas, andd starting value. The default is [0, 0, 0.1].
-    nend : tuple
-        End nx, ny for depth-dependent alphas, andd starting value. The default is [999, 999, 0.8].
+    dz: array
+        verical cell sizes.
+    beg_lin, end_lin: tuple
+        depth, val_x, val_y
 
     Returns
     -------
@@ -2447,15 +2445,31 @@ def generate_alphas(dims=None, astart=[0, 0, 0.1], aend=[999, 999, 0.8]):
     VR Aug 2024
 
     """
-    if dims is None:
-        sys.exit("generate_alphas: no deis given! Exit.")
 
 
-    nx, ny, nz = dims
 
-    a_x = astart[0]*np.ones((nz,1))
-    a_y = astart[1]*np.ones((nz,1))
+    a_x = np.nan * np.ones_like(dz)
+    a_y = np.nan * np.ones_like(dz)
 
-    aend[0] = aend[1] = np.amin([aend[0], nz])
+    _, depth = set_mesh(d=dz)
+
+
+    start_z = beg_lin[0]
+    end_z   = end_lin[0]
+
+    i0 = (depth>=start_z).argmax()
+    i1 = (depth>=end_z).argmax()
+    idif =np.abs(i1-i0)
+
+
+
+    a_x[:i0] = beg_lin[1]
+    a_x[i0:i1] = np.linspace(beg_lin[1], end_lin[1], idif)
+    a_x[i1:] = end_lin[1]
+
+    a_y[:i0] = beg_lin[2]
+    a_y[i0:i1] = np.linspace(beg_lin[2], end_lin[2], idif)
+    a_y[i1:] = end_lin[2]
+
 
     return a_x, a_y

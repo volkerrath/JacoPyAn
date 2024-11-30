@@ -87,7 +87,7 @@ def iseven(num):
     even = False
     if num % 2 == 0:
         even= True
-        
+
     return even
 
 def wait1d(periods=np.array([]),
@@ -95,7 +95,7 @@ def wait1d(periods=np.array([]),
 
     """
     Calculate magnetotelluric impedance Z , apparent resitivity rhoa, and phase phi for a given layer model.
-    
+
     """
 
     scale = 1 / (4 * np.pi / 10000000)
@@ -105,7 +105,7 @@ def wait1d(periods=np.array([]),
     Z = np.zeros(len(periods), dtype=complex)
     rhoa = np.zeros(len(periods))
     phi = np.zeros(len(periods))
-    
+
     for nfreq, w in enumerate(omega):
         prop_const = np.sqrt(1j*mu*cond[-1] * w)
         C = np.zeros(len(rhoa), dtype=complex)
@@ -118,7 +118,7 @@ def wait1d(periods=np.array([]),
                 C[k] = (1./ prop_layer) * (k1 / k2)
 
         Z[nfreq] = 1j * w * mu * C[0]
-    
+
     rhoa = 1./omega*np.abs(Z)**2;
     phi = np.angle(Z, deg=True)
 
@@ -227,14 +227,14 @@ def proj_utm_to_latlon(utm_e, utm_n, utm_zone=32629):
     """
     transform latlon to utm , using pyproj
     Look for other EPSG at https://epsg.io/
-    
+
     VR 08/23
-    """    
+    """
     prj_wgs = CRS("epsg:4326")
     prj_utm = CRS("epsg:" + str(utm_zone))
     transformer = Transformer.from_crs(prj_utm, prj_wgs)
     latitude, longitude = transformer.transform(utm_e, utm_n)
-    
+
     return latitude, longitude
 
 
@@ -276,10 +276,10 @@ def proj_itm_to_utm(itm_x, itm_y, utm_zone=32629):
     VR 08/23
     """
     prj_utm = CRS("epsg:" + str(utm_zone))
-    prj_itm = CRS("epsg:2157") 
+    prj_itm = CRS("epsg:2157")
     transformer = Transformer.from_crs(prj_itm, prj_utm)
     utm_e, utm_n = transformer.transform(itm_x, itm_y)
-    
+
     return utm_e, utm_n
 
 
@@ -292,10 +292,10 @@ def proj_utm_to_itm(utm_e, utm_n, utm_zone=32629):
     """
     prj_utm = CRS("epsg:" + str(utm_zone))
     prj_itm = CRS("epsg:2157")
-    
+
     transformer = Transformer.from_crs(prj_utm, prj_itm)
     itm_e, itm_n = transformer.transform(utm_e, utm_n)
-    
+
     return itm_e, itm_n
 
 
@@ -309,13 +309,13 @@ def proj_utm_to_utm(utm_e_in, utm_n_in, utmz_in=32629, utmz_out=32629):
     """
     if utmz_in==utmz_out:
         return  utm_e_in, utm_n_in
-        
+
     prj_utm_in = CRS("epsg:" + str(utmz_in))
     prj_utm_out = CRS("epsg:" + str(utmz_out))
-    
+
     transformer = Transformer.from_crs(prj_utm_in, prj_utm_out)
     utm_e, utm_n = transformer.transform(utm_e_in, utm_n_in)
-    
+
     return utm_e, utm_n
 
 
@@ -734,7 +734,7 @@ def calc_resnorm(data_obs=None, data_calc=None, data_std=None, p=2):
     #    return {'rnorm':rnorm, 'resid':resid }
     return rnorm, resid
 
-    
+
 def calc_rms(dcalc=None, dobs=None, Wd=1.0):
     """
     Calculate the NRMS ans SRMS.
@@ -759,36 +759,36 @@ def calc_rms(dcalc=None, dobs=None, Wd=1.0):
 def nearly_equal(a,b,sig_fig=6):
     return (a==b or int(a*10**sig_fig) == int(b*10**sig_fig))
 
-def make_pdf_catalog(WorkDir="./", PdfList= None, FileName=None):
-    """
-    Make pdf catalog from site-plot(
+# def make_pdf_catalog(WorkDir="./", PdfList= None, FileName=None):
+#     """
+#     Make pdf catalog from site-plot(
 
-    Parameters
-    ----------
-    Workdir : string
-        Working directory.
-    Filename : string
-        Filename. Files to be appended must begin with this string.
+#     Parameters
+#     ----------
+#     Workdir : string
+#         Working directory.
+#     Filename : string
+#         Filename. Files to be appended must begin with this string.
 
-    Returns
-    -------
-    None.
+#     Returns
+#     -------
+#     None.
 
-    """
-    # error("not in 3.9! Exit")
+#     """
+#     # error("not in 3.9! Exit")
 
-    import fitz
+#     import fitz
 
-    catalog = fitz.open()
+#     catalog = fitz.open()
 
-    for pdf in PdfList:
-        with fitz.open(pdf) as mfile:
-            catalog.insert_pdf(mfile)
+#     for pdf in PdfList:
+#         with fitz.open(pdf) as mfile:
+#             catalog.insert_pdf(mfile)
 
-    catalog.save(FileName, garbage=4, clean = True, deflate=True)
-    catalog.close()
+#     catalog.save(FileName, garbage=4, clean = True, deflate=True)
+#     catalog.close()
 
-    print("\n"+str(np.size(PdfList))+" files collected to "+FileName)
+#     print("\n"+str(np.size(PdfList))+" files collected to "+FileName)
 
 def print_title(version="", fname="", form="%m/%d/%Y, %H:%M:%S", package="JacoPyAn",out=True):
     """
@@ -846,15 +846,15 @@ def KLD(P=np.array([]), Q=np.array([]), epsilon= 1.e-8):
 
     Parameters
     ----------
-    P, Q: np.array 
+    P, Q: np.array
         pdfs
     epsilon : TYPE
         Epsilon is used here to avoid conditional code for
-        checking that neither P nor Q is equal to 0. 
+        checking that neither P nor Q is equal to 0.
 
     Returns
     -------
-    
+
     distance: float
         KL distance
 
@@ -862,28 +862,28 @@ def KLD(P=np.array([]), Q=np.array([]), epsilon= 1.e-8):
     """
     if P.size * Q.size==0:
         error("KLD: P or Q not defined! Exit.")
-        
+
     # You may want to instead make copies to avoid changing the np arrays.
     PP = P.copy()+epsilon
     QQ = Q.copy()+epsilon
 
     distance = np.sum(PP*np.log(PP/QQ))
-    
+
     return distance
 
 def set_opacity(mesh=None, zones=[(-1., 1.), (-2., 0.8), (-3, 0.6), (-4., 0.2), (-5.,0.1 )]):
-    
+
     dims = mesh.shape
     zons = zones.size
-    
+
     opac = np.zeros_like(mesh)
-    
+
     for izon in np.arange(zons):
         which = np.where(mesh>zones[izon][0])
         opac[which] = zones[izon][1]
-        
+
     return opac
-    
+
 def make_pdf_catalog(PDFList= None, FileName="Catalog.pdf"):
     """
     Make pdf catalog from list of pdf plots
@@ -915,16 +915,16 @@ def make_pdf_catalog(PDFList= None, FileName="Catalog.pdf"):
     catalog.close()
 
     print("\n"+str(np.size(PDFList))+" files collected to "+FileName)
-    
+
 def calc_rhoa_phas(freq=None, Z=None):
-    
+
     mu0 = 4.0e-7 * np.pi  # Magnetic Permeability (H/m)
     omega = 2.*np*freq
-    
+
     rhoa = np.power(np.abs(Z), 2) / (mu0 * omega)
     # phi = np.rad2deg(np.arctan(Z.imag / Z.real))
     phi = np.angle(Z, deg=True)
-    
+
     return rhoa, phi
 
 def mt1dfwd(freq, sig, d, inmod="r", out="imp", magfield="b"):
@@ -1002,4 +1002,3 @@ def mt1dfwd(freq, sig, d, inmod="r", out="imp", magfield="b"):
         rhoa = (absZ * absZ) / (mu0 * w)
         phase = np.rad2deg(np.arctan(Z.imag / Z.real))
         return Z, rhoa, phase
-
